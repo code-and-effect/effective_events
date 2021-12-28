@@ -1,0 +1,8 @@
+= tabs do
+  = tab 'Event' do
+    = render 'admin/events/form_event', event: event
+
+  - if event.persisted?
+    - if event.respond_to?(:log_changes_datatable)
+      = tab 'Logs' do
+        = render_inline_datatable(event.log_changes_datatable)
