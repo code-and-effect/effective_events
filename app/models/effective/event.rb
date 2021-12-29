@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# TODO
-# [ ] validate end_at is before start_at
-
 module Effective
   class Event < ActiveRecord::Base
 

@@ -6,6 +6,8 @@ module Effective
     belongs_to :event
     has_many :event_registrants
 
+    log_changes(to: :event) if respond_to?(:log_changes)
+
     effective_resource do
       title  :string
       capacity :integer
@@ -22,9 +24,9 @@ module Effective
     scope :sorted, -> { order(:title) }
     scope :deep, -> { all }
 
+    validates :title, presence: true
     validates :regular_price, presence: true
     validates :early_bird_price, presence: true
-    validates :tax_exempt, presence: true
 
     def to_s
       title.presence || 'New Event Ticket'

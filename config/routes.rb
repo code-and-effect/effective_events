@@ -12,7 +12,8 @@ EffectiveEvents::Engine.routes.draw do
 
   namespace :admin do
     resources :events, except: [:show]
-    resources :event_tickets
+    resources :event_tickets, except: [:show]
+    resources :event_registrants, except: [:show]
   end
 
 end

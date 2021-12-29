@@ -6,10 +6,10 @@ module Admin
       col :id, visible: false
 
       col :title
-      col :regular_price
-      col :early_bird_price
+      col :regular_price, as: :price
+      col :early_bird_price, as: :price
       col :capacity
-      col :event_registrants
+      col :event_registrants_count
 
       actions_col
     end

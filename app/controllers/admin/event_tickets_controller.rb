@@ -4,5 +4,7 @@ module Admin
     before_action { EffectiveResources.authorize!(self, :admin, :effective_events) }
 
     include Effective::CrudController
+
+    datatable -> { Admin::EffectiveEventTicketsDatatable.new }
   end
 end
