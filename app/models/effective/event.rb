@@ -6,11 +6,12 @@ module Effective
     has_many :event_registrants
     has_many :event_tickets
 
-    has_rich_text :body
-    log_changes if respond_to?(:log_changes)
-
     accepts_nested_attributes_for :event_registrants
     accepts_nested_attributes_for :event_tickets
+
+    log_changes if respond_to?(:log_changes)
+
+    has_rich_text :body
 
     effective_resource do
       title                  :string
@@ -48,6 +49,5 @@ module Effective
       return false if early_bird_end_at.blank?
       early_bird_end_at < Time.zone.now
     end
-
   end
 end

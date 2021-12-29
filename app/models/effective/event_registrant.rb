@@ -20,11 +20,6 @@ module Effective
       timestamps
     end
 
-    # TODO add purchase hook
-    # after_purchase do |order, order_item|
-    #   event_registration.finish! unless event_registration.finished?
-    # end
-
     scope :sorted, -> { order(:last_name) }
     scope :deep, -> { all }
 
@@ -41,6 +36,5 @@ module Effective
     def title
       "#{event.to_s} - #{event_ticket.to_s} - #{first_name} #{last_name}"
     end
-
   end
 end
