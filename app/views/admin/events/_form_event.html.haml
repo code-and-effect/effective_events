@@ -1,6 +1,6 @@
 = effective_form_with(model: [:admin, event], engine: true) do |f|
-  = f.text_field :title, label: "Event Title"
-  = f.rich_text_area :body, label: "Description shown on registration page"
+  = f.text_field :title, label: "Title"
+  = f.rich_text_area :body, label: "Description"
 
   = f.datetime_field :start_at, label: "Event Start"
   = f.datetime_field :end_at, label: "Event End"
