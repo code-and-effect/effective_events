@@ -2,6 +2,12 @@
   = tab 'Event' do
     = render 'admin/events/form_event', event: event
 
+    %hr.my-5
+
+    - if event.persisted?
+      - datatable = Admin::EffectiveEventTicketsDatatable.new(self, namespace: :effective, event: event)
+      = render_inline_datatable(datatable)
+
   - if event.persisted?
     - if event.respond_to?(:log_changes_datatable)
       = tab 'Logs' do
