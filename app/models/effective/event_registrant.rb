@@ -3,7 +3,6 @@
 module Effective
   class EventRegistrant < ActiveRecord::Base
     acts_as_purchasable
-
     log_changes(to: :event) if respond_to?(:log_changes)
 
     belongs_to :event

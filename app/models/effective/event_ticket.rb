@@ -5,7 +5,7 @@ module Effective
     belongs_to :event
 
     has_many :event_registrants
-    has_many :purchased_event_registrants, -> { EventRegistrant.purchased }
+    has_many :purchased_event_registrants, -> { EventRegistrant.purchased }, class_name: 'Effective::EventRegistrant'
 
     log_changes(to: :event) if respond_to?(:log_changes)
 
@@ -22,7 +22,7 @@ module Effective
       qb_item_name          :string
       tax_exempt            :boolean
 
-      position                  :integer
+      position              :integer
 
       timestamps
     end

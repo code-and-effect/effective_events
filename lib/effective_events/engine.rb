@@ -7,5 +7,12 @@ module EffectiveEvents
       eval File.read("#{config.root}/config/effective_events.rb")
     end
 
+    # Include concern and allow any ActiveRecord object to call it
+    initializer 'effective_events.active_record' do |app|
+      ActiveSupport.on_load :active_record do
+        ActiveRecord::Base.extend(EffectiveEventsEventRegistration::Base)
+      end
+    end
+
   end
 end

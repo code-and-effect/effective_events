@@ -8,11 +8,9 @@
       .alert.alert-warning This event is no longer available.
 
     - if @event.registerable?
-      = link_to 'Register For This Event', '#'
+      = link_to 'Register For This Event', effective_events.new_event_event_registration_path(@event), class: 'btn btn-primary'
 
     = render 'effective/events/event', event: @event
 
     .event-body.event-content
       = @event.body
-
-    = link_to 'Register For This Event', '#'

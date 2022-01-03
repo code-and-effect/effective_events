@@ -37,6 +37,7 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.boolean :tax_exempt, default: false
 
       t.integer :position
+      t.integer :event_registrants_count, default: 0
 
       t.timestamps
     end
@@ -64,5 +65,35 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
 
       t.timestamps
     end
+
+    create_table :event_registrations do |t|
+      t.string :token
+
+      t.integer :event_id
+
+      t.integer :owner_id
+      t.string :owner_type
+
+      t.integer :user_id
+      t.string :user_type
+
+      # Acts as Statused
+      t.string :status
+      t.text :status_steps
+
+      # Acts as Wizard
+      t.text :wizard_steps
+
+      # Dates
+      t.datetime :submitted_at
+
+      t.datetime :updated_at
+      t.datetime :created_at
+    end
+
+    add_index :event_registrations, [:owner_id, :owner_type]
+    add_index :event_registrations, :status
+    add_index :event_registrations, :token
+
   end
 end

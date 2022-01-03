@@ -32,8 +32,8 @@ module Effective
       early_bird_end_at      :datetime  # Optional
 
       # Access
-      roles_mask        :integer
-      authenticate_user :boolean
+      roles_mask             :integer
+      authenticate_user      :boolean
 
       timestamps
     end
