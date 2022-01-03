@@ -1,0 +1,8 @@
+%h1= @page_title
+
+= render 'layout' do
+  .effective-events
+    = render partial: @events, spacer_template: 'spacer'
+
+  %nav.d-flex.justify-content-center
+    = bootstrap_paginate(@events, per_page: EffectiveEvents.per_page)

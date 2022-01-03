@@ -3,6 +3,12 @@
     = render 'admin/events/form_event', event: event
 
   - if event.persisted?
+    = tab 'Content' do
+      = render '/admin/events/form_content', event: event
+
+    = tab 'Access' do
+      = render '/admin/events/form_access', event: event
+
     = tab "Tickets" do
       - datatable = Admin::EffectiveEventTicketsDatatable.new(event_id: event.id)
       = render_inline_datatable(datatable)

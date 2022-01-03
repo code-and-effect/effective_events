@@ -1,6 +1,7 @@
 = effective_form_with(model: [:admin, event_ticket], engine: true) do |f|
   = f.hidden_field :event_id
 
+  /= f.number_field :capacity, hint: 'The number of online purchases will be loosely limited to capacity.'
   = render 'effective/event_tickets/fields', f: f
 
   = effective_submit(f)

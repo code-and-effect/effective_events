@@ -5,6 +5,14 @@ module Admin
 
     include Effective::CrudController
 
-    datatable -> { Admin::EffectiveEventsDatatable.new }
+    submit :save, 'Save'
+    submit :save, 'Save and Add New', redirect: :new
+    submit :save, 'Save and View', redirect: -> { effective_events.event_path(resource) }
+    submit :save, 'Duplicate', redirect: -> { effective_events.new_admin_event_path(duplicate_id: resource.id) }
+
+    def post_params
+      params.require(:effective_event).permit!
+    end
+
   end
 end

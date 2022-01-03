@@ -1,0 +1,18 @@
+= render 'layout' do
+  .effective-event
+
+    - if @event.sold_out?
+      .alert.alert-warning This event is sold out.
+
+    - if @event.closed?
+      .alert.alert-warning This event is no longer available.
+
+    - if @event.registerable?
+      = link_to 'Register For This Event', '#'
+
+    = render 'effective/events/event', event: @event
+
+    .event-body.event-content
+      = @event.body
+
+    = link_to 'Register For This Event', '#'

@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'effective_bootstrap'
   spec.add_dependency 'effective_datatables', '>= 4.0.0'
   spec.add_dependency 'effective_resources'
+  spec.add_dependency 'effective_orders'
 
   spec.add_development_dependency 'sqlite3'
   spec.add_development_dependency 'devise'

@@ -1,0 +1,8 @@
+.effective-event
+  %h2.event-title= link_to event, effective_events.event_path(event)
+
+  .event-content.event-excerpt
+    = event.excerpt
+
+  .event-body
+    = event.body

@@ -12,6 +12,9 @@ module Admin
       col :registration_end_at
       col :early_bird_end_at
 
+      col :event_tickets
+      col :event_registrants
+
       actions_col
     end
 

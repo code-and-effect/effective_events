@@ -7,7 +7,7 @@ end
 EffectiveEvents::Engine.routes.draw do
   # Public routes
   scope module: 'effective' do
-    resources :events, except: [:show, :destroy]
+    resources :events, only: [:index, :show]
   end
 
   namespace :admin do

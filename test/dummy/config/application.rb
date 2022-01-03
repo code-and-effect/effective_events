@@ -9,6 +9,8 @@ Bundler.require(*Rails.groups)
 require 'devise'
 require 'haml-rails'
 
+require 'effective_addresses'
+require 'effective_orders'
 require 'effective_events'
 
 module Dummy
