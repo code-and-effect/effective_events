@@ -26,7 +26,7 @@ module EffectiveEventsTestBuilder
 
     event = Effective::Event.new(
       title: "#{now.year} Main Event",
-      except: '<p>This is a great event!</p>',
+      excerpt: '<p>This is a great event!</p>',
       body: '<p>This is really a great event!</p>',
 
       start_at: (now + 1.week),
