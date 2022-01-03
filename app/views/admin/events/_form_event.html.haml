@@ -1,3 +1,11 @@
 = effective_form_with(model: [:admin, event], engine: true) do |f|
-  = f.text_field :title
+  = f.text_field :title, label: "Title"
+  = f.rich_text_area :body, label: "Description"
+
+  = f.datetime_field :start_at, label: "Event Start"
+  = f.datetime_field :end_at, label: "Event End"
+  = f.datetime_field :registration_start_at, label: "Registration Start"
+  = f.datetime_field :registration_end_at, label: "Registration End"
+  = f.datetime_field :early_bird_end_at, label: "Early Bird End"
+
   = effective_submit(f)

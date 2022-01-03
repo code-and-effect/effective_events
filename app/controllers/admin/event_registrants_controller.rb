@@ -1,10 +1,10 @@
 module Admin
-  class EventsController < ApplicationController
+  class EventRegistrantsController < ApplicationController
     before_action(:authenticate_user!) if defined?(Devise)
     before_action { EffectiveResources.authorize!(self, :admin, :effective_events) }
 
     include Effective::CrudController
 
-    datatable -> { Admin::EffectiveEventsDatatable.new }
+    datatable -> { Admin::EffectiveEventRegistrantsDatatable.new }
   end
 end
