@@ -163,6 +163,9 @@ module EffectiveEventsEventRegistration
     # From Billing Step
     order.billing_address = owner.billing_address if owner.billing_address.present?
 
+    # Important to add/remove anything
+    order.save
+
     order
   end
 
@@ -176,6 +179,13 @@ module EffectiveEventsEventRegistration
     order = find_or_build_submit_order()
     raise('already has purchased submit order') if order.purchased?
 
+    true
+  end
+
+  # If they go back and change registrants. Update the order right away.
+  def registrants!
+    save!
+    build_submit_fees_and_order if submit_order.present?
     true
   end
 
