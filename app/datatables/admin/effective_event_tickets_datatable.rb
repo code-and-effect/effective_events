@@ -7,6 +7,8 @@ module Admin
       col :created_at, visible: false
       col :id, visible: false
 
+      col :event
+
       col :title
       col :regular_price, as: :price
       col :early_bird_price, as: :price
@@ -24,7 +26,13 @@ module Admin
     end
 
     collection do
-      Effective::EventTicket.deep.all.where(event: event)
+      scope = Effective::EventTicket.deep.all
+
+      if attributes[:event_id]
+        scope = scope.where(event: event)
+      end
+
+      scope
     end
 
     def event

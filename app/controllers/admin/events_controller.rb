@@ -10,7 +10,7 @@ module Admin
     submit :save, 'Save and View', redirect: -> { effective_events.event_path(resource) }
     submit :save, 'Duplicate', redirect: -> { effective_events.new_admin_event_path(duplicate_id: resource.id) }
 
-    def post_params
+    def permitted_params
       params.require(:effective_event).permit!
     end
 

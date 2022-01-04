@@ -18,7 +18,7 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
     col :price, as: :price
     col :notes
 
-    actions_col
+    # no actions_col
   end
 
   collection do

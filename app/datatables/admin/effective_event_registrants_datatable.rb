@@ -5,7 +5,14 @@ module Admin
       col :created_at, visible: false
       col :id, visible: false
 
-      col :event_ticket, search: { collection: Effective::EventTicket.where(event: event).all }
+      col :event
+
+      if attributes[:event_id]
+        col :event_ticket, search: Effective::EventTicket.where(event: event).all
+      else
+        col :event_ticket, search: :string
+      end
+
       col :purchased_order
 
       col :first_name
@@ -19,11 +26,19 @@ module Admin
     end
 
     collection do
-      Effective::EventRegistrant.deep.purchased.where(event: event)
+      scope = Effective::EventRegistrant.deep.purchased
+
+      if attributes[:event_id].present?
+        scope = scope.where(event: event)
+      end
+
+      scope
     end
 
     def event
-      Effective::Event.find(attributes[:event_id])
+      @event ||= if attributes[:event]
+        Effective::Event.find(attributes[:event_id])
+      end
     end
   end
 end

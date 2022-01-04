@@ -1,1 +1,10 @@
--# Nothing here
+- all_steps_content = resource.event&.rich_text_all_steps_content
+- step_content = resource.event&.send("rich_text_#{step}_content")
+
+- if all_steps_content.present?
+  .card
+    .card-body= all_steps_content
+
+- if step_content.present?
+  .card
+    .card-body= step_content

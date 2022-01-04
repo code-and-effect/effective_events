@@ -8,8 +8,16 @@ module Effective
     has_many :event_tickets
     accepts_nested_attributes_for :event_tickets, allow_destroy: true
 
-    has_rich_text :excerpt
-    has_rich_text :body
+    # rich_text_body - Used by the select step
+    has_many_rich_texts
+
+    # rich_text_body
+    # rich_text_excerpt
+
+    # rich_text_all_steps_content
+    # rich_text_start_content
+    # rich_text_select_content
+    # rich_text_select_content
 
     acts_as_slugged
     log_changes if respond_to?(:log_changes)
@@ -39,7 +47,7 @@ module Effective
     end
 
     scope :sorted, -> { order(:end_at) }
-    scope :deep, -> { with_rich_text_excerpt_and_embeds.with_rich_text_body_and_embeds.includes(:event_registrants, :event_tickets) }
+    scope :deep, -> { includes(:event_registrants, :event_tickets) }
 
     scope :drafts, -> { where(draft: true) }
     scope :published, -> { where(draft: false) }
@@ -105,6 +113,14 @@ module Effective
 
     def to_s
       title.presence || 'New Event'
+    end
+
+    def body
+      rich_text_body
+    end
+
+    def excerpt
+      rich_text_excerpt
     end
 
     def registerable?

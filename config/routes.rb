@@ -14,11 +14,11 @@ EffectiveEvents::Engine.routes.draw do
     end
   end
 
-
   namespace :admin do
     resources :events, except: [:show]
     resources :event_tickets, except: [:show]
     resources :event_registrants, except: [:show]
+    resources :event_registrations, only: [:index, :show]
   end
 
 end
