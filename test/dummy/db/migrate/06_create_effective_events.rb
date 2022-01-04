@@ -37,7 +37,6 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.boolean :tax_exempt, default: false
 
       t.integer :position
-      t.integer :event_registrants_count, default: 0
 
       t.timestamps
     end

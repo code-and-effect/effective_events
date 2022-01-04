@@ -12,7 +12,13 @@ module Admin
       col :early_bird_price, as: :price
 
       col :capacity
-      col :event_registrants_count
+      col :purchased_event_registrants_count, label: 'Registered'
+
+      col :purchased_event_registrants, label: 'Registrants' do |ticket|
+        ticket.purchased_event_registrants.sort_by(&:last_name).map do |registrant|
+          content_tag(:div, registrant.last_first_name, class: 'col-resource_item')
+        end.join.html_safe
+      end
 
       actions_col
     end

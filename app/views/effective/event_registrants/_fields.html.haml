@@ -1,7 +1,19 @@
-= f.select :event_ticket_id, Effective::EventTicket.where(event_id: f.object.event_id)
-= f.text_field :first_name
-= f.text_field :last_name
-= f.email_field :email
-= f.text_field :number, label: "Member or Registrant Number"
-= f.text_field :company
-= f.text_field :restrictions, label: "Dietary Restrictions"
+.card
+  .card-body
+    %h5.card-title Event Registrant
+
+    - if f.object.purchased?
+      = f.static_field :event_ticket, label: 'Purchased event ticket'
+    - else
+      = f.select :event_ticket_id, effective_events_event_tickets_collection(event)
+
+    .row
+      .col-lg= f.text_field :first_name
+      .col-lg= f.text_field :last_name
+      .col-lg= f.text_field :number
+
+    .row
+      .col-lg= f.email_field :email
+      .col-lg= f.text_field :company
+
+    = f.text_area :notes, label: 'Dietary restrictions or other notes'

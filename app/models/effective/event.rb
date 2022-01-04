@@ -47,6 +47,14 @@ module Effective
     scope :upcoming, -> { where(arel_table[:end_at].gt(Time.zone.now)) }
     scope :past, -> { where(arel_table[:end_at].lteq(Time.zone.now)) }
 
+    scope :closed, -> { where(arel_table[:registration_end_at].lt(Time.zone.now)) }
+    scope :not_closed, -> { where(arel_table[:registration_end_at].gteq(Time.zone.now)) }
+
+    scope :with_tickets, -> { where(id: Effective::EventTicket.select('event_id')) }
+
+    # Doesnt consider sold out yet
+    scope :registerable, -> { published.not_closed.with_tickets }
+
     scope :paginate, -> (page: nil, per_page: nil) {
       page = (page || 1).to_i
       offset = [(page - 1), 0].max * (per_page || EffectiveEvents.per_page)
@@ -120,6 +128,21 @@ module Effective
     def early_bird?
       return false if early_bird_end_at.blank?
       early_bird_end_at < Time.zone.now
+    end
+
+    def early_bird_past?
+      return false if early_bird_end_at.blank?
+      early_bird_end_at >= Time.zone.now
+    end
+
+    def early_bird_status
+      if early_bird?
+        'Early Bird Pricing'
+      elsif early_bird_past?
+        'Expired'
+      else
+        'None'
+      end
     end
 
     # Returns a duplicated event object, or throws an exception

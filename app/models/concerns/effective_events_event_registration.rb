@@ -21,7 +21,7 @@ module EffectiveEventsEventRegistration
     end
 
     def required_wizard_steps
-      [:start, :registrants, :summary, :billing, :checkout, :submitted]
+      [:start, :summary, :billing, :checkout, :submitted]
     end
   end
 
@@ -78,9 +78,19 @@ module EffectiveEventsEventRegistration
     scope :in_progress, -> { where.not(status: [:submitted]) }
     scope :done, -> { where(status: [:submitted]) }
 
+    scope :for, -> (user) {
+      owner = (user.respond_to?(:effective_memberships_owners) ? user.effective_memberships_owners : user)
+      where(owner: owner)
+    }
+
     # All Steps validations
     validates :owner, presence: true
     validates :event, presence: true
+
+    # Registrants Step
+    validate(if: -> { current_step == :registrants }) do
+      self.errors.add(:event_registrants, "can't be blank") unless present_event_registrants.present?
+    end
 
     # Billing Step
     validate(if: -> { current_step == :billing && owner.present? }) do
@@ -112,6 +122,22 @@ module EffectiveEventsEventRegistration
     can_revisit_completed_steps(step)
   end
 
+  # Find or build
+  def event_registrant(first_name:, last_name:, email:)
+    registrant = event_registrants.find { |er| er.first_name == first_name && er.last_name == last_name && er.email == email }
+    registrant || event_registrants.build(event: event, owner: owner, first_name: first_name, last_name: last_name, email: email)
+  end
+
+  # This builds the default event registrants used by the wizard form
+  def build_event_registrants
+    if event_registrants.blank?
+      raise('expected owner and event to be present') unless owner && event
+      event_registrants.build(first_name: owner.first_name, last_name: owner.last_name, email: owner.email)
+    end
+
+    event_registrants
+  end
+
   # All Fees and Orders
   def submit_fees
     event_registrants
@@ -119,19 +145,6 @@ module EffectiveEventsEventRegistration
 
   def submit_order
     orders.first
-  end
-
-  def find_or_build_submit_fees
-    return submit_fees if submit_fees.present?
-
-    fees.build(
-      owner: owner,
-      fee_type: 'Applicant',
-      category: category,
-      price: category.applicant_fee
-    )
-
-    submit_fees
   end
 
   def find_or_build_submit_order
@@ -157,8 +170,8 @@ module EffectiveEventsEventRegistration
   def build_submit_fees_and_order
     return false if was_submitted?
 
-    fees = find_or_build_submit_fees()
-    raise('already has purchased submit fees') if fees.any? { |fee| fee.purchased? }
+    fees = submit_fees()
+    raise('already has purchased submit fees') if fees.any?(&:purchased?)
 
     order = find_or_build_submit_order()
     raise('already has purchased submit order') if order.purchased?
@@ -197,6 +210,12 @@ module EffectiveEventsEventRegistration
     wizard_steps[:checkout] ||= Time.zone.now
     wizard_steps[:submitted] = Time.zone.now
     submitted!
+  end
+
+  private
+
+  def present_event_registrants
+    event_registrants.reject(&:marked_for_destruction?)
   end
 
 end

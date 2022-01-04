@@ -1,0 +1,30 @@
+-# In progress registration
+- registration = EffectiveEvents.EventRegistration.in_progress.for(current_user).first
+- datatable = EffectiveResources.best('EffectiveEventRegistrationsDatatable').new(self, namespace: :effective)
+
+- if registration.present?
+  %h2 In Progress Event Registrations
+
+  %p
+    Your registration for
+    = link_to(registration.event, effective_events.event_path(registration.event))
+    is incomplete
+
+  %p
+    Please
+    = link_to("Continue registration for #{registration.event}", effective_events.event_event_registration_build_path(registration.event, registration, registration.next_step), 'data-turbolinks' => false, class: 'btn btn-primary')
+    or you can
+    = link_to('Abandon registration', effective_events.event_event_registration_path(registration.event, registration), 'data-confirm': "Really delete #{registration}?", 'data-method': :delete, class: 'btn btn-danger')
+    to register for another event.
+
+    %hr
+
+%h2 Event Registrations
+
+- if datatable.present?
+  = render_simple_datatable(datatable)
+- else
+  %p You have no past event registrations. When you do, we'll show them here.
+
+- if registration.blank?
+  %p= link_to 'View all Events', effective_events.events_path, class: 'btn btn-primary'

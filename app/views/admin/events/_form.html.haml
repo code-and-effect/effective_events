@@ -6,16 +6,18 @@
     = tab 'Content' do
       = render '/admin/events/form_content', event: event
 
-    = tab 'Access' do
-      = render '/admin/events/form_access', event: event
+    = tab 'Tickets' do
+      %p An event must have tickets before registration can begin
 
-    = tab "Tickets" do
       - datatable = Admin::EffectiveEventTicketsDatatable.new(event_id: event.id)
       = render_inline_datatable(datatable)
 
-    = tab "Registrants" do
+    = tab 'Registrants' do
       - datatable = Admin::EffectiveEventRegistrantsDatatable.new(event_id: event.id)
       = render_inline_datatable(datatable)
+
+    = tab 'Access' do
+      = render '/admin/events/form_access', event: event
 
     - if event.respond_to?(:log_changes_datatable)
       = tab "Logs" do

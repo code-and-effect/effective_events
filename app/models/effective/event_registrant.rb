@@ -5,7 +5,7 @@ module Effective
     acts_as_purchasable
     log_changes(to: :event) if respond_to?(:log_changes)
 
-    belongs_to :event
+    belongs_to :event, counter_cache: true
 
     # Basically a category containing all the pricing and unique info about htis registrant
     belongs_to :event_ticket
@@ -38,14 +38,28 @@ module Effective
 
     validates :first_name, presence: true
     validates :last_name, presence: true
-    validates :email, presence: true
+    validates :email, presence: true, email: true
+
+    before_validation(if: -> { event_registration.present? }) do
+      self.event ||= event_registration.event
+      self.owner ||= event_registration.owner
+      self.price ||= event_ticket&.price
+    end
 
     def to_s
-      title
+      persisted? ? title : 'registrant'
     end
 
     def title
-      "#{event.to_s} - #{event_ticket.to_s} - #{first_name} #{last_name}"
+      "#{event_ticket} - #{last_first_name}"
+    end
+
+    def full_name
+      "#{first_name} #{last_name}"
+    end
+
+    def last_first_name
+      "#{last_name}, #{first_name}"
     end
 
     def tax_exempt

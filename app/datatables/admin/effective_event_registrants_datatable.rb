@@ -6,18 +6,20 @@ module Admin
       col :id, visible: false
 
       col :event_ticket, search: { collection: Effective::EventTicket.where(event: event).all }
+      col :purchased_order
 
       col :first_name
       col :last_name
       col :email
       col :company
-      col :restrictions
+      col :number
+      col :notes, label: 'Restrictions and notes'
 
       actions_col
     end
 
     collection do
-      Effective::EventRegistrant.deep.all.where(event: event)
+      Effective::EventRegistrant.deep.purchased.where(event: event)
     end
 
     def event

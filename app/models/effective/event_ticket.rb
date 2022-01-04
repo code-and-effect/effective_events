@@ -28,7 +28,7 @@ module Effective
     end
 
     scope :sorted, -> { order(:position) }
-    scope :deep, -> { with_rich_text_body }
+    scope :deep, -> { with_rich_text_body.includes(:purchased_event_registrants) }
 
     before_validation(if: -> { event.present? }) do
       self.position ||= (event.event_tickets.map(&:position).compact.max || -1) + 1
@@ -43,12 +43,17 @@ module Effective
     end
 
     def price
-      event&.early_bird? ? early_bird_price : regular_price
+      event.early_bird? ? early_bird_price : regular_price
     end
 
     def capacity_available?
       return true if capacity.blank?
       capacity <= purchased_event_registrants.count
     end
+
+    def purchased_event_registrants_count
+      purchased_event_registrants.count
+    end
+
   end
 end

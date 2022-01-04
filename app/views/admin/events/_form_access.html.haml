@@ -1,5 +1,5 @@
 = effective_form_with(model: event, url: event.persisted? ? effective_events.admin_event_path(event.id) : effective_events.admin_events_path) do |f|
-  = f.check_box :authenticate_user, label: 'Yes, the user must be be signed in to view this event'
+  = f.check_box :authenticate_user, label: 'Yes, the user must be be signed in to view this event', hint: 'Sign up is required to register for any event'
 
   - if EffectiveEvents.use_effective_roles
     = f.checks :roles, EffectiveRoles.roles_collection(f.object)

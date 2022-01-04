@@ -1,6 +1,6 @@
 = effective_form_with(model: [:admin, event_registrant], engine: true) do |f|
   = f.hidden_field :event_id
 
-  = render 'effective/event_registrants/fields', f: f
+  = render 'effective/event_registrants/fields', f: f, event: event_registrant.event
 
   = effective_submit(f)
