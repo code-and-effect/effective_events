@@ -7,10 +7,11 @@ if Rails.env.test?
   ActionText::RichText.where(record_type: ['Effective::Event', 'Effective::Ticket']).delete_all
 end
 
-# Build the first CpdCycle
+# Build an example event
 event = Effective::Event.create!(
   title: "#{now.year} Main Event",
-  body: '<p>This is a great event!</p>',
+  rich_text_excerpt: '<p>This is a great event</p>',
+  rich_text_body: '<p>This is a really great event!</p>',
 
   start_at: (now + 1.week),
   end_at: (now + 1.week + 1.hour),
