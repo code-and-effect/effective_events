@@ -2,5 +2,7 @@
   - blacklist = EffectiveEvents.EventRegistration.required_wizard_steps
   - steps = event_registration.required_steps - blacklist
 
+  = render "effective/event_registrations/summary", event_registration: event_registration
+
   - steps.select { |step| event_registration.has_completed_step?(step) }.each do |partial|
     = render "effective/event_registrations/#{partial}", event_registration: event_registration, step: partial

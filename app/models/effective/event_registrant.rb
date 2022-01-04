@@ -43,7 +43,10 @@ module Effective
     before_validation(if: -> { event_registration.present? }) do
       self.event ||= event_registration.event
       self.owner ||= event_registration.owner
-      self.price ||= event_ticket&.price
+    end
+
+    before_validation(if: -> { event_ticket.present? }) do
+      self.price ||= event_ticket.price
     end
 
     def to_s
@@ -52,10 +55,6 @@ module Effective
 
     def title
       "#{event_ticket} - #{last_first_name}"
-    end
-
-    def full_name
-      "#{first_name} #{last_name}"
     end
 
     def last_first_name
@@ -68,6 +67,18 @@ module Effective
 
     def qb_item_name
       event_ticket.qb_item_name
+    end
+
+    # This is the Admin Save and Mark Paid action
+    def mark_paid!
+      raise('expected a blank event registration') if event_registration.present?
+
+      save!
+
+      order = Effective::Order.new(items: self, user: owner)
+      order.purchase!(skip_buyer_validations: true, email: false)
+
+      true
     end
 
   end

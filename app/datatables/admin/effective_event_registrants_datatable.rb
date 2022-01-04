@@ -7,6 +7,9 @@ module Admin
 
       col :event
 
+      col :owner, visible: false
+      col :event_registration, visible: false
+
       if attributes[:event_id]
         col :event_ticket, search: Effective::EventTicket.where(event: event).all
       else
@@ -36,7 +39,7 @@ module Admin
     end
 
     def event
-      @event ||= if attributes[:event]
+      @event ||= if attributes[:event_id]
         Effective::Event.find(attributes[:event_id])
       end
     end

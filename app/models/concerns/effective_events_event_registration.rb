@@ -107,7 +107,7 @@ module EffectiveEventsEventRegistration
 
   # Instance Methods
   def to_s
-    'Event Registration'
+    persisted? ? "Registration ##{id}" : 'Event Registration'
   end
 
   def in_progress?

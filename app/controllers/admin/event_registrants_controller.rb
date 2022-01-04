@@ -4,5 +4,8 @@ module Admin
     before_action { EffectiveResources.authorize!(self, :admin, :effective_events) }
 
     include Effective::CrudController
+
+    submit :mark_paid, 'Save and Mark Paid'
+
   end
 end
