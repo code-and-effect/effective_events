@@ -14,6 +14,7 @@ module Admin
       col :id, visible: false
 
       col :title
+      col :draft
       col :start_at, label: 'Event Date'
 
       col :end_at, visible: false
@@ -34,11 +35,12 @@ module Admin
       col :event_tickets, search: :string
       col :event_registrants, search: :string
 
-      col :draft
       col :roles, visible: false
       col :authenticate_user, visible: false
 
-      actions_col
+      actions_col do |event|
+        dropdown_link_to('View Event', effective_events.event_path(event), target: '_blank')
+      end
     end
 
     collection do

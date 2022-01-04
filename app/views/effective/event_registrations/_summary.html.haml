@@ -15,6 +15,11 @@
             %td
               - url = (polymorphic_admin_path(event_registration.owner) rescue "/admin/users/#{event_registration.owner.to_param}/edit")
               = link_to(event_registration.owner, url)
+        - else
+          %tr
+            %th Owner
+            %td= event_registration.owner
+
 
         - if event_registration.orders.present?
           %tr
@@ -22,8 +27,3 @@
             %td
               - event_registration.orders.each do |order|
                 = link_to(order, effective_orders.order_path(order))
-
-        %tr
-          %th Status
-          %td
-            %span.badge.badge-secondary= event_registration.status

@@ -1,5 +1,23 @@
 .effective-event
   %h2.event-title= link_to event, effective_events.event_path(event)
 
+  %table.table.effective-events-table
+    %tbody
+      %tr
+        %td Starts
+        %td= event.start_at
+
+      %tr
+        %td Ends
+        %td= event.end_at
+
+      %tr
+        %td Registration Closes
+        %td= event.registration_end_at
+
+      %tr
+        %td Early Bird
+        %td= event.early_bird_status
+
   .event-content.event-excerpt
     = event.excerpt
