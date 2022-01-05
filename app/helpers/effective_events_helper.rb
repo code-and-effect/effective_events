@@ -5,7 +5,7 @@ module EffectiveEventsHelper
 
     event.event_tickets.map do |ticket|
       label = ticket.to_s
-      price = (ticket.price == 0 ? '$0' : number_to_currency(ticket.price))
+      price = (ticket.price == 0 ? '$0' : number_to_currency(ticket.price / 100))
 
       ["#{label} - #{price}", ticket.to_param]
     end
