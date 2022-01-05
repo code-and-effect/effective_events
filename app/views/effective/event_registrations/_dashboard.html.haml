@@ -26,5 +26,6 @@
 - else
   %p You have no past event registrations. When you do, we'll show them here.
 
-- if registration.blank?
+-# TODO enable an all events page
+- if false # if registration.blank?
   %p= link_to 'View all Events', effective_events.events_path, class: 'btn btn-primary'

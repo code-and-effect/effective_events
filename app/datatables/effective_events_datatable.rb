@@ -10,14 +10,20 @@ class EffectiveEventsDatatable < Effective::Datatable
     order :title
     col :id, visible: false
 
-    col :start_at, label: 'Event Date'
-    col :title, label: 'Event', action: :show
-    col :excerpt, label: 'Details'
+    col :start_at, label: 'Event Date', as: :date
+
+    col :title, label: 'Event' do |event|
+      if event.registerable?
+        link_to(event.to_s, effective_events.new_event_event_registration_path(event))
+      else
+        event.to_s
+      end
+    end
 
     col :registration_start_at, visible: false
-    col :registration_end_at, label: 'Registration ends'
+    col :registration_end_at, label: 'Registration Closes', visible: false
 
-    col :early_bird do |event|
+    col :early_bird, visible: false do |event|
       if event.early_bird?
         content_tag(:span, event.early_bird_status, class: 'badge badge-success')
       else
@@ -28,7 +34,7 @@ class EffectiveEventsDatatable < Effective::Datatable
     col :event_tickets, visible: false, search: :string
     col :early_bird_end_at, label: 'Early bird ends', visible: false
 
-    actions_col do |event|
+    actions_col show: false do |event|
       if event.registerable?
         dropdown_link_to('Register', effective_events.new_event_event_registration_path(event))
       end

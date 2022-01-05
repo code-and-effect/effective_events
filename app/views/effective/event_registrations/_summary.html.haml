@@ -11,13 +11,13 @@
 
         - if request.path.start_with?('/admin')
           %tr
-            %th Owner
+            %th Registered by
             %td
               - url = (polymorphic_admin_path(event_registration.owner) rescue "/admin/users/#{event_registration.owner.to_param}/edit")
               = link_to(event_registration.owner, url)
         - else
           %tr
-            %th Owner
+            %th Registered by
             %td= event_registration.owner
 
 

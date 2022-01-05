@@ -10,7 +10,10 @@ class EffectiveEventRegistrationsDatatable < Effective::Datatable
       er.submitted_at&.strftime('%F') || 'Incomplete'
     end
 
-    col :event, search: :string
+    col :event, search: :string do |er|
+      er.event.to_s
+    end
+
     col :owner, visible: false, search: :string
     col :status, visible: false
     col :event_registrants, search: :string

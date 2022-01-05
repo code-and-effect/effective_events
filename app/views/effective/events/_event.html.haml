@@ -1,6 +1,4 @@
 .effective-event
-  %h2.event-title= link_to event, effective_events.event_path(event)
-
   %table.table.effective-events-table
     %tbody
       %tr
@@ -16,7 +14,7 @@
         %td= event.registration_end_at
 
       %tr
-        %td Early Bird
+        %td Early Bird Status
         %td= event.early_bird_status
 
   .event-content.event-excerpt
