@@ -1,4 +1,4 @@
-module EffectiveMemberships
+module EffectiveEvents
   module Generators
     class InstallGenerator < Rails::Generators::Base
       include Rails::Generators::Migration

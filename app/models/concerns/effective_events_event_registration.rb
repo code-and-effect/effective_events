@@ -78,10 +78,7 @@ module EffectiveEventsEventRegistration
     scope :in_progress, -> { where.not(status: [:submitted]) }
     scope :done, -> { where(status: [:submitted]) }
 
-    scope :for, -> (user) {
-      owner = (user.respond_to?(:effective_memberships_owners) ? user.effective_memberships_owners : user)
-      where(owner: owner)
-    }
+    scope :for, -> (user) { where(owner: user) }
 
     # All Steps validations
     validates :owner, presence: true

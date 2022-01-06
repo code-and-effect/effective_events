@@ -6,7 +6,7 @@ module Effective
 
     resource_scope -> {
       event = Effective::Event.find(params[:event_id])
-      EffectiveEvents.EventRegistration.deep.where(owner: current_owner, event: event)
+      EffectiveEvents.EventRegistration.deep.where(owner: current_user, event: event)
     }
 
     # Allow only 1 in-progress event registration at a time
@@ -36,10 +36,6 @@ module Effective
     end
 
     private
-
-    def current_owner
-      (current_user.class.respond_to?(:effective_memberships_owner?) ? current_user.effective_memberships_owners : current_user)
-    end
 
     def permitted_params
       model = (params.key?(:effective_event_registration) ? :effective_event_registration : :event_registration)

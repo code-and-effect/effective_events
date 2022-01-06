@@ -30,9 +30,7 @@ class EffectiveEventRegistrationsDatatable < Effective::Datatable
   end
 
   collection do
-    owner = (current_user.respond_to?(:effective_memberships_owners) ? current_user.effective_memberships_owners : current_user)
-
-    EffectiveEvents.EventRegistration.deep.where(owner: owner)
+    EffectiveEvents.EventRegistration.deep.where(owner: current_user)
   end
 
 end
