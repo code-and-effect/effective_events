@@ -132,7 +132,11 @@ module EffectiveEventsEventRegistration
   def build_event_registrants
     if event_registrants.blank?
       raise('expected owner and event to be present') unless owner && event
-      event_registrants.build(first_name: owner.first_name, last_name: owner.last_name, email: owner.email)
+      event_registrants.build(
+        first_name: owner.try(:first_name),
+        last_name: owner.try(:last_name),
+        email: owner.try(:email)
+      )
     end
 
     event_registrants
