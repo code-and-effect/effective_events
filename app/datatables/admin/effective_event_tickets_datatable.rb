@@ -13,7 +13,7 @@ module Admin
       col :regular_price, as: :price
       col :early_bird_price, as: :price
 
-      col :capacity
+      #col :capacity
       col :purchased_event_registrants_count, label: 'Registered'
 
       col :purchased_event_registrants, label: 'Registrants' do |ticket|

@@ -1,0 +1,14 @@
+= effective_form_with(model: [:admin, event_purchase], engine: true) do |f|
+  = f.hidden_field :event_id
+
+  - if f.object.new_record?
+    = f.select :owner, { 'Users' => current_user.class.all }, polymorphic: true
+  - else
+    = f.static_field :owner
+
+  = render 'effective/event_purchases/fields', f: f, event: event_purchase.event
+
+  - if f.object.new_record?
+    = f.submit 'Save and Mark Paid'
+  - else
+    = f.submit 'Save'

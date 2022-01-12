@@ -14,6 +14,7 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.datetime :early_bird_end_at
 
       t.integer :event_registrants_count, default: 0
+      t.integer :event_purchases_count, default: 0
 
       t.integer :roles_mask
       t.boolean :authenticate_user, default: false
@@ -57,6 +58,40 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
 
       t.string :company
       t.string :number
+      t.text :notes
+
+      t.integer :purchased_order_id
+      t.integer :price
+
+      t.timestamps
+    end
+
+    create_table :event_products do |t|
+      t.integer :event_id
+
+      t.string :title
+      t.integer :capacity
+
+      t.integer :price
+
+      t.string :qb_item_name
+      t.boolean :tax_exempt, default: false
+
+      t.integer :position
+
+      t.timestamps
+    end
+
+    create_table :event_purchases do |t|
+      t.integer :event_id
+      t.integer :event_product_id
+
+      t.integer :owner_id
+      t.string :owner_type
+
+      t.integer :event_registration_id
+      t.string :event_registration_type
+
       t.text :notes
 
       t.integer :purchased_order_id

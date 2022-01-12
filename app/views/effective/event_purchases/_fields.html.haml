@@ -1,0 +1,10 @@
+.card
+  .card-body
+    %h5.card-title Event Product
+
+    - if f.object.purchased?
+      = f.static_field :event_product, label: 'Purchased event product'
+    - else
+      = f.select :event_product_id, effective_events_event_products_collection(event)
+
+    = f.text_area :notes, label: 'Notes'

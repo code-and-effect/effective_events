@@ -37,6 +37,7 @@ module EffectiveEventsEventRegistration
     acts_as_wizard(
       start: 'Start',
       registrants: 'Registrants',
+      purchases: 'Purchases',
       summary: 'Review',
       billing: 'Billing Address',
       checkout: 'Checkout',
@@ -54,6 +55,9 @@ module EffectiveEventsEventRegistration
 
     has_many :event_registrants, -> { order(:id) }, inverse_of: :event_registration, dependent: :destroy
     accepts_nested_attributes_for :event_registrants, reject_if: :all_blank, allow_destroy: true
+
+    has_many :event_purchases, -> { order(:id) }, inverse_of: :event_registration, dependent: :destroy
+    accepts_nested_attributes_for :event_purchases, reject_if: :all_blank, allow_destroy: true
 
     has_many :orders, -> { order(:id) }, as: :parent, class_name: 'Effective::Order', dependent: :nullify
     accepts_nested_attributes_for :orders
@@ -119,6 +123,21 @@ module EffectiveEventsEventRegistration
     can_revisit_completed_steps(step)
   end
 
+  def required_steps
+    return self.class.test_required_steps if Rails.env.test? && self.class.test_required_steps.present?
+
+    [
+      :start,
+      :registrants,
+      (:purchases if event&.event_products.present?),
+      :summary,
+      :billing,
+      :checkout,
+      :submitted
+    ].compact
+
+  end
+
   # Find or build
   def event_registrant(first_name:, last_name:, email:)
     registrant = event_registrants.find { |er| er.first_name == first_name && er.last_name == last_name && er.email == email }
@@ -141,7 +160,7 @@ module EffectiveEventsEventRegistration
 
   # All Fees and Orders
   def submit_fees
-    event_registrants
+    (event_registrants + event_purchases)
   end
 
   def submit_order
@@ -180,13 +199,6 @@ module EffectiveEventsEventRegistration
     order = find_or_build_submit_order()
     raise('already has purchased submit order') if order.purchased?
 
-    true
-  end
-
-  # If they go back and change registrants. Update the order right away.
-  def registrants!
-    save!
-    build_submit_fees_and_order if submit_order.present?
     true
   end
 

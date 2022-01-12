@@ -1,15 +1,18 @@
 # frozen_string_literal: true
 
+# Just like each EventRegistration has EventTickets and EventRegistrants
+# An Event Registration has EventProducts and EventPurchases
+
 module Effective
-  class EventRegistrant < ActiveRecord::Base
+  class EventPurchase < ActiveRecord::Base
     acts_as_purchasable
 
     log_changes(to: :event) if respond_to?(:log_changes)
 
     belongs_to :event, counter_cache: true
 
-    # Basically a category containing all the pricing and unique info about htis registrant
-    belongs_to :event_ticket
+    # Basically a category containing all the pricing and unique info about this product purchase
+    belongs_to :event_product
 
     # Every event registrant is charged to a owner
     belongs_to :owner, polymorphic: true
@@ -18,13 +21,7 @@ module Effective
     belongs_to :event_registration, polymorphic: true, optional: true
 
     effective_resource do
-      first_name    :string
-      last_name     :string
-      email         :string
-
-      company       :string
-      number        :string
-      notes         :text
+      notes             :text
 
       # Acts as Purchasable
       price             :integer
@@ -34,40 +31,28 @@ module Effective
       timestamps
     end
 
-    scope :sorted, -> { order(:last_name) }
+    scope :sorted, -> { order(:id) }
     scope :deep, -> { all }
-
-    validates :first_name, presence: true
-    validates :last_name, presence: true
-    validates :email, presence: true, email: true
 
     before_validation(if: -> { event_registration.present? }) do
       self.event ||= event_registration.event
       self.owner ||= event_registration.owner
     end
 
-    before_validation(if: -> { event_ticket.present? }) do
-      self.price ||= event_ticket.price
+    before_validation(if: -> { event_product.present? }) do
+      self.price ||= event_product.price
     end
 
     def to_s
-      persisted? ? title : 'registrant'
-    end
-
-    def title
-      "#{event_ticket} - #{last_first_name}"
-    end
-
-    def last_first_name
-      "#{last_name}, #{first_name}"
+      persisted? ? event_product.to_s : 'product'
     end
 
     def tax_exempt
-      event_ticket.tax_exempt
+      event_product.tax_exempt
     end
 
     def qb_item_name
-      event_ticket.qb_item_name
+      event_product.qb_item_name
     end
 
     # This is the Admin Save and Mark Paid action
