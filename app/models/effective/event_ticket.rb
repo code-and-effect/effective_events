@@ -34,7 +34,7 @@ module Effective
       self.position ||= (event.event_tickets.map(&:position).compact.max || -1) + 1
     end
 
-    validates :title, presence: true
+    validates :title, presence: true, uniqueness: { scope: [:event_id] }
     validates :regular_price, presence: true
     validates :early_bird_price, presence: true, if: -> { event&.early_bird_end_at.present? }
 

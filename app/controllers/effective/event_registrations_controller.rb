@@ -40,9 +40,7 @@ module Effective
     def permitted_params
       model = (params.key?(:effective_event_registration) ? :effective_event_registration : :event_registration)
 
-      params.require(model).permit!.except(
-        :status, :status_steps, :wizard_steps, :submitted_at
-      )
+      params.require(model).permit!.except(:status, :status_steps, :wizard_steps, :submitted_at)
     end
 
   end

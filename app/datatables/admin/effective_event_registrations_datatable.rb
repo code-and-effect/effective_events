@@ -9,10 +9,11 @@ class Admin::EffectiveEventRegistrationsDatatable < Effective::Datatable
 
     col :submitted_at, label: 'Submitted', visible: false, as: :date
 
-    col :event
+    col :event, search: :string
     col :owner
 
     col :event_registrants, search: :string
+    col :event_purchases, search: :string
     col :orders, label: 'Order'
 
     actions_col

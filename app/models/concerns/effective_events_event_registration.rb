@@ -37,11 +37,14 @@ module EffectiveEventsEventRegistration
     acts_as_wizard(
       start: 'Start',
       registrants: 'Registrants',
+      purchases: 'Purchases',
       summary: 'Review',
       billing: 'Billing Address',
       checkout: 'Checkout',
       submitted: 'Submitted'
     )
+
+    acts_as_purchasable_wizard
 
     log_changes(except: :wizard_steps) if respond_to?(:log_changes)
 
@@ -50,10 +53,13 @@ module EffectiveEventsEventRegistration
     accepts_nested_attributes_for :owner
 
     # Effective Namespace
-    belongs_to :event
+    belongs_to :event, class_name: 'Effective::Event'
 
-    has_many :event_registrants, -> { order(:id) }, inverse_of: :event_registration, dependent: :destroy
+    has_many :event_registrants, -> { order(:id) }, class_name: 'Effective::EventRegistrant', inverse_of: :event_registration, dependent: :destroy
     accepts_nested_attributes_for :event_registrants, reject_if: :all_blank, allow_destroy: true
+
+    has_many :event_purchases, -> { order(:id) }, class_name: 'Effective::EventPurchase', inverse_of: :event_registration, dependent: :destroy
+    accepts_nested_attributes_for :event_purchases, reject_if: :all_blank, allow_destroy: true
 
     has_many :orders, -> { order(:id) }, as: :parent, class_name: 'Effective::Order', dependent: :nullify
     accepts_nested_attributes_for :orders
@@ -89,17 +95,16 @@ module EffectiveEventsEventRegistration
       self.errors.add(:event_registrants, "can't be blank") unless present_event_registrants.present?
     end
 
-    # Billing Step
-    validate(if: -> { current_step == :billing && owner.present? }) do
-      self.errors.add(:base, "must have a billing address") unless owner.billing_address.present?
-      self.errors.add(:base, "must have an email") unless owner.email.present?
+    def required_steps
+      return self.class.test_required_steps if Rails.env.test? && self.class.test_required_steps.present?
+      event&.event_products.present? ? wizard_step_keys : (wizard_step_keys - [:purchases])
     end
 
-    after_purchase do |_|
-      raise('expected submit_order to be purchased') unless submit_order&.purchased?
-      submit_purchased!
-      after_submit_purchased!
+    # All Fees and Orders
+    def submit_fees
+      (event_registrants + event_purchases)
     end
+
   end
 
   # Instance Methods
@@ -113,10 +118,6 @@ module EffectiveEventsEventRegistration
 
   def done?
     submitted?
-  end
-
-  def can_visit_step?(step)
-    can_revisit_completed_steps(step)
   end
 
   # Find or build
@@ -137,90 +138,6 @@ module EffectiveEventsEventRegistration
     end
 
     event_registrants
-  end
-
-  # All Fees and Orders
-  def submit_fees
-    event_registrants
-  end
-
-  def submit_order
-    orders.first
-  end
-
-  def find_or_build_submit_order
-    order = submit_order || orders.build(user: owner)
-    fees = submit_fees()
-
-    # Adds fees, but does not overwrite any existing price.
-    fees.each do |fee|
-      order.add(fee) unless order.purchasables.include?(fee)
-    end
-
-    order.purchasables.each do |purchasable|
-      order.remove(purchasable) unless fees.include?(purchasable)
-    end
-
-    # From Billing Step
-    order.billing_address = owner.billing_address if owner.billing_address.present?
-
-    # Important to add/remove anything
-    order.save
-
-    order
-  end
-
-  # Should be indempotent.
-  def build_submit_fees_and_order
-    return false if was_submitted?
-
-    fees = submit_fees()
-    raise('already has purchased submit fees') if fees.any?(&:purchased?)
-
-    order = find_or_build_submit_order()
-    raise('already has purchased submit order') if order.purchased?
-
-    true
-  end
-
-  # If they go back and change registrants. Update the order right away.
-  def registrants!
-    save!
-    build_submit_fees_and_order if submit_order.present?
-    true
-  end
-
-  # Owner clicks on the Billing step. Next step is Checkout
-  def billing!
-    ready!
-  end
-
-  # Ready to check out
-  def ready!
-    build_submit_fees_and_order
-    save!
-  end
-
-  # Called automatically via after_purchase hook above
-  def submit_purchased!
-    return false if was_submitted?
-
-    wizard_steps[:checkout] = Time.zone.now
-    submit!
-  end
-
-  # A hook to extend
-  def after_submit_purchased!
-  end
-
-  # Draft -> Submitted requirements
-  def submit!
-    raise('already submitted') if was_submitted?
-    raise('expected a purchased order') unless submit_order&.purchased?
-
-    wizard_steps[:checkout] ||= Time.zone.now
-    wizard_steps[:submitted] = Time.zone.now
-    submitted!
   end
 
   private

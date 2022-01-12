@@ -1,0 +1,10 @@
+.card
+  .card-body
+    .row
+      .col-sm
+        %h5.card-title= event_registration.wizard_step_title(:purchases)
+      .col-sm-auto.text-right
+        = link_to('Edit', wizard_path(:purchases)) if edit_effective_event_registrations_wizard?
+
+    - datatable = EffectiveEventPurchasesDatatable.new(event_registration: event_registration)
+    .mb-4= render_simple_datatable(datatable)

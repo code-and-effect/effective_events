@@ -102,6 +102,32 @@ ActiveRecord::Schema.define(version: 6) do
     t.index ["user_id"], name: "index_customers_on_user_id"
   end
 
+  create_table "event_products", force: :cascade do |t|
+    t.integer "event_id"
+    t.string "title"
+    t.integer "capacity"
+    t.integer "price"
+    t.string "qb_item_name"
+    t.boolean "tax_exempt", default: false
+    t.integer "position"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "event_purchases", force: :cascade do |t|
+    t.integer "event_id"
+    t.integer "event_product_id"
+    t.integer "owner_id"
+    t.string "owner_type"
+    t.integer "event_registration_id"
+    t.string "event_registration_type"
+    t.text "notes"
+    t.integer "purchased_order_id"
+    t.integer "price"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "event_registrants", force: :cascade do |t|
     t.integer "event_id"
     t.integer "event_ticket_id"
@@ -119,6 +145,24 @@ ActiveRecord::Schema.define(version: 6) do
     t.integer "price"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "event_registrations", force: :cascade do |t|
+    t.string "token"
+    t.integer "event_id"
+    t.integer "owner_id"
+    t.string "owner_type"
+    t.integer "user_id"
+    t.string "user_type"
+    t.string "status"
+    t.text "status_steps"
+    t.text "wizard_steps"
+    t.datetime "submitted_at"
+    t.datetime "updated_at"
+    t.datetime "created_at"
+    t.index ["owner_id", "owner_type"], name: "index_event_registrations_on_owner_id_and_owner_type"
+    t.index ["status"], name: "index_event_registrations_on_status"
+    t.index ["token"], name: "index_event_registrations_on_token"
   end
 
   create_table "event_tickets", force: :cascade do |t|
@@ -144,6 +188,7 @@ ActiveRecord::Schema.define(version: 6) do
     t.datetime "registration_end_at"
     t.datetime "early_bird_end_at"
     t.integer "event_registrants_count", default: 0
+    t.integer "event_purchases_count", default: 0
     t.integer "roles_mask"
     t.boolean "authenticate_user", default: false
     t.datetime "created_at", precision: 6, null: false
