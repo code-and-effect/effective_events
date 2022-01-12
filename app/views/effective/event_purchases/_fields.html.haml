@@ -1,6 +1,6 @@
 .card
   .card-body
-    %h5.card-title Event Product
+    %h5.card-title Event Purchase
 
     - if f.object.purchased?
       = f.static_field :event_product, label: 'Purchased event product'
