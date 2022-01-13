@@ -12,8 +12,17 @@ module Admin
       col :title
       col :price, as: :price
 
-      #col :capacity
+      col :archived
+
+      col :capacity_to_s, label: 'Capacity' do |ticket|
+        if ticket.capacity.present?
+          "#{ticket.capacity_available} remaining / #{ticket.capacity} total"
+        end
+      end
+
       col :purchased_event_purchases_count, label: 'Purchased'
+      col :capacity, visible: false
+      col :capacity_available, visible: false
 
       col :purchased_event_purchases, label: 'Purchased by' do |product|
         product.purchased_event_purchases.sort_by(&:to_s).map do |purchase|

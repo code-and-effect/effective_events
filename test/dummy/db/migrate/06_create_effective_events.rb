@@ -38,6 +38,7 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.boolean :tax_exempt, default: false
 
       t.integer :position
+      t.boolean :archived, default: false
 
       t.timestamps
     end
@@ -78,6 +79,7 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.boolean :tax_exempt, default: false
 
       t.integer :position
+      t.boolean :archived, default: false
 
       t.timestamps
     end

@@ -23,12 +23,16 @@ module Effective
       tax_exempt            :boolean
 
       position              :integer
+      archived              :boolean
 
       timestamps
     end
 
     scope :sorted, -> { order(:position) }
     scope :deep, -> { with_rich_text_body.includes(:purchased_event_registrants) }
+
+    scope :archived, -> { where(archived: true) }
+    scope :unarchived, -> { where(archived: false) }
 
     before_validation(if: -> { event.present? }) do
       self.position ||= (event.event_tickets.map(&:position).compact.max || -1) + 1
@@ -46,13 +50,23 @@ module Effective
       event.early_bird? ? early_bird_price : regular_price
     end
 
+    # Available for purchase
+    def available?
+      return false if archived?
+      capacity_available?
+    end
+
     def capacity_available?
-      return true if capacity.blank?
-      capacity <= purchased_event_registrants.count
+      capacity.blank? || (capacity_available > 0)
+    end
+
+    def capacity_available
+      return nil if capacity.blank?
+      [(capacity - purchased_event_registrants_count), 0].max
     end
 
     def purchased_event_registrants_count
-      purchased_event_registrants.count
+      purchased_event_registrants.length
     end
 
   end

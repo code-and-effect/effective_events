@@ -13,8 +13,17 @@ module Admin
       col :regular_price, as: :price
       col :early_bird_price, as: :price
 
-      #col :capacity
+      col :archived
+
+      col :capacity_to_s, label: 'Capacity' do |ticket|
+        if ticket.capacity.present?
+          "#{ticket.capacity_available} remaining / #{ticket.capacity} total"
+        end
+      end
+
       col :purchased_event_registrants_count, label: 'Registered'
+      col :capacity, visible: false
+      col :capacity_available, visible: false
 
       col :purchased_event_registrants, label: 'Registrants' do |ticket|
         ticket.purchased_event_registrants.sort_by(&:last_name).map do |registrant|

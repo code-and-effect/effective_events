@@ -95,6 +95,19 @@ module EffectiveEventsEventRegistration
       self.errors.add(:event_registrants, "can't be blank") unless present_event_registrants.present?
     end
 
+    # Validate all items are available
+    validate(unless: -> { current_step == :checkout || done? }) do
+      event_registrants.reject { |er| er.purchased? || er.event_ticket&.available? }.each do |item|
+        errors.add(:base, "The #{item.event_ticket} ticket is sold out and no longer available for purchase")
+        item.errors.add(:event_ticket_id, "#{item.event_ticket} is unavailable for purchase")
+      end
+
+      event_purchases.reject { |ep| ep.purchased? || ep.event_product&.available? }.each do |item|
+        errors.add(:base, "The #{item.event_product} product is sold out and no longer available for purchase")
+        item.errors.add(:event_product_id, "#{item.event_product} is unavailable for purchase")
+      end
+    end
+
     def required_steps
       return self.class.test_required_steps if Rails.env.test? && self.class.test_required_steps.present?
       event&.event_products.present? ? wizard_step_keys : (wizard_step_keys - [:purchases])

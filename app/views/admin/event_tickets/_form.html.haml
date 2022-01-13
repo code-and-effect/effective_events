@@ -2,10 +2,13 @@
   = f.hidden_field :event_id
 
   = f.text_field :title
+  = f.number_field :capacity, hint: 'The number of online purchases will be limited to capacity.'
+  = f.check_box :archived, label: 'Yes, archive this ticket and make it unavailable for purchase'
+
   = f.price_field :regular_price
   = f.price_field :early_bird_price
-  = f.text_field :qb_item_name
+  = f.text_field :qb_item_name, label: 'Quickbooks item name'
   = f.check_box :tax_exempt
-  /= f.number_field :capacity, hint: 'The number of online purchases will be loosely limited to capacity.'
+
 
   = effective_submit(f)
