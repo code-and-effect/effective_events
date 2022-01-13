@@ -134,9 +134,15 @@ module EffectiveEventsEventRegistration
   end
 
   # Find or build
-  def event_registrant(first_name:, last_name:, email:)
-    registrant = event_registrants.find { |er| er.first_name == first_name && er.last_name == last_name && er.email == email }
-    registrant || event_registrants.build(event: event, owner: owner, first_name: first_name, last_name: last_name, email: email)
+  def event_registrant(event_ticket:, first_name:, last_name:, email:)
+    registrant = event_registrants.find { |er| er.event_ticket == event_ticket && er.first_name == first_name && er.last_name == last_name && er.email == email }
+    registrant || event_registrants.build(event: event, event_ticket: event_ticket, owner: owner, first_name: first_name, last_name: last_name, email: email)
+  end
+
+  # Find or build. But it's not gonna work with more than 1. This is for testing only really.
+  def event_purchase(event_product:)
+    purchase = event_purchases.find { |ep| ep.event_product == event_product }
+    purchase || event_purchases.build(event_product: event_product, owner: owner)
   end
 
   # This builds the default event registrants used by the wizard form
