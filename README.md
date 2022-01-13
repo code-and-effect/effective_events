@@ -68,10 +68,34 @@ All authorization checks are handled via the effective_resources gem found in th
 The permissions you actually want to define are as follows (using CanCan):
 
 ```ruby
-can :index, Effective::Event
+can([:index, :show], Effective::Event) { |event| !event.draft? }
+can([:new, :create], EffectiveEvents.EventRegistration)
+can([:show, :index], Effective::EventRegistrant) { |registrant| registrant.owner == user || registrant.owner.blank? }
+can([:show, :index], Effective::EventPurchase) { |purchase| purchase.owner == user || purchase.owner.blank? }
+can([:show, :index], EffectiveEvents.EventRegistration) { |registration| registration.owner == user }
+can([:update, :destroy], EffectiveEvents.EventRegistration) { |registration| registration.owner == user && !registration.was_submitted? }
 
 if user.admin?
-  can :manage, Effective::Event
+  can :admin, :effective_events
+
+  can(crud - [:destroy], Effective::Event)
+  can(:destroy, Effective::Event) { |et| et.event_registrants_count == 0 }
+
+  can(crud - [:destroy], Effective::EventRegistrant)
+  can(:mark_paid, Effective::EventRegistrant) { |er| !er.event_registration_id.present? }
+  can(:destroy, Effective::EventRegistrant) { |er| !er.purchased? }
+
+  can(crud - [:destroy], Effective::EventPurchase)
+  can(:mark_paid, Effective::EventPurchase) { |er| !er.event_registration_id.present? }
+  can(:destroy, Effective::EventPurchase) { |er| !er.purchased? }
+
+  can(crud - [:destroy], Effective::EventTicket)
+  can(:destroy, Effective::EventTicket) { |et| et.purchased_event_registrants_count == 0 }
+
+  can(crud - [:destroy], Effective::EventProduct)
+  can(:destroy, Effective::EventProduct) { |et| et.purchased_event_purchases_count == 0 }
+
+  can([:index, :show], EffectiveEvents.EventRegistration)
 end
 ```
 

@@ -1,7 +1,9 @@
 EffectiveEvents.setup do |config|
   config.events_table_name = :events
   config.event_tickets_table_name = :event_tickets
+  config.event_products_table_name = :event_products
   config.event_registrants_table_name = :event_registrants
+  config.event_purchases_table_name = :event_purchases
   config.event_registrations_table_name = :event_registrations
 
   # Layout Settings

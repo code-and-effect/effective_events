@@ -1,29 +1,26 @@
-.card
-  .card-body
-    %h5 Event Registration
+= card('Event Registration') do
+  %table.table.table-sm
+    %tbody
+      %tr
+        %th.border-0 Event
+        %td.border-0
+          = link_to(event_registration.event, effective_events.event_path(event_registration.event))
 
-    %table.table.table-sm
-      %tbody
+      - if request.path.start_with?('/admin')
         %tr
-          %th.border-0 Event
-          %td.border-0
-            = link_to(event_registration.event, effective_events.event_path(event_registration.event))
-
-        - if request.path.start_with?('/admin')
-          %tr
-            %th Registered by
-            %td
-              - url = (polymorphic_admin_path(event_registration.owner) rescue "/admin/users/#{event_registration.owner.to_param}/edit")
-              = link_to(event_registration.owner, url)
-        - else
-          %tr
-            %th Registered by
-            %td= event_registration.owner
+          %th Registered by
+          %td
+            - url = (polymorphic_admin_path(event_registration.owner) rescue "/admin/users/#{event_registration.owner.to_param}/edit")
+            = link_to(event_registration.owner, url)
+      - else
+        %tr
+          %th Registered by
+          %td= event_registration.owner
 
 
-        - if event_registration.orders.present?
-          %tr
-            %th Order
-            %td
-              - event_registration.orders.each do |order|
-                = link_to(order, effective_orders.order_path(order))
+      - if event_registration.orders.present?
+        %tr
+          %th Order
+          %td
+            - event_registration.orders.each do |order|
+              = link_to(order, effective_orders.order_path(order))

@@ -15,14 +15,13 @@ module Admin
 
       col :title
       col :draft
-      col :start_at, label: 'Event Date'
-
-      col :end_at, visible: false
+      col :start_at, label: 'Event Start Date'
+      col :end_at, label: 'Event End Date', visible: false
       col :excerpt, visible: false
 
-      col :registration_start_at, label: 'Registration opens'
-      col :registration_end_at, label: 'Registration closes'
-      col :early_bird_end_at, label: 'Early bird ends'
+      col :registration_start_at, label: 'Registration opens', visible: false
+      col :registration_end_at, label: 'Registration closes', visible: false
+      col :early_bird_end_at, label: 'Early bird ends', visible: false
 
       col :early_bird do |event|
         if event.early_bird?
@@ -33,7 +32,9 @@ module Admin
       end
 
       col :event_tickets, search: :string
+      col :event_products, search: :string
       col :event_registrants, search: :string
+      col :event_purchases, search: :string
 
       col :roles, visible: false
       col :authenticate_user, visible: false

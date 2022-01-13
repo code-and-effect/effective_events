@@ -16,7 +16,8 @@ class EffectiveEventRegistrationsDatatable < Effective::Datatable
 
     col :owner, visible: false, search: :string
     col :status, visible: false
-    col :event_registrants, search: :string
+    col :event_registrants, label: 'Registrants', search: :string
+    col :event_purchases, label: 'Purchases', search: :string
     col :orders, action: :show, visible: false, search: :string
 
     actions_col(actions: []) do |er|
