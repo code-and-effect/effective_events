@@ -71,7 +71,7 @@ The permissions you actually want to define are as follows (using CanCan):
 can([:index, :show], Effective::Event) { |event| !event.draft? }
 can([:new, :create], EffectiveEvents.EventRegistration)
 can([:show, :index], Effective::EventRegistrant) { |registrant| registrant.owner == user || registrant.owner.blank? }
-can([:show, :index], Effective::EventPurchase) { |purchase| purchase.owner == user || purchase.owner.blank? }
+can([:show, :index], Effective::EventAddon) { |purchase| purchase.owner == user || purchase.owner.blank? }
 can([:show, :index], EffectiveEvents.EventRegistration) { |registration| registration.owner == user }
 can([:update, :destroy], EffectiveEvents.EventRegistration) { |registration| registration.owner == user && !registration.was_submitted? }
 
@@ -85,15 +85,15 @@ if user.admin?
   can(:mark_paid, Effective::EventRegistrant) { |er| !er.event_registration_id.present? }
   can(:destroy, Effective::EventRegistrant) { |er| !er.purchased? }
 
-  can(crud - [:destroy], Effective::EventPurchase)
-  can(:mark_paid, Effective::EventPurchase) { |er| !er.event_registration_id.present? }
-  can(:destroy, Effective::EventPurchase) { |er| !er.purchased? }
+  can(crud - [:destroy], Effective::EventAddon)
+  can(:mark_paid, Effective::EventAddon) { |er| !er.event_registration_id.present? }
+  can(:destroy, Effective::EventAddon) { |er| !er.purchased? }
 
   can(crud - [:destroy], Effective::EventTicket)
   can(:destroy, Effective::EventTicket) { |et| et.purchased_event_registrants_count == 0 }
 
   can(crud - [:destroy], Effective::EventProduct)
-  can(:destroy, Effective::EventProduct) { |et| et.purchased_event_purchases_count == 0 }
+  can(:destroy, Effective::EventProduct) { |et| et.purchased_event_addons_count == 0 }
 
   can([:index, :show], EffectiveEvents.EventRegistration)
 end

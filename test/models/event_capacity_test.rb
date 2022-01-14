@@ -30,12 +30,12 @@ class EventCapacityTest < ActiveSupport::TestCase
     product.save!
 
     assert product.available?
-    assert_equal 0, product.purchased_event_purchases_count
+    assert_equal 0, product.purchased_event_addons_count
     assert_equal 3, product.capacity_available
 
-    purchase = build_event_purchase(event_product: product, event: product.event)
-    purchase2 = build_event_purchase(event_product: product, event: product.event)
-    purchase3 = build_event_purchase(event_product: product, event: product.event)
+    purchase = build_event_addon(event_product: product, event: product.event)
+    purchase2 = build_event_addon(event_product: product, event: product.event)
+    purchase3 = build_event_addon(event_product: product, event: product.event)
 
     order = Effective::Order.new(items: [purchase, purchase2, purchase3], user: purchase.owner)
     order.purchase!
@@ -43,7 +43,7 @@ class EventCapacityTest < ActiveSupport::TestCase
     product.reload
 
     refute product.available?
-    assert_equal 3, product.purchased_event_purchases_count
+    assert_equal 3, product.purchased_event_addons_count
     assert_equal 0, product.capacity_available
   end
 
@@ -60,11 +60,11 @@ class EventCapacityTest < ActiveSupport::TestCase
   test 'event registrations validate product capacity' do
     event_registration = build_event_registration()
 
-    event_registration.event_purchases.first.event_product.update!(capacity: 0)
+    event_registration.event_addons.first.event_product.update!(capacity: 0)
     refute event_registration.save
 
     assert event_registration.errors[:base].to_s.include?('no longer available for purchase')
-    assert event_registration.event_purchases.first.errors[:event_product_id].to_s.include?('unavailable')
+    assert event_registration.event_addons.first.errors[:event_product_id].to_s.include?('unavailable')
   end
 
 

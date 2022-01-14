@@ -6,7 +6,7 @@ class EventRegistrationsTest < ActiveSupport::TestCase
     assert event_registration.valid?
 
     assert_equal 3, event_registration.event_registrants.length
-    assert_equal 2, event_registration.event_purchases.length
+    assert_equal 2, event_registration.event_addons.length
   end
 
   test 'build_event_registration purchase' do

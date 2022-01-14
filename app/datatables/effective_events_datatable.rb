@@ -10,9 +10,9 @@ class EffectiveEventsDatatable < Effective::Datatable
     order :title
     col :id, visible: false
 
-    col :start_at, label: 'Event Date', as: :date
+    col :start_at, label: 'Date', as: :date
 
-    col :title, label: 'Event' do |event|
+    col :title, label: 'Title' do |event|
       if event.registerable?
         link_to(event.to_s, effective_events.new_event_event_registration_path(event))
       else

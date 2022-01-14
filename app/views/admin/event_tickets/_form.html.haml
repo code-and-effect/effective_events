@@ -2,13 +2,15 @@
   = f.hidden_field :event_id
 
   = f.text_field :title
-  = f.number_field :capacity, hint: 'The number of online purchases will be limited to capacity.'
-  = f.check_box :archived, label: 'Yes, archive this ticket and make it unavailable for purchase'
+  = f.number_field :capacity, hint: 'The number of registrations will be limited to capacity. Leave blank for unlimited capacity.'
 
-  = f.price_field :regular_price
-  = f.price_field :early_bird_price
-  = f.text_field :qb_item_name, label: 'Quickbooks item name'
+  = f.price_field :regular_price, hint: 'A price of $0 will allow a checkout for free.'
+  = f.price_field :early_bird_price, hint: 'A price of $0 will allow a checkout for free.'
   = f.check_box :tax_exempt
 
+  - if defined?(EffectiveQbSync)
+    = f.text_field :qb_item_name, label: 'QuickBooks item name'
+
+  = f.check_box :archived, label: 'Archive this ticket. It will be unavailable for purchase.'
 
   = effective_submit(f)

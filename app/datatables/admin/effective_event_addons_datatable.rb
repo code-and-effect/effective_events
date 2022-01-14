@@ -1,5 +1,5 @@
 module Admin
-  class EffectiveEventPurchasesDatatable < Effective::Datatable
+  class EffectiveEventAddonsDatatable < Effective::Datatable
     datatable do
       col :updated_at, visible: false
       col :created_at, visible: false
@@ -23,7 +23,7 @@ module Admin
     end
 
     collection do
-      scope = Effective::EventPurchase.deep.purchased
+      scope = Effective::EventAddon.deep.purchased
 
       if attributes[:event_id].present?
         scope = scope.where(event: event)

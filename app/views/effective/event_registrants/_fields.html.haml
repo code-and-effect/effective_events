@@ -1,11 +1,9 @@
-.card
+.card.mb-4
   .card-body
-    %h5.card-title Event Registrant
-
     - if f.object.purchased?
-      = f.static_field :event_ticket, label: 'Purchased event ticket'
+      = f.static_field :event_ticket, label: 'Purchased ticket'
     - else
-      = f.select :event_ticket_id, effective_events_event_tickets_collection(event)
+      = f.select :event_ticket_id, effective_events_event_tickets_collection(event), label: 'Ticket'
 
     .row
       .col-lg= f.text_field :first_name
