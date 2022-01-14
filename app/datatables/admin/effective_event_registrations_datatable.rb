@@ -13,7 +13,7 @@ class Admin::EffectiveEventRegistrationsDatatable < Effective::Datatable
     col :owner
 
     col :event_registrants, search: :string
-    col :event_purchases, search: :string
+    col :event_addons, search: :string
     col :orders, label: 'Order'
 
     actions_col

@@ -34,7 +34,7 @@ module Admin
       col :event_tickets, search: :string
       col :event_products, search: :string
       col :event_registrants, search: :string
-      col :event_purchases, search: :string
+      col :event_addons, search: :string
 
       col :roles, visible: false
       col :authenticate_user, visible: false

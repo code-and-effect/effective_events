@@ -3,7 +3,7 @@
 class EffectiveEventRegistrantsDatatable < Effective::Datatable
   datatable do
 
-    col :event_ticket, search: :string
+    col :event_ticket, search: :string, label: 'Ticket'
 
     col :name do |er|
       "#{er.first_name} #{er.last_name}<br><small>#{mail_to(er.email)}</small>"

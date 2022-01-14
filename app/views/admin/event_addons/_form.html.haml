@@ -1,4 +1,4 @@
-= effective_form_with(model: [:admin, event_purchase], engine: true) do |f|
+= effective_form_with(model: [:admin, event_addon], engine: true) do |f|
   = f.hidden_field :event_id
 
   - if f.object.new_record?
@@ -6,7 +6,7 @@
   - else
     = f.static_field :owner
 
-  = render 'effective/event_purchases/fields', f: f, event: event_purchase.event
+  = render 'effective/event_addons/fields', f: f, event: event_addon.event
 
   - if f.object.new_record?
     = f.submit 'Save and Mark Paid'

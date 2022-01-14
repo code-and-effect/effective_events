@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 # Just like each EventRegistration has EventTickets and EventRegistrants
-# An Event Registration has EventProducts and EventPurchases
+# An Event Registration has EventProducts and EventAddons
 
 module Effective
-  class EventPurchase < ActiveRecord::Base
+  class EventAddon < ActiveRecord::Base
     acts_as_purchasable
 
     log_changes(to: :event) if respond_to?(:log_changes)
