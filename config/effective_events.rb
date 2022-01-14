@@ -13,7 +13,9 @@ EffectiveEvents.setup do |config|
   # Event Settings
   # config.event_registrations_class_name = 'Effective::EventRegistration'
 
+  # Pagination length on the Events#index page
   config.per_page = 10
 
+  # Events can be restricted by role
   config.use_effective_roles = true
 end
