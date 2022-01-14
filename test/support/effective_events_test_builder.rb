@@ -52,7 +52,7 @@ module EffectiveEventsTestBuilder
 
       registration_start_at: now,
       registration_end_at: (now + 6.days),
-      early_bird_end_at: (now + 3.days)
+      early_bird_end_at: nil
     )
 
     event.event_tickets.build(

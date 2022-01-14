@@ -18,4 +18,22 @@ class EventsTest < ActiveSupport::TestCase
     assert event.registerable?
   end
 
+  test 'early bird' do
+    now = Time.zone.now
+
+    event = build_event()
+
+    event.early_bird_end_at = nil
+    refute event.early_bird?
+    refute event.early_bird_past?
+
+    event.early_bird_end_at = now + 1.minute
+    assert event.early_bird?
+    refute event.early_bird_past?
+
+    event.early_bird_end_at = now
+    refute event.early_bird?
+    assert event.early_bird_past?
+  end
+
 end

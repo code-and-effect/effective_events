@@ -36,7 +36,7 @@ module EffectiveEventsEventRegistration
 
     acts_as_wizard(
       start: 'Start',
-      registrants: 'Registrants',
+      tickets: 'Tickets',
       addons: 'Add-ons',
       summary: 'Review',
       billing: 'Billing Address',
@@ -91,7 +91,7 @@ module EffectiveEventsEventRegistration
     validates :event, presence: true
 
     # Registrants Step
-    validate(if: -> { current_step == :registrants }) do
+    validate(if: -> { current_step == :tickets }) do
       self.errors.add(:event_registrants, "can't be blank") unless present_event_registrants.present?
     end
 

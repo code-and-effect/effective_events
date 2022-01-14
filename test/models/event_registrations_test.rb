@@ -33,6 +33,7 @@ class EventRegistrationsTest < ActiveSupport::TestCase
 
     order = event_registration.submit_order
     assert_equal 5, order.order_items.length
+
     assert_equal 800_00, order.subtotal
 
     event_registration.event_registrants.last.destroy!
@@ -44,4 +45,25 @@ class EventRegistrationsTest < ActiveSupport::TestCase
     assert_equal 4, order.order_items.length
     assert_equal 600_00, order.subtotal
   end
+
+  test 'regular pricing' do
+    event = build_event()
+    event_registration = build_event_registration(event: event)
+    event_registration.ready!
+
+    order = event_registration.submit_order
+    assert_equal 800_00, order.subtotal
+  end
+
+  test 'early bird pricing' do
+    event = build_event()
+    event.update!(early_bird_end_at: Time.zone.now + 1.minute)
+
+    event_registration = build_event_registration(event: event)
+    event_registration.ready!
+
+    order = event_registration.submit_order
+    assert_equal 650_00, order.subtotal
+  end
+
 end
