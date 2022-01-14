@@ -2,9 +2,9 @@
 - step_content = resource.event&.send("rich_text_#{step}_content")
 
 - if all_steps_content.present?
-  .card
+  .card.mb-4
     .card-body= all_steps_content
 
 - if step_content.present?
-  .card
+  .card.mb-4
     .card-body= step_content

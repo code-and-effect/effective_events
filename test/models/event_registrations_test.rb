@@ -44,5 +44,4 @@ class EventRegistrationsTest < ActiveSupport::TestCase
     assert_equal 4, order.order_items.length
     assert_equal 600_00, order.subtotal
   end
-
 end
