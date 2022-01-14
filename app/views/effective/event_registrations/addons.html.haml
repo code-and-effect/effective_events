@@ -1,10 +1,12 @@
 = render 'layout' do
-  = render 'effective/event_registrations/content', resource: resource
+  .card.mb-4
+    .card-body
+      %p
+        Add-ons are free or paid additional items that can be included in your registration.
+        %br
+        If you are registering for multiple people, you need to include an add-on for each person.
 
-  %p
-    Add-ons are free or paid additional items that can be included in your registration.
-    %br
-    If you are registering for multiple people, you need to include an add-on for each person.
+  = render 'effective/event_registrations/content', resource: resource
 
   .card
     .card-body

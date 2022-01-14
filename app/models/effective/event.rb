@@ -149,12 +149,12 @@ module Effective
 
     def early_bird?
       return false if early_bird_end_at.blank?
-      early_bird_end_at < Time.zone.now
+      early_bird_end_at > Time.zone.now
     end
 
     def early_bird_past?
       return false if early_bird_end_at.blank?
-      early_bird_end_at >= Time.zone.now
+      early_bird_end_at < Time.zone.now
     end
 
     def early_bird_status
