@@ -19,7 +19,7 @@ EffectiveEvents::Engine.routes.draw do
     resources :event_tickets, except: [:show]
     resources :event_products, except: [:show]
     resources :event_registrants, except: [:show]
-    resources :event_purchases, except: [:show]
+    resources :event_addons, except: [:show]
     resources :event_registrations, only: [:index, :show]
   end
 

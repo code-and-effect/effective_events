@@ -37,7 +37,7 @@ module EffectiveEventsEventRegistration
     acts_as_wizard(
       start: 'Start',
       registrants: 'Registrants',
-      purchases: 'Purchases',
+      addons: 'Add-ons',
       summary: 'Review',
       billing: 'Billing Address',
       checkout: 'Checkout',
@@ -58,8 +58,8 @@ module EffectiveEventsEventRegistration
     has_many :event_registrants, -> { order(:id) }, class_name: 'Effective::EventRegistrant', inverse_of: :event_registration, dependent: :destroy
     accepts_nested_attributes_for :event_registrants, reject_if: :all_blank, allow_destroy: true
 
-    has_many :event_purchases, -> { order(:id) }, class_name: 'Effective::EventPurchase', inverse_of: :event_registration, dependent: :destroy
-    accepts_nested_attributes_for :event_purchases, reject_if: :all_blank, allow_destroy: true
+    has_many :event_addons, -> { order(:id) }, class_name: 'Effective::EventAddon', inverse_of: :event_registration, dependent: :destroy
+    accepts_nested_attributes_for :event_addons, reject_if: :all_blank, allow_destroy: true
 
     has_many :orders, -> { order(:id) }, as: :parent, class_name: 'Effective::Order', dependent: :nullify
     accepts_nested_attributes_for :orders
@@ -102,7 +102,7 @@ module EffectiveEventsEventRegistration
         item.errors.add(:event_ticket_id, "#{item.event_ticket} is unavailable for purchase")
       end
 
-      event_purchases.reject { |ep| ep.purchased? || ep.event_product&.available? }.each do |item|
+      event_addons.reject { |ep| ep.purchased? || ep.event_product&.available? }.each do |item|
         errors.add(:base, "The #{item.event_product} product is sold out and no longer available for purchase")
         item.errors.add(:event_product_id, "#{item.event_product} is unavailable for purchase")
       end
@@ -110,12 +110,12 @@ module EffectiveEventsEventRegistration
 
     def required_steps
       return self.class.test_required_steps if Rails.env.test? && self.class.test_required_steps.present?
-      event&.event_products.present? ? wizard_step_keys : (wizard_step_keys - [:purchases])
+      event&.event_products.present? ? wizard_step_keys : (wizard_step_keys - [:addons])
     end
 
     # All Fees and Orders
     def submit_fees
-      (event_registrants + event_purchases)
+      (event_registrants + event_addons)
     end
 
   end
@@ -140,9 +140,9 @@ module EffectiveEventsEventRegistration
   end
 
   # Find or build. But it's not gonna work with more than 1. This is for testing only really.
-  def event_purchase(event_product:)
-    purchase = event_purchases.find { |ep| ep.event_product == event_product }
-    purchase || event_purchases.build(event_product: event_product, owner: owner)
+  def event_addon(event_product:)
+    purchase = event_addons.find { |ep| ep.event_product == event_product }
+    purchase || event_addons.build(event_product: event_product, owner: owner)
   end
 
   # This builds the default event registrants used by the wizard form

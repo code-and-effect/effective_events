@@ -2,12 +2,6 @@
 
 - upcoming = Effective::Event.events(user: current_user).upcoming.count
 
-%p
-  - if upcoming == 1
-    There is 1 upcoming event.
-  - else
-    There are #{upcoming} upcoming events.
-
 - datatable = EffectiveEventsDatatable.new(self, namespace: :effective)
 = render_datatable(datatable, simple: true)
 

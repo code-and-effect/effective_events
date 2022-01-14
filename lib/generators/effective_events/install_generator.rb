@@ -22,7 +22,7 @@ module EffectiveEvents
       def create_migration_file
         @events_table_name  = ':' + EffectiveEvents.events_table_name.to_s
         @event_products_table_name  = ':' + EffectiveEvents.event_products_table_name.to_s
-        @event_purchases_table_name  = ':' + EffectiveEvents.event_purchases_table_name.to_s
+        @event_addons_table_name  = ':' + EffectiveEvents.event_addons_table_name.to_s
         @event_registrants_table_name  = ':' + EffectiveEvents.event_registrants_table_name.to_s
         @event_registrations_table_name  = ':' + EffectiveEvents.event_registrations_table_name.to_s
         @event_tickets_table_name = ':' + EffectiveEvents.event_tickets_table_name.to_s

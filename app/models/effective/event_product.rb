@@ -4,8 +4,8 @@ module Effective
   class EventProduct < ActiveRecord::Base
     belongs_to :event
 
-    has_many :event_purchases
-    has_many :purchased_event_purchases, -> { EventPurchase.purchased }, class_name: 'Effective::EventPurchase'
+    has_many :event_addons
+    has_many :purchased_event_addons, -> { EventAddon.purchased }, class_name: 'Effective::EventAddon'
 
     log_changes(to: :event) if respond_to?(:log_changes)
 
@@ -28,7 +28,7 @@ module Effective
     end
 
     scope :sorted, -> { order(:position) }
-    scope :deep, -> { with_rich_text_body.includes(:purchased_event_purchases) }
+    scope :deep, -> { with_rich_text_body.includes(:purchased_event_addons) }
 
     scope :archived, -> { where(archived: true) }
     scope :unarchived, -> { where(archived: false) }
@@ -56,11 +56,11 @@ module Effective
 
     def capacity_available
       return nil if capacity.blank?
-      [(capacity - purchased_event_purchases_count), 0].max
+      [(capacity - purchased_event_addons_count), 0].max
     end
 
-    def purchased_event_purchases_count
-      purchased_event_purchases.length
+    def purchased_event_addons_count
+      purchased_event_addons.length
     end
 
   end

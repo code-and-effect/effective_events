@@ -20,12 +20,12 @@ module Admin
         end
       end
 
-      col :purchased_event_purchases_count, label: 'Purchased'
+      col :purchased_event_addons_count, label: 'Purchased'
       col :capacity, visible: false
       col :capacity_available, visible: false
 
-      col :purchased_event_purchases, label: 'Purchased by' do |product|
-        product.purchased_event_purchases.sort_by(&:to_s).map do |purchase|
+      col :purchased_event_addons, label: 'Purchased by' do |product|
+        product.purchased_event_addons.sort_by(&:to_s).map do |purchase|
           content_tag(:div, purchase.owner.to_s, class: 'col-resource_item')
         end.join.html_safe
       end

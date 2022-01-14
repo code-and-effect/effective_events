@@ -1,16 +1,16 @@
-# Used on the Event Registrations purchases step
+# Used on the Event Registrations Addons step
 
-class EffectiveEventPurchasesDatatable < Effective::Datatable
+class EffectiveEventAddonsDatatable < Effective::Datatable
   datatable do
 
-    col :event_product, search: :string
+    col :event_product, search: :string, label: 'Product'
     col :price, as: :price
-    col :notes
+    # col :notes
     # no actions_col
   end
 
   collection do
-    scope = Effective::EventPurchase.deep.all
+    scope = Effective::EventAddon.deep.all
 
     if event.present?
       scope = scope.where(event: event)

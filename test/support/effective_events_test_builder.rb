@@ -115,7 +115,7 @@ module EffectiveEventsTestBuilder
     end
 
     event_registration.event.event_products.each_with_index do |event_product, index|
-      event_registration.event_purchase(event_product: event_product)
+      event_registration.event_addon(event_product: event_product)
     end
 
     event_registration.save!
@@ -162,12 +162,12 @@ module EffectiveEventsTestBuilder
     )
   end
 
-  def build_event_purchase(owner: nil, event: nil, event_product: nil)
+  def build_event_addon(owner: nil, event: nil, event_product: nil)
     owner ||= build_user_with_address()
     event ||= build_event()
     event_product ||= build_event_product()
 
-    Effective::EventPurchase.new(
+    Effective::EventAddon.new(
       owner: owner,
       event: event,
       event_product: event_product,

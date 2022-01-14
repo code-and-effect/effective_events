@@ -102,20 +102,7 @@ ActiveRecord::Schema.define(version: 6) do
     t.index ["user_id"], name: "index_customers_on_user_id"
   end
 
-  create_table "event_products", force: :cascade do |t|
-    t.integer "event_id"
-    t.string "title"
-    t.integer "capacity"
-    t.integer "price"
-    t.string "qb_item_name"
-    t.boolean "tax_exempt", default: false
-    t.integer "position"
-    t.boolean "archived", default: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-  end
-
-  create_table "event_purchases", force: :cascade do |t|
+  create_table "event_addons", force: :cascade do |t|
     t.integer "event_id"
     t.integer "event_product_id"
     t.integer "owner_id"
@@ -125,6 +112,19 @@ ActiveRecord::Schema.define(version: 6) do
     t.text "notes"
     t.integer "purchased_order_id"
     t.integer "price"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "event_products", force: :cascade do |t|
+    t.integer "event_id"
+    t.string "title"
+    t.integer "capacity"
+    t.integer "price"
+    t.string "qb_item_name"
+    t.boolean "tax_exempt", default: false
+    t.integer "position"
+    t.boolean "archived", default: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -190,7 +190,7 @@ ActiveRecord::Schema.define(version: 6) do
     t.datetime "registration_end_at"
     t.datetime "early_bird_end_at"
     t.integer "event_registrants_count", default: 0
-    t.integer "event_purchases_count", default: 0
+    t.integer "event_addons_count", default: 0
     t.integer "roles_mask"
     t.boolean "authenticate_user", default: false
     t.datetime "created_at", precision: 6, null: false
