@@ -71,7 +71,7 @@ The permissions you actually want to define are as follows (using CanCan):
 can([:index, :show], Effective::Event) { |event| !event.draft? }
 can([:new, :create], EffectiveEvents.EventRegistration)
 can([:show, :index], Effective::EventRegistrant) { |registrant| registrant.owner == user || registrant.owner.blank? }
-can([:show, :index], Effective::EventAddon) { |purchase| purchase.owner == user || purchase.owner.blank? }
+can([:show, :index], Effective::EventAddon) { |addon| addon.owner == user || addon.owner.blank? }
 can([:show, :index], EffectiveEvents.EventRegistration) { |registration| registration.owner == user }
 can([:update, :destroy], EffectiveEvents.EventRegistration) { |registration| registration.owner == user && !registration.was_submitted? }
 

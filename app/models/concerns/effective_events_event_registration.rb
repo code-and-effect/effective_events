@@ -141,8 +141,8 @@ module EffectiveEventsEventRegistration
 
   # Find or build. But it's not gonna work with more than 1. This is for testing only really.
   def event_addon(event_product:)
-    purchase = event_addons.find { |ep| ep.event_product == event_product }
-    purchase || event_addons.build(event_product: event_product, owner: owner)
+    addon = event_addons.find { |ep| ep.event_product == event_product }
+    addon || event_addons.build(event_product: event_product, owner: owner)
   end
 
   # This builds the default event registrants used by the wizard form

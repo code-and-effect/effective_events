@@ -33,11 +33,11 @@ class EventCapacityTest < ActiveSupport::TestCase
     assert_equal 0, product.purchased_event_addons_count
     assert_equal 3, product.capacity_available
 
-    purchase = build_event_addon(event_product: product, event: product.event)
-    purchase2 = build_event_addon(event_product: product, event: product.event)
-    purchase3 = build_event_addon(event_product: product, event: product.event)
+    addon = build_event_addon(event_product: product, event: product.event)
+    addon2 = build_event_addon(event_product: product, event: product.event)
+    addon3 = build_event_addon(event_product: product, event: product.event)
 
-    order = Effective::Order.new(items: [purchase, purchase2, purchase3], user: purchase.owner)
+    order = Effective::Order.new(items: [addon, addon2, addon3], user: addon.owner)
     order.purchase!
 
     product.reload
