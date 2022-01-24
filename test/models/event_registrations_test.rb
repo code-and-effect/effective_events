@@ -72,6 +72,7 @@ class EventRegistrationsTest < ActiveSupport::TestCase
     event_registration.ready!
     order = event_registration.submit_order
 
+    # 1 order email to user, 1 order email to admin
     assert_email(count: 2) { order.purchase! }
   end
 
@@ -81,7 +82,7 @@ class EventRegistrationsTest < ActiveSupport::TestCase
     event = event_registration.event
     category = 'Registrant purchased'
 
-    event_registration.event_notifications.create!(
+    Effective::EventNotification.create!(
       category: category,
       event: event,
       from: 'noreply@example.com',
@@ -92,7 +93,9 @@ class EventRegistrationsTest < ActiveSupport::TestCase
     event_registration.ready!
     order = event_registration.submit_order
 
-    assert_email(count: 4) { order.purchase! }
+    # 1 order email to user, 1 order email to admin
+    # Plus 3 registrant emails
+    assert_email(count: 5) { order.purchase! }
   end
 
 end
