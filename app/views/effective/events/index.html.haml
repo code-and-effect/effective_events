@@ -1,5 +1,5 @@
 = card do
-  - if @datatable
+  - if @datatable.present?(self)
     = render_datatable(@datatable, simple: true)
   - else
     %p There are no events open for registration. When there are, we'll show them here.
