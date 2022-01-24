@@ -174,4 +174,20 @@ module EffectiveEventsTestBuilder
     )
   end
 
+
+  def build_event_notification(owner: nil, event: nil, category: nil)
+    owner ||= build_user_with_address()
+    event ||= build_event()
+    category ||= 'Registrant purchased'
+
+    Effective::EventNotification.new(
+      category: category,
+      event: event,
+      reminder: 1.day.to_i,
+      from: 'noreply@example.com',
+      subject: "#{category} subject",
+      body: "#{category} body"
+    )
+  end
+
 end

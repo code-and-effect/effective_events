@@ -131,5 +131,22 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
     add_index :event_registrations, :status
     add_index :event_registrations, :token
 
+    create_table :event_notifications do |t|
+      t.references :event
+
+      t.string :category
+      t.integer :reminder
+
+      t.string :from
+      t.string :subject
+      t.text :body
+
+      t.datetime :started_at
+      t.datetime :completed_at
+
+      t.datetime :updated_at
+      t.datetime :created_at
+    end
+
   end
 end

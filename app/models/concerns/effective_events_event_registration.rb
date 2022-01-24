@@ -118,6 +118,11 @@ module EffectiveEventsEventRegistration
       (event_registrants + event_addons)
     end
 
+    def after_submit_purchased!
+      notifications = event.event_notifications.select(&:registrant_purchased?)
+      notifications.each { |notification| notification.notify!(event_registrants: event_registrants) }
+    end
+
   end
 
   # Instance Methods

@@ -1,0 +1,44 @@
+= effective_form_with(model: [:admin, event_notification], engine: true) do |f|
+  - if inline_datatable?
+    = f.hidden_field :event_id
+  - else
+    = f.select :event_id, Effective::Event.sorted.all
+
+  = f.select :category, Effective::EventNotification::CATEGORIES,
+    label: 'Send an email notification'
+
+  - # Render email templates
+  - Effective::EventNotification::CATEGORIES.each do |category|
+    - template = 'event_' + category.parameterize.underscore
+
+    = f.show_if :category, category do
+      = render "/admin/event_notifications/form_#{template}", f: f
+
+      - if f.object.category == category && f.object.persisted?
+        = f.text_field :from
+        = f.text_field :subject
+        = f.text_area :body, rows: 10
+
+      - elsif EffectiveEvents.use_effective_email_templates == false
+        = f.text_field :from, value: EffectiveResources.mailer_sender
+        = f.text_field :subject, value: ''
+        = f.text_area :body, rows: 10, value: ''
+
+      - else
+        - email_template = Effective::EmailTemplate.where(template_name: template).first!
+
+        = f.text_field :from, value: email_template.from
+        = f.text_field :subject, value: email_template.subject
+        = f.text_area :body, rows: 10, value: email_template.body
+
+      - if EffectiveEvents.use_effective_email_templates
+
+        %p The available variables are:
+
+        %ul
+          - Effective::EventNotification::EMAIL_TEMPLATE_VARIABLES.each do |variable|
+            %li {{ #{variable} }}
+
+        %small.text-muted Only a developer can add additional variables
+
+  = effective_submit(f)
