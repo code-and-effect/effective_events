@@ -1,6 +1,6 @@
 # Effective Events
 
-Events, event registrants, event tickets and event products.
+Events, event registrants, event tickets, and event products.
 
 ## Getting Started
 

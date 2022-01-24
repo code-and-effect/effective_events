@@ -1,4 +1,4 @@
-# Used on the Event Registrations registrants step
+# Used on the Event Registrations tickets step
 
 class EffectiveEventRegistrantsDatatable < Effective::Datatable
   datatable do

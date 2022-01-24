@@ -13,19 +13,21 @@ module Admin
       col :created_at, visible: false
       col :id, visible: false
 
-      col :title
-      col :slug, visible: false
+      col :title do |event|
+        link_to event.title, effective_events.edit_admin_event_path(event)
+      end
 
+      col :slug, visible: false
       col :draft
-      col :start_at, label: 'Event Start Date'
-      col :end_at, label: 'Event End Date', visible: false
+      col :start_at, label: 'Start', visible: false
+      col :end_at, label: 'End', visible: false
       col :excerpt, visible: false
 
       col :registration_start_at, label: 'Registration opens', visible: false
       col :registration_end_at, label: 'Registration closes', visible: false
       col :early_bird_end_at, label: 'Early bird ends', visible: false
 
-      col :early_bird do |event|
+      col :early_bird, visible: false do |event|
         if event.early_bird?
           content_tag(:span, event.early_bird_status, class: 'badge badge-success')
         else
@@ -33,10 +35,11 @@ module Admin
         end
       end
 
-      col :event_tickets, search: :string
-      col :event_products, search: :string
-      col :event_registrants, search: :string
-      col :event_addons, search: :string
+      # These show too much information to be useful to admins, rely on the edit screen
+      # col :event_tickets, search: :string
+      # col :event_products, search: :string
+      # col :event_registrants, search: :string
+      # col :event_addons, search: :string
 
       col :roles, visible: false
       col :authenticate_user, visible: false

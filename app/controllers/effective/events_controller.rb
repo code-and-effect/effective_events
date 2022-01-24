@@ -7,21 +7,6 @@ module Effective
       Effective::Event.events(user: current_user, unpublished: unpublished)
     }
 
-    def index
-      @events ||= resource_scope.published
-
-      @events = @events.paginate(page: params[:page])
-
-      # if params[:search].present?
-      #   search = params[:search].permit(EffectiveEvents.permitted_params).delete_if { |k, v| v.blank? }
-      #   @events = @events.where(search) if search.present?
-      # end
-
-      EffectiveResources.authorize!(self, :index, Effective::Event)
-
-      @page_title ||= ['Events', (" - Page #{params[:page]}" if params[:page])].compact.join
-    end
-
     def show
       @event = resource_scope.find(params[:id])
 

@@ -1,16 +1,12 @@
-= render 'layout' do
-  .effective-event
-    - if @event.sold_out?
-      .alert.alert-warning This event is sold out.
+.effective-event
+  - if @event.sold_out?
+    .alert.alert-warning This event is sold out.
 
-    - if @event.closed?
-      .alert.alert-warning This event is no longer available.
+  - if @event.closed?
+    .alert.alert-warning This event is no longer available.
 
-    - if @event.registerable?
-      .resource-buttons
-        = link_to 'Register', effective_events.new_event_event_registration_path(@event), class: 'btn btn-primary'
+  - if @event.registerable?
+    .resource-buttons
+      = link_to 'Register', effective_events.new_event_event_registration_path(@event), class: 'btn btn-primary'
 
-    = render 'effective/events/event', event: @event
-
-    .event-body.event-content
-      = @event.body
+  = render 'effective/events/event', event: @event

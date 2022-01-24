@@ -1,8 +1,5 @@
-%h1= @page_title
-
-= render 'layout' do
-  .effective-events
-    = render partial: @events, spacer_template: 'spacer'
-
-  %nav.d-flex.justify-content-center
-    = bootstrap_paginate(@events, per_page: EffectiveEvents.per_page)
+= card do
+  - if @datatable
+    = render_datatable(@datatable, simple: true)
+  - else
+    %p There are no events open for registration. When there are, we'll show them here.
