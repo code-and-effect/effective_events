@@ -147,7 +147,7 @@ GEM
       effective_resources
       rails (>= 4.0.0)
       sassc
-    effective_resources (1.10.0)
+    effective_resources (1.10.1)
       rails (>= 4.0.0)
     effective_test_bot (1.2.9)
       capybara (>= 2.15)
