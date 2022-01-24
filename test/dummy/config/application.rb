@@ -11,6 +11,7 @@ require 'haml-rails'
 
 require 'effective_addresses'
 require 'effective_orders'
+require 'effective_email_templates'
 require 'effective_events'
 
 module Dummy

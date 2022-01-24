@@ -57,4 +57,24 @@ module EffectiveEventsTestHelper
     assert false, message || "(assert_email) Expected email with #{expected} to have been delivered"
   end
 
+  def with_effective_email_templates(&block)
+    Rails.autoloaders.main.reload
+
+    before = EffectiveEvents.use_effective_email_templates
+
+    EffectiveEvents.use_effective_email_templates = true
+    yield
+    EffectiveEvents.use_effective_email_templates = before
+  end
+
+  def without_effective_email_templates(&block)
+    Rails.autoloaders.main.reload
+
+    before = EffectiveEvents.use_effective_email_templates
+
+    EffectiveEvents.use_effective_email_templates = false
+    yield
+    EffectiveEvents.use_effective_email_templates = before
+  end
+
 end

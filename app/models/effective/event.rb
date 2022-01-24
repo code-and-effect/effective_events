@@ -2,10 +2,10 @@
 
 module Effective
   class Event < ActiveRecord::Base
-    has_many :event_tickets, -> { EventTicket.sorted }, inverse_of: :event
+    has_many :event_tickets, -> { EventTicket.sorted }, inverse_of: :event, dependent: :destroy
     accepts_nested_attributes_for :event_tickets, allow_destroy: true
 
-    has_many :event_products, -> { EventProduct.sorted }, inverse_of: :event
+    has_many :event_products, -> { EventProduct.sorted }, inverse_of: :event, dependent: :destroy
     accepts_nested_attributes_for :event_products, allow_destroy: true
 
     has_many :event_registrants, -> { order(:event_ticket_id, :created_at) }, inverse_of: :event
@@ -13,6 +13,9 @@ module Effective
 
     has_many :event_addons, -> { order(:event_product_id, :created_at) }, inverse_of: :event
     accepts_nested_attributes_for :event_addons, allow_destroy: true
+
+    has_many :event_notifications, -> { order(:id) }, inverse_of: :event, dependent: :destroy
+    accepts_nested_attributes_for :event_notifications, allow_destroy: true
 
     # rich_text_body - Used by the select step
     has_many_rich_texts

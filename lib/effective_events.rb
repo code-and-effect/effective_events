@@ -9,7 +9,8 @@ module EffectiveEvents
       :events_table_name, :event_registrants_table_name, :event_tickets_table_name,
       :event_registrations_table_name, :event_products_table_name, :event_addons_table_name,
       :layout, :per_page, :use_effective_roles,
-      :event_registration_class_name
+      :event_registration_class_name,
+      :mailer, :use_effective_email_templates
     ]
   end
 
@@ -17,6 +18,10 @@ module EffectiveEvents
 
   def self.EventRegistration
     event_registration_class_name&.constantize || Effective::EventRegistration
+  end
+
+  def self.mailer_class
+    mailer&.constantize || Effective::EventsMailer
   end
 
 end

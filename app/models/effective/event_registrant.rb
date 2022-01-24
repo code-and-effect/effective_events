@@ -58,6 +58,10 @@ module Effective
       "#{event_ticket} - #{last_first_name}"
     end
 
+    def name
+      "#{first_name} #{last_name}"
+    end
+
     def last_first_name
       "#{last_name}, #{first_name}"
     end

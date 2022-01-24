@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 6) do
+ActiveRecord::Schema.define(version: 7) do
 
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
@@ -102,6 +102,18 @@ ActiveRecord::Schema.define(version: 6) do
     t.index ["user_id"], name: "index_customers_on_user_id"
   end
 
+  create_table "email_templates", force: :cascade do |t|
+    t.string "template_name"
+    t.string "subject"
+    t.string "from"
+    t.string "bcc"
+    t.string "cc"
+    t.string "content_type"
+    t.text "body"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "event_addons", force: :cascade do |t|
     t.integer "event_id"
     t.integer "event_product_id"
@@ -114,6 +126,20 @@ ActiveRecord::Schema.define(version: 6) do
     t.integer "price"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "event_notifications", force: :cascade do |t|
+    t.bigint "event_id"
+    t.string "category"
+    t.integer "reminder"
+    t.string "from"
+    t.string "subject"
+    t.text "body"
+    t.datetime "started_at"
+    t.datetime "completed_at"
+    t.datetime "updated_at"
+    t.datetime "created_at"
+    t.index ["event_id"], name: "index_event_notifications_on_event_id"
   end
 
   create_table "event_products", force: :cascade do |t|

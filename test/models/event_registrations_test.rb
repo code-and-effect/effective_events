@@ -66,4 +66,36 @@ class EventRegistrationsTest < ActiveSupport::TestCase
     assert_equal 650_00, order.subtotal
   end
 
+  test 'sends order receipt emails on event registration purchase' do
+    event_registration = build_event_registration()
+
+    event_registration.ready!
+    order = event_registration.submit_order
+
+    # 1 order email to user, 1 order email to admin
+    assert_email(count: 2) { order.purchase! }
+  end
+
+  test 'sends order receipt emails AND event notifications on event registration purchase' do
+    event_registration = build_event_registration()
+
+    event = event_registration.event
+    category = 'Registrant purchased'
+
+    Effective::EventNotification.create!(
+      category: category,
+      event: event,
+      from: 'noreply@example.com',
+      subject: "#{category} subject",
+      body: "#{category} body"
+    )
+
+    event_registration.ready!
+    order = event_registration.submit_order
+
+    # 1 order email to user, 1 order email to admin
+    # Plus 3 registrant emails
+    assert_email(count: 5) { order.purchase! }
+  end
+
 end

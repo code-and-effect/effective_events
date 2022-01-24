@@ -8,7 +8,7 @@ module Effective
     }
 
     def index
-      @events ||= resource_scope
+      @events ||= resource_scope.published
 
       @events = @events.paginate(page: params[:page])
 

@@ -16,6 +16,12 @@
       - datatable = Admin::EffectiveEventProductsDatatable.new(event_id: event.id)
       = render_inline_datatable(datatable)
 
+    = tab 'Email' do
+      %p Click New to add one or more emails.
+
+      - datatable = Admin::EffectiveEventNotificationsDatatable.new(event_id: event.id)
+      = render_datatable(datatable, inline: true, simple: true)
+
     = tab 'Registrations' do
       %h2 Registrations
       - datatable = Admin::EffectiveEventRegistrationsDatatable.new(event_id: event.id)

@@ -14,6 +14,8 @@ module Admin
       col :id, visible: false
 
       col :title
+      col :slug, visible: false
+
       col :draft
       col :start_at, label: 'Event Start Date'
       col :end_at, label: 'Event End Date', visible: false
