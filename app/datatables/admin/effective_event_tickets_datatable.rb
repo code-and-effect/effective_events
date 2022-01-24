@@ -25,12 +25,6 @@ module Admin
       col :capacity, visible: false
       col :capacity_available, visible: false
 
-      col :purchased_event_registrants, label: 'Registrants' do |ticket|
-        ticket.purchased_event_registrants.sort_by(&:last_name).map do |registrant|
-          content_tag(:div, registrant.last_first_name, class: 'col-resource_item')
-        end.join.html_safe
-      end
-
       actions_col
     end
 

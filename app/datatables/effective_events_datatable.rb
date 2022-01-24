@@ -13,11 +13,7 @@ class EffectiveEventsDatatable < Effective::Datatable
     col :start_at, label: 'Date', as: :date
 
     col :title, label: 'Title' do |event|
-      if event.registerable?
-        link_to(event.to_s, effective_events.new_event_event_registration_path(event))
-      else
-        event.to_s
-      end
+      link_to(event.to_s, effective_events.event_path(event))
     end
 
     col :registration_start_at, visible: false

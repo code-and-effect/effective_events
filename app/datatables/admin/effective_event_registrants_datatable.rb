@@ -16,7 +16,7 @@ module Admin
         col :event_ticket, search: :string
       end
 
-      col :purchased_order
+      col :purchased_order, visible: false
 
       col :first_name
       col :last_name

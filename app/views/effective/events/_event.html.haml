@@ -1,21 +1,41 @@
-.effective-event
-  %table.table.effective-event-table
-    %tbody
-      %tr
-        %td Starts
-        %td= event.start_at
+.card
+  .card-body
+    %table.table.effective-events-table
+      %tbody
+        %tr
+          %th Dates
+          %td
+            Starts: #{event.start_at&.strftime('%F %R')}
+            %br
+            Ends: #{event.end_at&.strftime('%F %R')}
 
-      %tr
-        %td Ends
-        %td= event.end_at
+        %tr
+          %th Registration Closes
+          %td= event.registration_end_at.strftime('%F %R')
 
-      %tr
-        %td Registration Closes
-        %td= event.registration_end_at
+        %tr
+          %th Early Bird
+          %td
+            Status: #{event.early_bird_status}
+            %br
+            Ends: #{event.early_bird_end_at&.strftime('%F %R')}
 
-      %tr
-        %td Early Bird Status
-        %td= event.early_bird_status
+        %tr
+          %th Tickets
+          %td
+            %ul.pl-3
+              - event.event_tickets.each do |ticket|
+                %li= "#{ticket} (#{price_to_currency(ticket.price)})"
 
-  .event-content.event-excerpt
-    = event.excerpt
+        - if event.event_products.present?
+          %tr
+            %th Add-ons
+            %td
+              %ul.pl-0
+                - event.event_products.each do |product|
+                  %li= "#{product} (#{price_to_currency(product.price)})"
+
+        - if event.body.present?
+          %tr
+            %th Description
+            %td= event.body

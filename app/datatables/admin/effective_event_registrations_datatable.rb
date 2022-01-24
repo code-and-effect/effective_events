@@ -12,8 +12,8 @@ class Admin::EffectiveEventRegistrationsDatatable < Effective::Datatable
     col :event, search: :string
     col :owner
 
-    col :event_registrants, search: :string
-    col :event_addons, search: :string
+    col :event_registrants, search: :string, visible: false
+    col :event_addons, search: :string, visible: false
     col :orders, label: 'Order'
 
     actions_col

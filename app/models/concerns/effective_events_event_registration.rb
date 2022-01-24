@@ -90,7 +90,7 @@ module EffectiveEventsEventRegistration
     validates :owner, presence: true
     validates :event, presence: true
 
-    # Registrants Step
+    # Tickets Step
     validate(if: -> { current_step == :tickets }) do
       self.errors.add(:event_registrants, "can't be blank") unless present_event_registrants.present?
     end
