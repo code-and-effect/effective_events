@@ -15,14 +15,6 @@ module EffectiveEventsEventRegistration
 
   module ClassMethods
     def effective_events_event_registration?; true; end
-
-    def all_wizard_steps
-      const_get(:WIZARD_STEPS).keys
-    end
-
-    def required_wizard_steps
-      [:start, :summary, :billing, :checkout, :submitted]
-    end
   end
 
   included do

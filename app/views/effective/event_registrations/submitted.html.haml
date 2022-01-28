@@ -9,6 +9,7 @@
 
   = link_to "Return to Dashboard", root_path, class: 'btn btn-lg btn-primary mb-4'
 
+  = render 'effective/event_registrations/summary', event_registration: resource
   = render 'effective/event_registrations/event_registration', event_registration: resource
   = render 'effective/event_registrations/orders', event_registration: resource
 

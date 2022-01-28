@@ -30,8 +30,4 @@ module EffectiveEventsHelper
     end
   end
 
-  def edit_effective_event_registrations_wizard?
-    params[:controller] == 'effective/event_registrations' && defined?(resource) && resource.draft?
-  end
-
 end
