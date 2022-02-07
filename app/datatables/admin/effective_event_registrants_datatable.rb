@@ -22,7 +22,7 @@ module Admin
       col :last_name
       col :email
       col :company
-      col :number
+      col :number, label: 'Designations'
       col :notes, label: 'Restrictions and notes'
 
       actions_col

@@ -13,7 +13,7 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
     col :last_name, visible: false
     col :email, visible: false
     col :company, visible: false
-    col :number, visible: false
+    col :number, visible: false, label: 'Designations'
 
     col :price, as: :price
     col :notes
