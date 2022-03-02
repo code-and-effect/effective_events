@@ -44,3 +44,9 @@ event.event_tickets.create!(
   early_bird_price: 150_00,
   qb_item_name: 'Tickets'
 )
+
+event.event_products.create!(
+  title: 'T-Shirt',
+  price: 100_00,
+  qb_item_name: 'Addons'
+)
