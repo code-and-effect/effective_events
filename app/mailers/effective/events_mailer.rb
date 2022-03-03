@@ -1,7 +1,7 @@
 module Effective
-  class EventsMailer < EffectiveResources.parent_mailer_class
-    default from: -> { EffectiveResources.mailer_sender }
-    layout -> { EffectiveResources.mailer_layout }
+  class EventsMailer < EffectiveEvents.parent_mailer_class
+    default from: -> { EffectiveEvents.mailer_sender }
+    layout -> { EffectiveEvents.mailer_layout }
 
     include EffectiveEmailTemplatesMailer if EffectiveEvents.use_effective_email_templates
 

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    effective_events (0.2.4)
+    effective_events (0.2.5)
       effective_bootstrap
       effective_datatables (>= 4.0.0)
       effective_orders
@@ -139,7 +139,7 @@ GEM
       effective_resources
       liquid
       rails (>= 3.2.0)
-    effective_orders (5.2.17)
+    effective_orders (5.3.1)
       coffee-rails
       effective_addresses
       effective_bootstrap
@@ -147,7 +147,7 @@ GEM
       effective_resources
       rails (>= 4.0.0)
       sassc
-    effective_resources (1.10.1)
+    effective_resources (1.14.0)
       rails (>= 4.0.0)
     effective_test_bot (1.2.9)
       capybara (>= 2.15)

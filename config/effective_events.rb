@@ -19,13 +19,19 @@ EffectiveEvents.setup do |config|
   # Events can be restricted by role
   config.use_effective_roles = true
 
-  # Mailer Configuration
+  # Mailer Settings
+  # Please see config/initializers/effective_resources.rb for default effective_* gem mailer settings
   #
-  # Additional mailer settings for parent_mailer, delivery_method, layout, sender and admin
-  # are required fields in config/initializers/effective_resources.rb
-
   # Configure the class responsible to send e-mails.
   # config.mailer = 'Effective::EventsMailer'
+  #
+  # Override effective_resource mailer defaults
+  #
+  # config.parent_mailer = nil      # The parent class responsible for sending emails
+  # config.deliver_method = nil     # The deliver method, deliver_later or deliver_now
+  # config.mailer_layout = nil      # Default mailer layout
+  # config.mailer_sender = nil      # Default From value
+  # config.mailer_admin = nil       # Default To value for Admin correspondence
 
   # Use effective email templates for event notifications
   config.use_effective_email_templates = true
