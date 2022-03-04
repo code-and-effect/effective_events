@@ -1,22 +1,22 @@
 module Effective
   class EventsMailer < EffectiveEvents.parent_mailer_class
-    default from: -> { EffectiveEvents.mailer_sender }
-    layout -> { EffectiveEvents.mailer_layout }
 
+    include EffectiveMailer
     include EffectiveEmailTemplatesMailer if EffectiveEvents.use_effective_email_templates
 
-    def event_registrant_purchased(event_registrant, opts = {})
-      @assigns = assigns_for(event_registrant)
-      @event_registrant = event_registrant
+    def event_registrant_purchased(resource, opts = {})
+      raise('expected an Effective::EventRegistrant') unless resource.kind_of?(Effective::EventRegistrant)
 
-      mail(to: event_registrant.email, **headers_for(event_registrant, opts))
+      @assigns = assigns_for(resource)
+      @event_registrant = resource
+
+      subject = subject_for(__method__, 'Event Registrant Purchased', resource, opts)
+      headers = headers_for(resource, opts)
+
+      mail(to: resource.email, subject: subject, **headers)
     end
 
     protected
-
-    def headers_for(resource, opts = {})
-      resource.respond_to?(:log_changes_datatable) ? opts.merge(log: resource) : opts
-    end
 
     def assigns_for(resource)
       if resource.kind_of?(EventRegistrant)

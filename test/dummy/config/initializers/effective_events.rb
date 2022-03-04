@@ -35,7 +35,4 @@ EffectiveEvents.setup do |config|
 
   # Use effective email templates for event notifications
   config.use_effective_email_templates = true
-
-  # Use effective email templates for event notifications
-  config.use_effective_email_templates = true
 end
