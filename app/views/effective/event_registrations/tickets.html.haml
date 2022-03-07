@@ -7,6 +7,6 @@
         = f.hidden_field :id
 
         = f.has_many :event_registrants, f.object.build_event_registrants do |fr|
-          = render('effective/event_registrants/fields', f: fr, event: f.object.event)
+          = render('effective/event_registrants/fields', f: fr, event: f.object.event, namespace: :events)
 
         = f.save 'Save and Continue'

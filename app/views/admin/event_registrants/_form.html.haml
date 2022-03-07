@@ -6,7 +6,7 @@
   - else
     = f.static_field :owner
 
-  = render 'effective/event_registrants/fields', f: f, event: event_registrant.event
+  = render 'effective/event_registrants/fields', f: f, event: event_registrant.event, namespace: :admin
 
   - if f.object.new_record?
     = f.submit 'Save and Mark Paid'

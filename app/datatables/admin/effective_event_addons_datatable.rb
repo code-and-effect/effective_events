@@ -23,7 +23,7 @@ module Admin
     end
 
     collection do
-      scope = Effective::EventAddon.deep.purchased
+      scope = Effective::EventAddon.deep.purchased.includes(:purchased_order, :owner)
 
       if attributes[:event_id].present?
         scope = scope.where(event: event)
