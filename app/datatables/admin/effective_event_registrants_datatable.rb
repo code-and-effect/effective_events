@@ -1,5 +1,10 @@
 module Admin
   class EffectiveEventRegistrantsDatatable < Effective::Datatable
+    filters do
+      scope :unarchived, label: "All"
+      scope :archived
+    end
+
     datatable do
       col :updated_at, visible: false
       col :created_at, visible: false

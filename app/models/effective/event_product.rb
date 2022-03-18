@@ -2,6 +2,8 @@
 
 module Effective
   class EventProduct < ActiveRecord::Base
+    acts_as_archived
+
     belongs_to :event
 
     has_many :event_addons

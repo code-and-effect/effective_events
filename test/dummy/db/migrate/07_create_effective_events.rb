@@ -64,6 +64,8 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.integer :purchased_order_id
       t.integer :price
 
+      t.boolean :archived, default: false
+
       t.timestamps
     end
 
@@ -98,6 +100,8 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
 
       t.integer :purchased_order_id
       t.integer :price
+
+      t.boolean :archived, default: false
 
       t.timestamps
     end

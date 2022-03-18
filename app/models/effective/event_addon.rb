@@ -6,6 +6,7 @@
 module Effective
   class EventAddon < ActiveRecord::Base
     acts_as_purchasable
+    acts_as_archived
 
     log_changes(to: :event) if respond_to?(:log_changes)
 
@@ -22,6 +23,8 @@ module Effective
 
     effective_resource do
       notes             :text
+
+      archived          :boolean
 
       # Acts as Purchasable
       price             :integer

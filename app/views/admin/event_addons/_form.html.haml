@@ -8,6 +8,8 @@
 
   = render 'effective/event_addons/fields', f: f, event: event_addon.event
 
+  = f.check_box :archived, label: "Archive this addon. It will be displayed as archived on the owner's event registration"
+
   - if f.object.new_record?
     = f.submit 'Save and Mark Paid'
   - else

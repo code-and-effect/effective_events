@@ -3,6 +3,7 @@
 module Effective
   class EventRegistrant < ActiveRecord::Base
     acts_as_purchasable
+    acts_as_archived
 
     log_changes(to: :event) if respond_to?(:log_changes)
 
@@ -25,6 +26,8 @@ module Effective
       company       :string
       number        :string
       notes         :text
+
+      archived      :boolean
 
       # Acts as Purchasable
       price             :integer

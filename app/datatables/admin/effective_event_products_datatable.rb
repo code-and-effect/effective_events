@@ -1,5 +1,10 @@
 module Admin
   class EffectiveEventProductsDatatable < Effective::Datatable
+    filters do
+      scope :unarchived, label: "All"
+      scope :archived
+    end
+
     datatable do
       reorder :position
 
@@ -11,8 +16,6 @@ module Admin
 
       col :title
       col :price, as: :price
-
-      col :archived
 
       col :capacity_to_s, label: 'Capacity' do |ticket|
         if ticket.capacity.present?
