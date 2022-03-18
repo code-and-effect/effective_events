@@ -3,10 +3,10 @@
     - if f.object.purchased?
       = f.static_field :event_ticket, label: 'Purchased ticket'
     - else
-      = f.select :event_ticket_id, effective_events_event_tickets_collection(event), label: 'Ticket'
+      = f.select :event_ticket_id, effective_events_event_tickets_collection(event, namespace), label: 'Ticket'
 
     - if f.object.purchased? && namespace == :admin
-      = f.select :event_ticket_id, effective_events_event_tickets_collection(event), label: 'Change Ticket', hint: 'Admin only. Change the purchased ticket. This will not create charges, alter the original order, or consider ticket capacity.'
+      = f.select :event_ticket_id, effective_events_event_tickets_collection(event, namespace), label: 'Change Ticket', hint: 'Admin only. Change the purchased ticket. This will not create charges, alter the original order, or consider ticket capacity.'
 
     .row
       .col-lg= f.text_field :first_name

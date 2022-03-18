@@ -1,10 +1,10 @@
 module EffectiveEventsHelper
 
-  def effective_events_event_tickets_collection(event)
+  def effective_events_event_tickets_collection(event, namespace = nil)
     raise('expected an Effective::Event') unless event.kind_of?(Effective::Event)
 
     # Allow an admin to assign archived tickets
-    authorized = EffectiveResources.authorized?(self, :admin, :effective_events)
+    authorized = (namespace == :admin)
     tickets = (authorized ? event.event_tickets : event.event_tickets.reject(&:archived?))
 
     tickets.map do |ticket|
@@ -19,11 +19,11 @@ module EffectiveEventsHelper
     end
   end
 
-  def effective_events_event_products_collection(event)
+  def effective_events_event_products_collection(event, namespace = nil)
     raise('expected an Effective::Event') unless event.kind_of?(Effective::Event)
 
     # Allow an admin to assign archived products
-    authorized = EffectiveResources.authorized?(self, :admin, :effective_events)
+    authorized = (namespace == :admin)
     products = (authorized ? event.event_products : event.event_products.reject(&:archived?))
 
     products.map do |product|
