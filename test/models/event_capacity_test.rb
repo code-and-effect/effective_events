@@ -14,6 +14,10 @@ class EventCapacityTest < ActiveSupport::TestCase
     registrant2 = build_event_registrant(event_ticket: ticket, event: ticket.event)
     registrant3 = build_event_registrant(event_ticket: ticket, event: ticket.event)
 
+    registrant.save!
+    registrant2.save!
+    registrant3.save!
+
     order = Effective::Order.new(items: [registrant, registrant2, registrant3], user: registrant.owner)
     order.purchase!
 
@@ -36,6 +40,10 @@ class EventCapacityTest < ActiveSupport::TestCase
     addon = build_event_addon(event_product: product, event: product.event)
     addon2 = build_event_addon(event_product: product, event: product.event)
     addon3 = build_event_addon(event_product: product, event: product.event)
+
+    addon.save!
+    addon2.save!
+    addon3.save!
 
     order = Effective::Order.new(items: [addon, addon2, addon3], user: addon.owner)
     order.purchase!
