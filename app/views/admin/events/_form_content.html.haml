@@ -1,5 +1,9 @@
 = effective_form_with(model: [:admin, event], engine: true) do |f|
-  = f.rich_text_area :rich_text_excerpt, hint: 'Will be used for the events excerpt on index pages.'
-  = f.rich_text_area :rich_text_body, hint: 'The main body of your event'
+  - if defined?(EffectiveArticleEditor)
+    = f.article_editor :rich_text_excerpt, hint: 'Will be used for the events excerpt on index pages.'
+    = f.article_editor :rich_text_body, hint: 'The main body of your event'
+  - else
+    = f.rich_text_area :rich_text_excerpt, hint: 'Will be used for the events excerpt on index pages.'
+    = f.rich_text_area :rich_text_body, hint: 'The main body of your event'
 
   = f.submit

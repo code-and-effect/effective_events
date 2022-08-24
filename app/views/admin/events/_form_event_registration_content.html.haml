@@ -2,8 +2,10 @@
 
 = effective_form_with(model: [:admin, event], engine: true) do |f|
   = card("All Steps") do
-    = f.rich_text_area "rich_text_all_steps_content", label: false,
-      hint: "displayed on all steps"
+    - if defined?(EffectiveArticleEditor)
+      = f.article_editor "rich_text_all_steps_content", label: false, hint: "displayed on all steps"
+    - else
+      = f.rich_text_area "rich_text_all_steps_content", label: false, hint: "displayed on all steps"
 
   %hr
 
@@ -13,7 +15,9 @@
     - next unless enabled.include?(step)
 
     = card("#{title}") do
-      = f.rich_text_area "rich_text_#{step}_content", label: false,
-        hint: "displayed on the event registration #{step} wizard step only"
+      - if defined?(EffectiveArticleEditor)
+        = f.article_editor "rich_text_#{step}_content", label: false, hint: "displayed on the event registration #{step} wizard step only"
+      - else
+        = f.rich_text_area "rich_text_#{step}_content", label: false, hint: "displayed on the event registration #{step} wizard step only"
 
   = f.submit
