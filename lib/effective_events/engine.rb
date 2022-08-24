@@ -9,8 +9,10 @@ module EffectiveEvents
 
     # Include concern and allow any ActiveRecord object to call it
     initializer 'effective_events.active_record' do |app|
-      ActiveSupport.on_load :active_record do
-        ActiveRecord::Base.extend(EffectiveEventsEventRegistration::Base)
+      app.config.to_prepare do
+        ActiveSupport.on_load :active_record do
+          ActiveRecord::Base.extend(EffectiveEventsEventRegistration::Base)
+        end
       end
     end
 
