@@ -84,7 +84,7 @@ module Effective
       save!
 
       order = Effective::Order.new(items: self, user: owner)
-      order.purchase!(skip_buyer_validations: true, email: false)
+      order.mark_as_purchased!
 
       true
     end

@@ -82,7 +82,7 @@ module Effective
     scope :events, -> (user: nil, unpublished: false) {
       scope = all.deep.sorted
 
-      if defined?(EffectiveRoles) && EffectivePosts.use_effective_roles
+      if defined?(EffectiveRoles) && EffectiveEvents.use_effective_roles
         scope = scope.for_role(user&.roles)
       end
 
