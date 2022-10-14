@@ -14,7 +14,7 @@ class Admin::EffectiveEventNotificationsDatatable < Effective::Datatable
     col :category
 
     col :from do |event|
-      html_escape(event.from)
+      simple_format(event.from)
     end
 
     # col :reminder do |poll_notification|
