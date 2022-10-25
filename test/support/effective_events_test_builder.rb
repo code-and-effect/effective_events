@@ -47,6 +47,7 @@ module EffectiveEventsTestBuilder
       rich_text_excerpt: '<p>This is a great event!</p>',
       rich_text_body: '<p>This is really a great event!</p>',
 
+      published_at: Time.zone.now,
       start_at: (now + 1.week),
       end_at: (now + 1.week + 1.hour),
 

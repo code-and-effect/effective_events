@@ -9,6 +9,12 @@ class EventRegistrationsTest < ActiveSupport::TestCase
     assert_equal 2, event_registration.event_addons.length
   end
 
+  test 'event with external registration is invalid for registration' do
+    event_registration = build_event_registration()
+    event_registration.event.update_column(:external_registration, true)
+    refute event_registration.valid?
+  end
+
   test 'build_event_registration purchase' do
     event_registration = build_event_registration()
 

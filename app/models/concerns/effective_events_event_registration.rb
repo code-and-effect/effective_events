@@ -82,6 +82,11 @@ module EffectiveEventsEventRegistration
     validates :owner, presence: true
     validates :event, presence: true
 
+    # All Steps
+    validate(if: -> { event.present? }) do
+      self.errors.add(:base, "cannot register for an external registration event") if event.external_registration?
+    end
+
     # Tickets Step
     validate(if: -> { current_step == :tickets }) do
       self.errors.add(:event_registrants, "can't be blank") unless present_event_registrants.present?

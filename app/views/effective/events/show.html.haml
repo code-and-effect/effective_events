@@ -7,6 +7,7 @@
 
   - if @event.registerable?
     .resource-buttons
-      = link_to 'Register', effective_events.new_event_event_registration_path(@event), class: 'btn btn-primary'
+      - url = @event.external_registration_url.presence || effective_events.new_event_event_registration_path(@event)
+      = link_to 'Register', url, class: 'btn btn-primary'
 
   = render 'effective/events/event', event: @event
