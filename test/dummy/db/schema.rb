@@ -210,8 +210,10 @@ ActiveRecord::Schema.define(version: 7) do
 
   create_table "events", force: :cascade do |t|
     t.string "title"
+    t.string "category"
     t.string "slug"
     t.boolean "draft", default: false
+    t.datetime "published_at"
     t.datetime "start_at"
     t.datetime "end_at"
     t.datetime "registration_start_at"
@@ -219,6 +221,8 @@ ActiveRecord::Schema.define(version: 7) do
     t.datetime "early_bird_end_at"
     t.integer "event_registrants_count", default: 0
     t.integer "event_addons_count", default: 0
+    t.boolean "external_registration", default: false
+    t.string "external_registration_url"
     t.integer "roles_mask"
     t.boolean "authenticate_user", default: false
     t.datetime "created_at", precision: 6, null: false

@@ -1,5 +1,10 @@
 .card
   .card-body
+    - if event.file.attached?
+      = image_tag(event.file)
+
+    = event.excerpt.to_s
+
     %table.table.effective-events-table
       %tbody
         %tr
@@ -8,6 +13,15 @@
             Starts: #{event.start_at&.strftime('%F %R')}
             %br
             Ends: #{event.end_at&.strftime('%F %R')}
+
+        - if event.category.present?
+          %tr
+            %th Category
+            %td= event.category
+
+        %tr
+          %th Published At
+          %td= event.published_at.strftime('%F %R')
 
         %tr
           %th Registration Closes
@@ -20,12 +34,13 @@
             %br
             Ends: #{event.early_bird_end_at&.strftime('%F %R')}
 
-        %tr
-          %th Tickets
-          %td
-            %ul.pl-3
-              - event.event_tickets.each do |ticket|
-                %li= "#{ticket} (#{price_to_currency(ticket.price)})"
+        - if event.event_tickets.present?
+          %tr
+            %th Tickets
+            %td
+              %ul.pl-3
+                - event.event_tickets.each do |ticket|
+                  %li= "#{ticket} (#{price_to_currency(ticket.price)})"
 
         - if event.event_products.present?
           %tr
@@ -35,7 +50,4 @@
                 - event.event_products.each do |product|
                   %li= "#{product} (#{price_to_currency(product.price)})"
 
-        - if event.body.present?
-          %tr
-            %th Description
-            %td= event.body
+    = link_to('View more', effective_events.event_path(event))

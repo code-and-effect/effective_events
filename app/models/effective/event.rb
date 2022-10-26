@@ -28,6 +28,8 @@ module Effective
     # rich_text_select_content
     # rich_text_select_content
 
+    has_one_attached :file
+
     acts_as_slugged
     log_changes if respond_to?(:log_changes)
     acts_as_role_restricted if respond_to?(:acts_as_role_restricted)
@@ -37,8 +39,11 @@ module Effective
     effective_resource do
       title                  :string
 
+      category               :string
       slug                   :string
+
       draft                  :boolean
+      published_at           :datetime
 
       start_at               :datetime
       end_at                 :datetime
@@ -48,6 +53,9 @@ module Effective
 
       early_bird_end_at      :datetime  # Optional
 
+      external_registration       :boolean
+      external_registration_url   :string
+
       # Access
       roles_mask             :integer
       authenticate_user      :boolean
@@ -55,11 +63,11 @@ module Effective
       timestamps
     end
 
-    scope :sorted, -> { order(:end_at) }
+    scope :sorted, -> { order(published_at: :desc).order(:id) }
     scope :deep, -> { includes(:event_registrants, :event_tickets) }
 
-    scope :drafts, -> { where(draft: true) }
-    scope :published, -> { where(draft: false) }
+    scope :published, -> { where(draft: false).where(arel_table[:published_at].lt(Time.zone.now)) }
+    scope :unpublished, -> { where(draft: true).where(arel_table[:published_at].gteq(Time.zone.now)) }
 
     scope :upcoming, -> { where(arel_table[:end_at].gt(Time.zone.now)) }
     scope :past, -> { where(arel_table[:end_at].lteq(Time.zone.now)) }
@@ -79,7 +87,7 @@ module Effective
       limit(per_page).offset(offset)
     }
 
-    scope :events, -> (user: nil, unpublished: false) {
+    scope :events, -> (user: nil, category: nil, unpublished: false) {
       scope = all.deep.sorted
 
       if defined?(EffectiveRoles) && EffectiveEvents.use_effective_roles
@@ -90,6 +98,10 @@ module Effective
         scope = scope.where(authenticate_user: false)
       end
 
+      if category.present?
+        scope = scope.where(category: category)
+      end
+
       unless unpublished
         scope = scope.published
       end
@@ -98,11 +110,12 @@ module Effective
     }
 
     validates :title, presence: true, length: { maximum: 255 }
-
+    validates :published_at, presence: true, unless: -> { draft? }
     validates :start_at, presence: true
     validates :end_at, presence: true
     validates :registration_start_at, presence: true
     validates :registration_end_at, presence: true
+    validates :external_registration_url, presence: true, if: -> { external_registration? }
 
     validate(if: -> { start_at && end_at }) do
       self.errors.add(:end_at, 'must be after start date') unless start_at < end_at
@@ -120,6 +133,14 @@ module Effective
       self.errors.add(:early_bird_end_at, 'must be before start date') unless early_bird_end_at < start_at
     end
 
+    validate(if: -> { file.attached? }) do
+      self.errors.add(:file, 'must be an image') unless file.image?
+    end
+
+    validate(if: -> { category.present? }) do
+      self.errors.add(:category, 'is not included in the list') unless EffectiveEvents.categories.include?(category)
+    end
+
     def to_s
       title.presence || 'New Event'
     end
@@ -132,13 +153,19 @@ module Effective
       rich_text_excerpt
     end
 
-    def registerable?
+    def published?
       return false if draft?
+      return false if published_at.blank?
+
+      published_at < Time.zone.now
+    end
+
+    def registerable?
+      return false unless published?
       return false if closed?
       return false if sold_out?
-      return false if event_tickets.blank?
 
-      true
+      external_registration? || event_tickets.present?
     end
 
     def closed?

@@ -7,6 +7,16 @@ end
 EffectiveEvents::Engine.routes.draw do
   # Public routes
   scope module: 'effective' do
+
+    # Event Category routes
+    match 'events/:category', to: 'events#index', via: :get, constraints: lambda { |req|
+      EffectiveEvents.categories.map(&:parameterize).include?(req.params['category'])
+    }
+
+    match "events/:category/:id", to: 'events#show', via: :get, constraints: lambda { |req|
+      EffectiveEvents.categories.map(&:parameterize).include?(req.params['category'])
+    }
+
     resources :events, only: [:index, :show] do
       resources :event_registrations, only: [:new, :show, :destroy] do
         resources :build, controller: :event_registrations, only: [:show, :update]

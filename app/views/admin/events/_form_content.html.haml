@@ -1,9 +1,11 @@
 = effective_form_with(model: [:admin, event], engine: true) do |f|
+  = f.file_field :file, label: 'Image attachment', hint: EffectiveEvents.events_hint_text
+
   - if defined?(EffectiveArticleEditor)
-    = f.article_editor :rich_text_excerpt, hint: 'Will be used for the events excerpt on index pages.'
-    = f.article_editor :rich_text_body, hint: 'The main body of your event'
+    = f.article_editor :rich_text_excerpt, label: 'Excerpt', hint: 'Will be used for the events excerpt on index pages.'
+    = f.article_editor :rich_text_body, label: 'Body', hint: 'The main body of your event'
   - else
-    = f.rich_text_area :rich_text_excerpt, hint: 'Will be used for the events excerpt on index pages.'
-    = f.rich_text_area :rich_text_body, hint: 'The main body of your event'
+    = f.rich_text_area :rich_text_excerpt, label: 'Excerpt', hint: 'Will be used for the events excerpt on index pages.'
+    = f.rich_text_area :rich_text_body, label: 'Body', hint: 'The main body of your event'
 
   = f.submit

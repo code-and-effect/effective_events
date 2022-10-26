@@ -19,6 +19,12 @@ EffectiveEvents.setup do |config|
   # Events can be restricted by role
   config.use_effective_roles = true
 
+  # Categories
+  config.categories = ['Events']
+
+  # Hint text for event images attachments
+  config.events_hint_text = 'Hint text that includes required image dimensions'
+
   # Mailer Settings
   # Please see config/initializers/effective_resources.rb for default effective_* gem mailer settings
   #

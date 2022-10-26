@@ -13,6 +13,7 @@ event = Effective::Event.create!(
   rich_text_excerpt: '<p>This is a great event</p>',
   rich_text_body: '<p>This is a really great event!</p>',
 
+  published_at: Time.zone.now,
   start_at: (now + 1.week),
   end_at: (now + 1.week + 1.hour),
 

@@ -1,0 +1,8 @@
+.effective-event-categories
+  %p
+    %strong Categories
+
+  = link_to('All Events', effective_events.events_path)
+
+  - EffectiveEvents.categories.each do |category|
+    = link_to(category, effective_events.events_path + '/' + category.parameterize)

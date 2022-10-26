@@ -1,5 +1,11 @@
 = effective_form_with(model: [:admin, event], engine: true) do |f|
   = f.text_field :title, label: "Title"
+
+  - categories = EffectiveEvents.categories
+  - if categories.present?
+    = f.select :category, categories, hint: 'optional category'
+
+  = f.datetime_field :published_at, label: 'Publish date', hint: 'When should this be displayed on the website.'
   = f.check_box :draft, hint: 'Save this event as a draft. It will not be accessible on the website.'
 
   - if f.object.persisted? || f.object.errors.include?(:slug)
@@ -13,9 +19,13 @@
   %p The online registration and purchase for this event will be available between:
   = f.datetime_field :registration_start_at, label: "Registration Start"
   = f.datetime_field :registration_end_at, label: "Registration End"
-
   = f.datetime_field :early_bird_end_at, label: "Early Bird End",
     hint: 'Event tickets can be purchased for early bird pricing before this date. Afterwards regular pricing applies.'
+
+  = f.check_box :external_registration, label: "Yes, the registration for this event is handled by another website"
+
+  = f.show_if(:external_registration, true) do
+    = f.url_field :external_registration_url, hint: "The url for external event registration. Must start with http(s)://"
 
   = f.submit do
     = f.save 'Save'

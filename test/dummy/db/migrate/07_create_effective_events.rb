@@ -3,8 +3,11 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
     create_table :events do |t|
       t.string :title
 
+      t.string :category
       t.string :slug
+
       t.boolean :draft, default: false
+      t.datetime :published_at
 
       t.datetime :start_at
       t.datetime :end_at
@@ -15,6 +18,9 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
 
       t.integer :event_registrants_count, default: 0
       t.integer :event_addons_count, default: 0
+
+      t.boolean :external_registration, default: false
+      t.string :external_registration_url
 
       t.integer :roles_mask
       t.boolean :authenticate_user, default: false

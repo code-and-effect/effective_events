@@ -6,6 +6,7 @@
     = tab 'Content' do
       = render '/admin/events/form_content', event: event
 
+  - if event.persisted? && !event.external_registration?
     = tab 'Tickets' do
       %h2 Tickets
       - datatable = Admin::EffectiveEventTicketsDatatable.new(event_id: event.id)
@@ -40,6 +41,7 @@
     = tab 'Wizard' do
       = render '/admin/events/form_event_registration_content', event: event
 
+  - if event.persisted?
     = tab 'Access' do
       = render '/admin/events/form_access', event: event
 

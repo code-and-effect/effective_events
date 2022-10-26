@@ -3,7 +3,8 @@ module Admin
     filters do
       scope :all
       scope :registerable
-      scope :drafts
+      scope :published
+      scope :unpublished
       scope :upcoming
       scope :past
     end

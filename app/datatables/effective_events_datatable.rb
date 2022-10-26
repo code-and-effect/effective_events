@@ -2,6 +2,7 @@
 class EffectiveEventsDatatable < Effective::Datatable
   filters do
     # Upcoming should be first here, so when displayed as a simple datatable on the dashboard they only see upcoming events
+    scope :upcoming
     scope :registerable
     scope :all
   end
@@ -32,7 +33,8 @@ class EffectiveEventsDatatable < Effective::Datatable
 
     actions_col show: false do |event|
       if event.registerable?
-        dropdown_link_to('Register', effective_events.new_event_event_registration_path(event))
+        url = event.external_registration_url.presence || effective_events.new_event_event_registration_path(event)
+        dropdown_link_to('Register', url)
       end
     end
   end

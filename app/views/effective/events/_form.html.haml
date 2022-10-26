@@ -1,0 +1,11 @@
+= effective_form_with(scope: :q, model: event_search, method: :get, url: request.path) do |f|
+  - if f.object.term.present?
+    = f.search_field :term, label: 'Term'
+
+  /= f.radios :category, EffectiveEvents.categories, buttons: true
+
+  - f.object.order ||= Effective::EventSearch::ORDERS.first
+  = f.radios :order, Effective::EventSearch::ORDERS, buttons: true
+
+  = f.save('Search', class: 'btn btn-primary btn-search mr-3', name: nil)
+  = link_to 'Reset filters', request.path
