@@ -10,4 +10,43 @@
       - url = @event.external_registration_url.presence || effective_events.new_event_event_registration_path(@event)
       = link_to 'Register', url, class: 'btn btn-primary'
 
-  = render 'effective/events/event', event: @event
+  = card do
+    - if @event.file.attached?
+      = image_tag(@event.file)
+
+    = @event.body.to_s
+
+    %table.table.effective-events-table
+      %tbody
+        %tr
+          %th Dates
+          %td
+            Starts: #{@event.start_at&.strftime('%F %R')}
+            %br
+            Ends: #{@event.end_at&.strftime('%F %R')}
+
+        %tr
+          %th Registration Closes
+          %td= @event.registration_end_at.strftime('%F %R')
+
+        %tr
+          %th Early Bird
+          %td
+            Status: #{@event.early_bird_status}
+            %br
+            Ends: #{@event.early_bird_end_at&.strftime('%F %R')}
+
+        %tr
+          %th Tickets
+          %td
+            %ul.pl-3
+              - @event.event_tickets.each do |ticket|
+                %li= "#{ticket} (#{price_to_currency(ticket.price)})"
+
+        - if @event.event_products.present?
+          %tr
+            %th Add-ons
+            %td
+              %ul.pl-0
+                - @event.event_products.each do |product|
+                  %li= "#{product} (#{price_to_currency(product.price)})"

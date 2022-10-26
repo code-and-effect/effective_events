@@ -63,7 +63,7 @@ module Effective
       timestamps
     end
 
-    scope :sorted, -> { order(:end_at) }
+    scope :sorted, -> { order(published_at: :desc).order(:id) }
     scope :deep, -> { includes(:event_registrants, :event_tickets) }
 
     scope :published, -> { where(draft: false).where(arel_table[:published_at].lt(Time.zone.now)) }

@@ -1,5 +1,15 @@
-= card do
-  - if @datatable.present?(self)
-    = render_datatable(@datatable, simple: true)
-  - else
-    %p There are no events open for registration. When there are, we'll show them here.
+-# render_datatable(@datatable)
+
+= render 'layout' do
+  = render('effective/events/form', event_search: @event_search)
+
+  - results = @event_search.results(page: params[:page])
+
+  - if @event_search.present? && results.length == 0
+    .alert.alert-info There are no results for your search. Please try again.
+
+  - results.each do |event|
+    = render('effective/events/event', event: event)
+
+  %nav.d-flex.justify-content-center
+    = bootstrap_paginate(results, per_page: @event_search.per_page)
