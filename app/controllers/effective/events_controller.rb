@@ -8,7 +8,7 @@ module Effective
     }
 
     def index
-      @page_title = 'Events'
+      @page_title ||= 'Events'
       EffectiveResources.authorize!(self, :index, Effective::Event)
 
       # Sometimes we just display a Datatable for the events
