@@ -14,6 +14,11 @@
             %br
             Ends: #{event.end_at&.strftime('%F %R')}
 
+        - if event.category.present?
+          %tr
+            %th Category
+            %td= event.category
+
         %tr
           %th Published At
           %td= event.published_at.strftime('%F %R')
@@ -44,3 +49,5 @@
               %ul.pl-0
                 - event.event_products.each do |product|
                   %li= "#{product} (#{price_to_currency(product.price)})"
+
+    = link_to('View more', effective_events.event_path(event))

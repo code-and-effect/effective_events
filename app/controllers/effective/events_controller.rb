@@ -46,7 +46,13 @@ module Effective
       search = EventSearch.new(search_params)
       search.current_user = current_user
       search.unpublished = EffectiveResources.authorized?(self, :admin, :effective_events)
+      search.category ||= event_category
       search
+    end
+
+    def event_category
+      return nil unless params[:category].present?
+      EffectiveEvents.categories.find { |category| category.parameterize == params[:category] }
     end
 
     def search_params
