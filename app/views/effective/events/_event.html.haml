@@ -1,53 +1,7 @@
-.card
+.card{class: "effective-events-#{event.category.parameterize}"}
   .card-body
-    - if event.file.attached?
-      = image_tag(event.file)
-
-    = event.excerpt.to_s
-
-    %table.table.effective-events-table
-      %tbody
-        %tr
-          %th Dates
-          %td
-            Starts: #{event.start_at&.strftime('%F %R')}
-            %br
-            Ends: #{event.end_at&.strftime('%F %R')}
-
-        - if event.category.present?
-          %tr
-            %th Category
-            %td= event.category
-
-        %tr
-          %th Published At
-          %td= event.published_at.strftime('%F %R')
-
-        %tr
-          %th Registration Closes
-          %td= event.registration_end_at.strftime('%F %R')
-
-        %tr
-          %th Early Bird
-          %td
-            Status: #{event.early_bird_status}
-            %br
-            Ends: #{event.early_bird_end_at&.strftime('%F %R')}
-
-        - if event.event_tickets.present?
-          %tr
-            %th Tickets
-            %td
-              %ul.pl-3
-                - event.event_tickets.each do |ticket|
-                  %li= "#{ticket} (#{price_to_currency(ticket.price)})"
-
-        - if event.event_products.present?
-          %tr
-            %th Add-ons
-            %td
-              %ul.pl-0
-                - event.event_products.each do |product|
-                  %li= "#{product} (#{price_to_currency(product.price)})"
-
-    = link_to('View more', effective_events.event_path(event))
+    = link_to(event.category, effective_events.events_path + '/' + event.category.parameterize, class: "badge badge-event mb-2 effective-events-#{event.category.parameterize}")
+    %h2.mt-1= link_to event.title, effective_events.event_path(event)
+    .effective-events-schedule= effective_events_event_schedule(event)
+    .effective-events-excerpt= event.excerpt.to_s
+    = link_to "View Event",  effective_events.event_path(event), class: 'btn btn-primary'
