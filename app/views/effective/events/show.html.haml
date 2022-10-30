@@ -1,52 +1,58 @@
-.effective-event
-  - if @event.sold_out?
-    .alert.alert-warning This event is sold out.
+= render 'layout' do
+  .effective-event
+    - if @event.sold_out?
+      .alert.alert-warning.mb-3 This event is sold out.
 
-  - if @event.closed?
-    .alert.alert-warning This event is no longer available.
+    - if @event.closed?
+      .alert.alert-warning.mb-3 This event is no longer available.
 
-  - if @event.registerable?
-    .resource-buttons
-      - url = @event.external_registration_url.presence || effective_events.new_event_event_registration_path(@event)
-      = link_to 'Register', url, class: 'btn btn-primary'
+    - if @event.registerable?
+      .resource-buttons
+        - url = @event.external_registration_url.presence || effective_events.new_event_event_registration_path(@event)
+        = link_to 'Register', url, class: 'btn btn-primary'
 
-  = card do
-    - if @event.file.attached?
-      = image_tag(@event.file)
+  - if @event.file.attached?
+    = image_tag(@event.file)
 
+  - if @event.file.attached?
+    = image_tag(@event.file)
+
+  %ul.list-unstyled
+    -# Not shown
+      %li
+        %strong Published:
+        = @event.published_at.strftime("%b %d, %Y %I:%M%P")
+
+    %li
+      %strong Event Date:
+      = effective_events_event_schedule(@event)
+
+    %li
+      %strong Registration Opens:
+      = @event.registration_start_at.strftime("%b %d, %Y %I:%M%P")
+
+    - if @event.early_bird_end_at.present?
+      %li
+        %strong Early Bird Rate Ends:
+        = @event.early_bird_end_at.strftime("%b %d, %Y %I:%M%P")
+
+    %li
+      %strong Registration Closes:
+      = @event.registration_end_at.strftime('%F %R')
+
+    - if @event.event_tickets.present?
+      %li
+        %strong Tickets
+        %ul
+          - @event.event_tickets.each do |ticket|
+            %li= "#{ticket} (#{price_to_currency(ticket.price)})"
+
+    - if @event.event_products.present?
+      %li
+        %strong Add-ons
+        %ul
+          - @event.event_products.each do |product|
+            %li= "#{product} (#{price_to_currency(product.price)})"
+
+  - if @event.body.present?
     = @event.body.to_s
-
-    %table.table.effective-events-table
-      %tbody
-        %tr
-          %th Dates
-          %td
-            Starts: #{@event.start_at&.strftime('%F %R')}
-            %br
-            Ends: #{@event.end_at&.strftime('%F %R')}
-
-        %tr
-          %th Registration Closes
-          %td= @event.registration_end_at.strftime('%F %R')
-
-        %tr
-          %th Early Bird
-          %td
-            Status: #{@event.early_bird_status}
-            %br
-            Ends: #{@event.early_bird_end_at&.strftime('%F %R')}
-
-        %tr
-          %th Tickets
-          %td
-            %ul.pl-3
-              - @event.event_tickets.each do |ticket|
-                %li= "#{ticket} (#{price_to_currency(ticket.price)})"
-
-        - if @event.event_products.present?
-          %tr
-            %th Add-ons
-            %td
-              %ul.pl-0
-                - @event.event_products.each do |product|
-                  %li= "#{product} (#{price_to_currency(product.price)})"
