@@ -4,6 +4,7 @@ class EffectiveEventsDatatable < Effective::Datatable
     # Upcoming should be first here, so when displayed as a simple datatable on the dashboard they only see upcoming events
     scope :upcoming
     scope :registerable
+    scope :external
     scope :all
   end
 

@@ -79,6 +79,7 @@ module Effective
 
     # Doesnt consider sold out yet
     scope :registerable, -> { published.not_closed.with_tickets }
+    scope :external, -> { published.where(external_registration: true) }
 
     scope :paginate, -> (page: nil, per_page: nil) {
       page = (page || 1).to_i
@@ -113,8 +114,9 @@ module Effective
     validates :published_at, presence: true, unless: -> { draft? }
     validates :start_at, presence: true
     validates :end_at, presence: true
-    validates :registration_start_at, presence: true
-    validates :registration_end_at, presence: true
+
+    validates :registration_start_at, presence: true, unless: -> { external_registration? }
+    validates :registration_end_at, presence: true, unless: -> { external_registration? }
     validates :external_registration_url, presence: true, if: -> { external_registration? }
 
     validate(if: -> { start_at && end_at }) do
@@ -204,8 +206,8 @@ module Effective
         event.slug = event.slug + '-copy'
         event.draft = true
 
-        event.body = body
-        event.excerpt = excerpt
+        event.rich_text_body = rich_text_body
+        event.rich_text_excerpt = rich_text_excerpt
       end
     end
 

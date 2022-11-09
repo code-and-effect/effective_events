@@ -27,18 +27,20 @@
       %strong Event Date:
       = effective_events_event_schedule(@event)
 
-    %li
-      %strong Registration Opens:
-      = @event.registration_start_at.strftime("%b %d, %Y %I:%M%P")
+    - if @event.registration_start_at.present?
+      %li
+        %strong Registration Opens:
+        = @event.registration_start_at.strftime("%b %d, %Y %I:%M%P")
 
     - if @event.early_bird_end_at.present?
       %li
         %strong Early Bird Rate Ends:
         = @event.early_bird_end_at.strftime("%b %d, %Y %I:%M%P")
 
-    %li
-      %strong Registration Closes:
-      = @event.registration_end_at.strftime('%F %R')
+    - if @event.registration_end_at.present?
+      %li
+        %strong Registration Closes:
+        = @event.registration_end_at.strftime('%F %R')
 
     - if @event.event_tickets.present?
       %li
