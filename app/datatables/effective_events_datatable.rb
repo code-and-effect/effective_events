@@ -9,7 +9,8 @@ class EffectiveEventsDatatable < Effective::Datatable
   end
 
   datatable do
-    order :title
+    order :start_at
+
     col :id, visible: false
 
     col :start_at, label: 'Date', as: :date

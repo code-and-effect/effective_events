@@ -72,7 +72,7 @@ module Effective
       when 'Sort by Event Date'
         events.reorder(start_at: :desc)
       else
-        events.reorder(published_at: :desc) # Default Sort by Published Date
+        events.reorder(start_at: :desc) # Default Sort by Event Date
       end
 
       events
