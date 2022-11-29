@@ -40,7 +40,7 @@
     - if @event.registration_end_at.present?
       %li
         %strong Registration Closes:
-        = @event.registration_end_at.strftime('%F %R')
+        = @event.registration_end_at.strftime("%b %d, %Y %I:%M%P")
 
     - if @event.event_tickets.present?
       %li

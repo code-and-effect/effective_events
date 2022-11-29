@@ -45,7 +45,7 @@ module Admin
 
     def event
       @event ||= if attributes[:event_id]
-        Effective::Event.find(attributes[:event_id])
+        Effective::Event.find_by_id(attributes[:event_id])
       end
     end
   end
