@@ -1,6 +1,8 @@
-.card{class: "effective-events-#{event.category.parameterize}"}
+.card.mb-4{class: "effective-events-#{event.category.to_s.parameterize}"}
   .card-body
-    = link_to(event.category, effective_events.events_path + '/' + event.category.parameterize, class: "badge badge-event mb-2 effective-events-#{event.category.parameterize}")
+    - if event.category.present?
+      = link_to(event.category, effective_events.events_path + '/' + event.category.parameterize, class: "badge badge-event mb-2 effective-events-#{event.category.parameterize}")
+
     %h2.mt-1= link_to event.title, effective_events.event_path(event)
     .effective-events-schedule= effective_events_event_schedule(event)
     .effective-events-excerpt= event.excerpt.to_s
