@@ -50,9 +50,11 @@ module Effective
       self.price ||= event_product.price
     end
 
-    validates :first_name, presence: true
-    validates :last_name, presence: true
-    validates :email, email: true
+    with_options(if: -> { new_record? }) do
+      validates :first_name, presence: true
+      validates :last_name, presence: true
+      validates :email, presence: true, email: true
+    end
 
     def to_s
       persisted? ? title : 'addon'
