@@ -3,7 +3,11 @@
 class EffectiveEventAddonsDatatable < Effective::Datatable
   datatable do
 
-    col :event_product, search: :string, label: 'Product' do |er|
+    col :name do |er|
+      "#{er.first_name} #{er.last_name}<br><small>#{mail_to(er.email)}</small>"
+    end
+
+    col :event_product, search: :string, label: 'Add-on' do |er|
       [
         er.event_product.to_s,
         (content_tag(:span, 'Archived', class: 'badge badge-warning') if er.event_product&.archived?)
@@ -12,9 +16,12 @@ class EffectiveEventAddonsDatatable < Effective::Datatable
 
     col :price, as: :price
 
+    col :first_name, visible: false
+    col :last_name, visible: false
+    col :email, visible: false
+
     col :archived, visible: false
 
-    # col :notes
     # no actions_col
   end
 

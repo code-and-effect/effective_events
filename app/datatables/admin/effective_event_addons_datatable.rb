@@ -22,6 +22,10 @@ module Admin
 
       col :purchased_order
       col :owner
+
+      col :first_name
+      col :last_name
+      col :email
       col :notes, label: 'Notes'
 
       actions_col

@@ -11,7 +11,7 @@ class EffectiveEventRegistrationsDatatable < Effective::Datatable
     end
 
     col :event, search: :string do |er|
-      er.event.to_s
+      link_to(er.event.to_s, effective_events.event_path(er.event))
     end
 
     col :owner, visible: false, search: :string
@@ -26,6 +26,13 @@ class EffectiveEventRegistrationsDatatable < Effective::Datatable
         dropdown_link_to('Delete', effective_events.event_event_registration_path(er.event, er), 'data-confirm': "Really delete #{er}?", 'data-method': :delete)
       else
         dropdown_link_to('Show', effective_events.event_event_registration_path(er.event, er))
+
+        # Register Again
+        if er.event.registerable?
+          url = er.event.external_registration_url.presence || effective_events.new_event_event_registration_path(er.event)
+          dropdown_link_to('Register Again', url)
+        end
+
       end
     end
   end

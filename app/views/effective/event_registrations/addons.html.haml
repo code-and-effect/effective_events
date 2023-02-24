@@ -13,7 +13,7 @@
       = effective_form_with(model: resource, url: wizard_path(step), method: :put) do |f|
         = f.hidden_field :id
 
-        = f.has_many :event_addons do |fp|
+        = f.has_many :event_addons, f.object.build_event_addons do |fp|
           = render('effective/event_addons/fields', f: fp, event: f.object.event)
 
         = f.save 'Save and Continue'

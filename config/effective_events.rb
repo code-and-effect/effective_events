@@ -11,7 +11,7 @@ EffectiveEvents.setup do |config|
   # config.layout = { application: 'application', admin: 'admin' }
 
   # Event Settings
-  # config.event_registrations_class_name = 'Effective::EventRegistration'
+  # config.event_registration_class_name = 'Effective::EventRegistration'
 
   # Pagination length on the Events#index page
   config.per_page = 10

@@ -3,6 +3,13 @@
     - if f.object.purchased?
       = f.static_field :event_product, label: 'Purchased event add-ons'
     - else
-      = f.select :event_product_id, effective_events_event_products_collection(event), label: false
+      = f.select :event_product_id, effective_events_event_products_collection(event), label: 'Add-on'
+
+    .row
+      .col-lg= f.text_field :first_name
+      .col-lg= f.text_field :last_name
+
+    .row
+      .col-lg= f.email_field :email
 
     -# = f.text_area :notes, label: 'Notes'

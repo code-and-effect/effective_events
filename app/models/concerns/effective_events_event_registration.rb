@@ -151,14 +151,32 @@ module EffectiveEventsEventRegistration
   def build_event_registrants
     if event_registrants.blank?
       raise('expected owner and event to be present') unless owner && event
+
       event_registrants.build(
+        first_name: owner.try(:first_name),
+        last_name: owner.try(:last_name),
+        email: owner.try(:email),
+        company: owner.try(:company),
+        number: owner.try(:membership).try(:number) || owner.try(:number)
+      )
+    end
+
+    event_registrants
+  end
+
+  # This builds the default event addons used by the wizard form
+  def build_event_addons
+    if event_addons.blank?
+      raise('expected owner and event to be present') unless owner && event
+
+      event_addons.build(
         first_name: owner.try(:first_name),
         last_name: owner.try(:last_name),
         email: owner.try(:email)
       )
     end
 
-    event_registrants
+    event_addons
   end
 
   private

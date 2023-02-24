@@ -102,6 +102,10 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.integer :event_registration_id
       t.string :event_registration_type
 
+      t.string :first_name
+      t.string :last_name
+      t.string :email
+
       t.text :notes
 
       t.integer :purchased_order_id

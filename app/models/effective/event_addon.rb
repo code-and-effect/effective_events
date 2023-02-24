@@ -22,6 +22,10 @@ module Effective
     belongs_to :event_registration, polymorphic: true, optional: true
 
     effective_resource do
+      first_name        :string
+      last_name         :string
+      email             :string
+
       notes             :text
 
       archived          :boolean
@@ -46,8 +50,25 @@ module Effective
       self.price ||= event_product.price
     end
 
+    validates :first_name, presence: true
+    validates :last_name, presence: true
+    validates :email, email: true
+
     def to_s
-      persisted? ? event_product.to_s : 'product'
+      persisted? ? title : 'addon'
+    end
+
+    def title
+      return event_product.to_s unless first_name.present? && last_name.present?
+      "#{event_product} - #{last_first_name}"
+    end
+
+    def name
+      "#{first_name} #{last_name}"
+    end
+
+    def last_first_name
+      "#{last_name}, #{first_name}"
     end
 
     def tax_exempt
