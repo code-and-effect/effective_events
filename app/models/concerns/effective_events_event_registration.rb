@@ -142,9 +142,9 @@ module EffectiveEventsEventRegistration
   end
 
   # Find or build. But it's not gonna work with more than 1. This is for testing only really.
-  def event_addon(event_product:)
-    addon = event_addons.find { |ep| ep.event_product == event_product }
-    addon || event_addons.build(event_product: event_product, owner: owner)
+  def event_addon(event_product:, first_name:, last_name:, email:)
+    addon = event_addons.find { |er| er.event_product == event_product && er.first_name == first_name && er.last_name == last_name && er.email == email }
+    addon || event_addons.build(event: event, event_product: event_product, owner: owner, first_name: first_name, last_name: last_name, email: email)
   end
 
   # This builds the default event registrants used by the wizard form

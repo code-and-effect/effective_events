@@ -73,8 +73,8 @@ ActiveRecord::Schema.define(version: 7) do
     t.integer "purchasable_id"
     t.string "unique"
     t.integer "quantity"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.index ["cart_id"], name: "index_cart_items_on_cart_id"
     t.index ["purchasable_id"], name: "index_cart_items_on_purchasable_id"
     t.index ["purchasable_type", "purchasable_id"], name: "index_cart_items_on_purchasable_type_and_purchasable_id"
@@ -84,8 +84,8 @@ ActiveRecord::Schema.define(version: 7) do
     t.integer "user_id"
     t.string "user_type"
     t.integer "cart_items_count", default: 0
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.index ["user_id"], name: "index_carts_on_user_id"
   end
 
@@ -97,8 +97,8 @@ ActiveRecord::Schema.define(version: 7) do
     t.string "active_card"
     t.string "status"
     t.integer "subscriptions_count", default: 0
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.index ["user_id"], name: "index_customers_on_user_id"
   end
 
@@ -242,8 +242,8 @@ ActiveRecord::Schema.define(version: 7) do
     t.integer "quantity"
     t.integer "price", default: 0
     t.boolean "tax_exempt"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.index ["order_id"], name: "index_order_items_on_order_id"
     t.index ["purchasable_id"], name: "index_order_items_on_purchasable_id"
     t.index ["purchasable_type", "purchasable_id"], name: "index_order_items_on_purchasable_type_and_purchasable_id"
@@ -266,11 +266,15 @@ ActiveRecord::Schema.define(version: 7) do
     t.string "payment_provider"
     t.string "payment_card"
     t.decimal "tax_rate", precision: 6, scale: 3
+    t.decimal "surcharge_percent", precision: 6, scale: 3
     t.integer "subtotal"
     t.integer "tax"
+    t.integer "amount_owing"
+    t.integer "surcharge"
+    t.integer "surcharge_tax"
     t.integer "total"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
@@ -280,8 +284,8 @@ ActiveRecord::Schema.define(version: 7) do
     t.integer "price"
     t.boolean "tax_exempt", default: false
     t.string "qb_item_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "subscriptions", force: :cascade do |t|
@@ -295,8 +299,8 @@ ActiveRecord::Schema.define(version: 7) do
     t.string "interval"
     t.integer "quantity"
     t.string "status"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.index ["customer_id"], name: "index_subscriptions_on_customer_id"
     t.index ["subscribable_id"], name: "index_subscriptions_on_subscribable_id"
     t.index ["subscribable_type", "subscribable_id"], name: "index_subscriptions_on_subscribable_type_and_subscribable_id"

@@ -1,5 +1,5 @@
-class CreateEffectiveOrders < ActiveRecord::Migration[5.0]
-  def change
+class CreateEffectiveOrders < ActiveRecord::Migration[4.2]
+  def self.up
     create_table :orders do |t|
       t.integer   :user_id
       t.string    :user_type
@@ -22,17 +22,20 @@ class CreateEffectiveOrders < ActiveRecord::Migration[5.0]
       t.string    :payment_provider
       t.string    :payment_card
 
-      t.decimal   :tax_rate, precision: 6, scale: 3
+      t.decimal   :tax_rate, :precision => 6, :scale => 3
+      t.decimal   :surcharge_percent, :precision => 6, :scale => 3
 
       t.integer   :subtotal
       t.integer   :tax
+      t.integer   :amount_owing
+      t.integer   :surcharge
+      t.integer   :surcharge_tax
       t.integer   :total
 
       t.timestamps
     end
 
     add_index :orders, :user_id
-
 
     create_table :order_items do |t|
       t.integer   :order_id
@@ -41,7 +44,7 @@ class CreateEffectiveOrders < ActiveRecord::Migration[5.0]
 
       t.string    :name
       t.integer   :quantity
-      t.integer   :price, default: 0
+      t.integer   :price, :default => 0
       t.boolean   :tax_exempt
 
       t.timestamps
@@ -56,7 +59,7 @@ class CreateEffectiveOrders < ActiveRecord::Migration[5.0]
       t.integer   :user_id
       t.string    :user_type
 
-      t.integer   :cart_items_count, default: 0
+      t.integer   :cart_items_count, :default => 0
       t.timestamps
     end
 
@@ -86,7 +89,7 @@ class CreateEffectiveOrders < ActiveRecord::Migration[5.0]
       t.string    :active_card
       t.string    :status
 
-      t.integer   :subscriptions_count, default: 0
+      t.integer   :subscriptions_count, :default => 0
 
       t.timestamps
     end
@@ -120,7 +123,7 @@ class CreateEffectiveOrders < ActiveRecord::Migration[5.0]
 
       t.string    :name
       t.integer   :price
-      t.boolean   :tax_exempt, default: false
+      t.boolean   :tax_exempt, :default => false
 
       t.string    :qb_item_name
 
@@ -129,4 +132,13 @@ class CreateEffectiveOrders < ActiveRecord::Migration[5.0]
 
   end
 
+  def self.down
+    drop_table :orders
+    drop_table :order_items
+    drop_table :carts
+    drop_table :cart_items
+    drop_table :customers
+    drop_table :subscriptions
+    drop_table :products
+  end
 end

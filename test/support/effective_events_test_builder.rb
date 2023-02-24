@@ -116,7 +116,12 @@ module EffectiveEventsTestBuilder
     end
 
     event_registration.event.event_products.each_with_index do |event_product, index|
-      event_registration.event_addon(event_product: event_product)
+      event_registration.event_addon(
+        event_product: event_product,
+        first_name: "First",
+        last_name: "Last #{index+1}",
+        email: "registrant#{index+1}@effective_events.test"
+      )
     end
 
     event_registration.save!
@@ -172,6 +177,9 @@ module EffectiveEventsTestBuilder
       owner: owner,
       event: event,
       event_product: event_product,
+      first_name: "Joe",
+      last_name: "Dirt",
+      email: "joe@dirt.com"
     )
   end
 
