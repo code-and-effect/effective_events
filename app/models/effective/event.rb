@@ -117,7 +117,6 @@ module Effective
 
     validates :registration_start_at, presence: true, unless: -> { external_registration? }
     validates :registration_end_at, presence: true, unless: -> { external_registration? }
-    validates :external_registration_url, presence: true, if: -> { external_registration? }
 
     validate(if: -> { start_at && end_at }) do
       self.errors.add(:end_at, 'must be after start date') unless start_at < end_at
@@ -167,7 +166,7 @@ module Effective
       return false if closed?
       return false if sold_out?
 
-      external_registration? || event_tickets.present?
+      (external_registration? && external_registration_url.present?) || event_tickets.present?
     end
 
     def closed?
