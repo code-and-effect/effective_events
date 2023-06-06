@@ -32,6 +32,7 @@ module Effective
 
     acts_as_slugged
     log_changes if respond_to?(:log_changes)
+    acts_as_tagged if respond_to?(:acts_as_tagged)
     acts_as_role_restricted if respond_to?(:acts_as_role_restricted)
 
     self.table_name = EffectiveEvents.events_table_name.to_s
