@@ -49,6 +49,6 @@
       = tab "Logs" do
         = render_inline_datatable(event.log_changes_datatable)
 
-  - if event.persisted? && respond_to?(:acts_as_tagged?)
+  - if event.persisted? && event.class.respond_to?(:acts_as_tagged?)
     = tab "Tags" do
       = render '/admin/events/form_tags', event: event
