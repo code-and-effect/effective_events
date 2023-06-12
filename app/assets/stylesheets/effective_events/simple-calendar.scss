@@ -1,0 +1,25 @@
+.simple-calendar {
+  .calendar-heading {
+    background: $gray-200;
+  }
+
+  .calendar-arrow {
+    font-size: 10px;
+
+    a {
+      text-decoration: none;
+    }
+  }
+
+  .table th {
+    border: 0px;
+  }
+
+  .table td {
+    aspect-ratio: 1 / 1;
+    width: 2rem;
+    height: 2rem;
+    vertical-align: middle;
+    border: 1px solid $gray-200;
+  }
+}

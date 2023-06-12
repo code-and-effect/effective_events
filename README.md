@@ -99,6 +99,9 @@ if user.admin?
 end
 ```
 
+## Calendar
+`effective_events` comes with an integration with `simple_calendar` where events can be displayed in calendars. You can override its views using the command `rails g simple_calendar:views` - check out [Customizing Views](https://github.com/excid3/simple_calendar#customizing-the-calendar) for more information.
+
 ## License
 
 MIT License.  Copyright [Code and Effect Inc.](http://www.codeandeffect.com/)
