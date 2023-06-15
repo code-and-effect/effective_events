@@ -1,4 +1,4 @@
-.simple-calendar
+.effective__simple-calendar
   .calendar-heading.d-flex.justify-content-between.align-items-center.mb-2.py-1
     - date = params[:start_date].presence.try(:to_date) || Date.current
     .calendar-arrow.p-1= link_to t('simple_calendar.previous', default: 'Previous').html_safe, effective_events.events_path(start_date: date - 1.month)
