@@ -214,5 +214,9 @@ module Effective
       duplicate.tap { |event| event.save! }
     end
 
+    def start_time
+      start_at
+    end
+
   end
 end

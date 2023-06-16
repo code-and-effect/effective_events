@@ -1,0 +1,15 @@
+---
+en:
+  simple_calendar:
+    previous: "&#9664;"
+    next: "&#9654;"
+
+  date:
+    abbr_day_names:
+    - S
+    - M
+    - T
+    - W
+    - T
+    - F
+    - S

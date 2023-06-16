@@ -1,4 +1,5 @@
 = render 'layout' do
+
   -# render_datatable(@datatable)
 
   .mb-4= render('effective/events/categories')
@@ -9,8 +10,16 @@
   - if @event_search.present? && results.length == 0
     .alert.alert-info There are no results for your search. Please try again.
 
-  -# This renders effective/events/event
-  = render(results)
+  .row
+    .col-md-3
+      = month_calendar(events: @events) do |date, events|
+        - if events.any? { |event| event.start_at.to_date == date }
+          = date.day
+        - else
+          &nbsp;
+    .col-md-9
+      -# This renders effective/events/event
+      = render(results)
 
   %nav.d-flex.justify-content-center
     = bootstrap_paginate(results, per_page: @event_search.per_page)
