@@ -18,7 +18,7 @@ module Effective
                           highlight: true,
                         }
                       },
-                      if: -> (event) { !event.draft }
+                      if: -> (event) { event.published? }
 
     end
 
