@@ -5,6 +5,9 @@
   - if categories.present?
     = f.select :category, categories, hint: 'optional category'
 
+  - if event.class.respond_to?(:acts_as_tagged?)
+    = render 'effective/tags/fields', f: f
+
   = f.datetime_field :published_at, label: 'Publish date', hint: 'When should this be displayed on the website.'
   = f.check_box :draft, hint: 'Save this event as a draft. It will not be accessible on the website.'
 
