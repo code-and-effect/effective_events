@@ -2,6 +2,25 @@
 
 module Effective
   class Event < ActiveRecord::Base
+    if defined?(PgSearch)
+      include PgSearch::Model
+
+      multisearchable against: [
+                        :title,
+                        :slug,
+                      ],
+                      associated_against: {
+                        rich_texts: [:body],
+                      },
+                      using: {
+                        trigram: {},
+                        tsearch: {
+                          highlight: true,
+                        }
+                      }
+
+    end
+
     has_many :event_tickets, -> { EventTicket.sorted }, inverse_of: :event, dependent: :destroy
     accepts_nested_attributes_for :event_tickets, allow_destroy: true
 
