@@ -5,20 +5,7 @@ module Effective
     if defined?(PgSearch)
       include PgSearch::Model
 
-      multisearchable against: [
-                        :title,
-                        :slug,
-                      ],
-                      associated_against: {
-                        rich_texts: [:body],
-                      },
-                      using: {
-                        trigram: {},
-                        tsearch: {
-                          highlight: true,
-                        }
-                      }
-
+      multisearchable against: [:title, :body, :except]
     end
 
     has_many :event_tickets, -> { EventTicket.sorted }, inverse_of: :event, dependent: :destroy
