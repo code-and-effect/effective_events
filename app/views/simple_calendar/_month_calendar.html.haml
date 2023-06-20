@@ -1,20 +1,26 @@
-.effective__simple-calendar
-  .calendar-heading.d-flex.justify-content-between.align-items-center.mb-2.py-1
-    - date = params[:start_date].presence.try(:to_date) || Date.current
-    .calendar-arrow.p-1= link_to t('simple_calendar.previous', default: 'Previous').html_safe, effective_events.events_path(start_date: date - 1.month)
-    %span.calendar-title.text-uppercase.text-primary.font-weight-bold= t('date.month_names')[start_date.month]
-    .calendar-arrow.p-1= link_to t('simple_calendar.next', default: 'Next').html_safe, effective_events.events_path(start_date: date + 1.month)
+- date = params[:start_date].presence.try(:to_date) || Date.current
 
-  %table.table.table-striped.table-sm
+.effective__simple-calendar
+  .calendar-heading.d-flex.justify-content-between.align-items-center
+    .calendar-arrow
+      = link_to t('simple_calendar.previous', default: 'Previous').html_safe, effective_events.events_path(start_date: date - 1.month)
+
+    %span.calendar-title
+      = t('date.month_names')[start_date.month]
+
+    .calendar-arrow
+      = link_to t('simple_calendar.next', default: 'Next').html_safe, effective_events.events_path(start_date: date + 1.month)
+
+  %table.table.table-sm
     %thead
-      %tr.text-center.text-primary.font-weight-normal.py-2
+      %tr
         - date_range.slice(0, 7).each do |day|
-          %th.px-1= t('date.abbr_day_names')[day.wday]
+          %th= t('date.abbr_day_names')[day.wday]
 
     %tbody
       - date_range.each_slice(7) do |week|
         %tr
           - week.each do |day|
             - content = capture_haml(day, sorted_events.fetch(day, []), &passed_block)
-            = content_tag :td, class: content.to_i > 0 && 'text-center bg-primary font-weight-bold font-size-small text-white' do
+            = content_tag :td, class: content.to_i > 0 && 'calendar-day' do
               = content
