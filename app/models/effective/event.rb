@@ -5,7 +5,11 @@ module Effective
     if defined?(PgSearch)
       include PgSearch::Model
 
-      multisearchable against: [:title, :body, :except]
+      multisearchable against: [:search_content]
+
+      def search_content
+        title + '|' + body.to_plain_text
+      end
     end
 
     has_many :event_tickets, -> { EventTicket.sorted }, inverse_of: :event, dependent: :destroy
