@@ -1,57 +1,82 @@
 = render 'layout' do
   .effective-event
-    - if @event.sold_out?
-      .alert.alert-warning.mb-3 This event is sold out.
+    .row
+      .col
+        %h1.mb-4= @page_title
 
-    - if @event.closed?
-      .alert.alert-warning.mb-3 This event is no longer available.
+    .row
+      .col-md-3
+        - if @event.registerable?
+          .register.mb-4
+            - url = @event.external_registration_url.presence || effective_events.new_event_event_registration_path(@event)
+            = link_to 'Register', url, class: 'btn btn-primary btn-block'
 
-    - if @event.registerable?
-      .resource-buttons
-        - url = @event.external_registration_url.presence || effective_events.new_event_event_registration_path(@event)
-        = link_to 'Register', url, class: 'btn btn-primary'
+        %ul.list-unstyled
+          -# Not shown
+          -# %li.mb-3
+          -#   %label Published
+          -#   %br
+          -#   = @event.published_at.strftime("%B %e at %l:%M%P")
+          %li.mb-3
+            %label Event Date
+            %br
+            = effective_events_event_schedule(@event)
 
-  - if @event.file.attached?
-    = image_tag(@event.file)
+          - if @event.registration_start_at.present?
+            %li.mb-3
+              %label Registration Opens
+              %br
+              = @event.registration_start_at.strftime("%b %d, %Y %I:%M%P")
 
-  %ul.list-unstyled
-    -# Not shown
-      %li
-        %strong Published:
-        = @event.published_at.strftime("%b %d, %Y %I:%M%P")
+          - if @event.early_bird_end_at.present?
+            %li.mb-3
+              %label Early Bird Rate Ends
+              %br
+              = @event.early_bird_end_at.strftime("%b %d, %Y %I:%M%P")
 
-    %li
-      %strong Event Date:
-      = effective_events_event_schedule(@event)
+          - if @event.registration_end_at.present?
+            %li.mb-3
+              %label Registration Closes
+              %br
+              = @event.registration_end_at.strftime("%b %d, %Y %I:%M%P")
 
-    - if @event.registration_start_at.present?
-      %li
-        %strong Registration Opens:
-        = @event.registration_start_at.strftime("%b %d, %Y %I:%M%P")
+        - if @event.event_tickets.present? #|| @event.event_products.present?
+          %ul.list-unstyled
+            - if @event.event_tickets.present?
+              %li
+                %label Tickets
+                %br
+                %ul
+                  - @event.event_tickets.each do |ticket|
+                    %li= "#{ticket} (#{price_to_currency(ticket.price)})"
 
-    - if @event.early_bird_end_at.present?
-      %li
-        %strong Early Bird Rate Ends:
-        = @event.early_bird_end_at.strftime("%b %d, %Y %I:%M%P")
+            -# - if @event.event_products.present?
+            -#   %li
+            -#     %label Add-ons
+            -#     %br
+            -#     %ul
+            -#       - @event.event_products.each do |product|
+            -#         %li= "#{product} (#{price_to_currency(product.price)})"
 
-    - if @event.registration_end_at.present?
-      %li
-        %strong Registration Closes:
-        = @event.registration_end_at.strftime("%b %d, %Y %I:%M%P")
+        %hr
 
-    - if @event.event_tickets.present?
-      %li
-        %strong Tickets
-        %ul
-          - @event.event_tickets.each do |ticket|
-            %li= "#{ticket} (#{price_to_currency(ticket.price)})"
+        %label.mb-2 Upcoming Events
+        %ul.list-unstyled
+          %li.mb-3
+            - @upcoming_events.each do |event|
+              %h5= link_to event.title, effective_events.event_path(event), class: 'text-decoration-none'
 
-    - if @event.event_products.present?
-      %li
-        %strong Add-ons
-        %ul
-          - @event.event_products.each do |product|
-            %li= "#{product} (#{price_to_currency(product.price)})"
+      .col-md-8
+        - if @event.sold_out?
+          .alert.alert-warning.mb-3 This event is sold out.
 
-  - if @event.body.present?
-    = @event.body.to_s
+        - if @event.closed?
+          .alert.alert-warning.mb-3 This event is no longer available.
+
+        - if @event.file.attached?
+          .d-flex.justify-content-center.mb-3
+            = image_tag(@event.file)
+
+        - if @event.body.present?
+          .content.my-5
+            = @event.body.to_s

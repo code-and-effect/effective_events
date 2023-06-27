@@ -16,7 +16,7 @@ module Effective
 
     # Base collection to search.
     def collection
-      Event.events(user: current_user, unpublished: unpublished)
+      Event.events(user: current_user, unpublished: unpublished).upcoming
     end
 
     def per_page
