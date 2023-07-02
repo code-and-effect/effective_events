@@ -23,4 +23,4 @@
           - week.each do |day|
             - content = capture_haml(day, sorted_events.fetch(day, []), &passed_block)
             = content_tag :td, class: content.to_i > 0 && 'calendar-day' do
-              = content
+              = day.day
