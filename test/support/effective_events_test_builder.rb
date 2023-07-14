@@ -4,6 +4,18 @@ module EffectiveEventsTestBuilder
     build_user.tap { |user| user.save! }
   end
 
+
+  def create_event_by(name, start_at)
+    Effective::Event.create!(
+      title: name,
+      published_at: Date.yesterday,
+      start_at: start_at,
+      end_at: start_at + 1.month,
+      registration_start_at: 1.month.ago,
+      registration_end_at: Date.today
+    )
+  end
+
   def build_user
     @user_index ||= 0
     @user_index += 1
