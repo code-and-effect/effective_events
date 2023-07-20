@@ -140,7 +140,7 @@ GEM
       effective_resources
       liquid
       rails (>= 3.2.0)
-    effective_orders (6.5.6)
+    effective_orders (6.5.7)
       coffee-rails
       effective_addresses
       effective_bootstrap
