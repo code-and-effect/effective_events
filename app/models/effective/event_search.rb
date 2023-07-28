@@ -68,11 +68,11 @@ module Effective
       # Apply Sorting
       events = case order.to_s
       when 'Sort by Published Date'
-        events.reorder(published_at: :desc)
+        events.reorder(published_at: :asc)
       when 'Sort by Event Date'
-        events.reorder(start_at: :desc)
+        events.reorder(start_at: :asc)
       else
-        events.reorder(start_at: :desc) # Default Sort by Event Date
+        events.reorder(start_at: :asc) # Default Sort by Event Date
       end
 
       events
