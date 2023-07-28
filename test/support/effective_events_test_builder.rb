@@ -5,13 +5,13 @@ module EffectiveEventsTestBuilder
   end
 
 
-  def create_event_by(name, start_at)
+  def create_event_by(name, end_at)
     Effective::Event.create!(
       title: name,
       published_at: Date.yesterday,
-      start_at: start_at,
-      end_at: start_at + 1.month,
-      registration_start_at: 1.month.ago,
+      start_at: 1.month.ago,
+      end_at: end_at,
+      registration_start_at: 1.month.ago - 1,
       registration_end_at: Date.today
     )
   end
