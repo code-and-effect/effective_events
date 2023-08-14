@@ -31,7 +31,7 @@ module Effective
     end
 
     scope :sorted, -> { order(:position) }
-    scope :deep, -> { with_rich_text_body.includes(:purchased_event_registrants) }
+    scope :deep, -> { with_rich_text_body.includes(:event, :purchased_event_registrants) }
 
     scope :archived, -> { where(archived: true) }
     scope :unarchived, -> { where(archived: false) }

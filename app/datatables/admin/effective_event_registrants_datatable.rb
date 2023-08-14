@@ -2,6 +2,8 @@ module Admin
   class EffectiveEventRegistrantsDatatable < Effective::Datatable
     filters do
       scope :unarchived, label: "All"
+      scope :purchased
+      scope :deferred
       scope :archived
     end
 
@@ -34,7 +36,7 @@ module Admin
     end
 
     collection do
-      scope = Effective::EventRegistrant.deep.purchased
+      scope = Effective::EventRegistrant.deep.purchased_or_deferred.includes(:purchased_order, :owner)
 
       if attributes[:event_id].present?
         scope = scope.where(event: event)
