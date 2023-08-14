@@ -38,7 +38,7 @@ module Effective
     end
 
     scope :sorted, -> { order(:last_name) }
-    scope :deep, -> { all }
+    scope :deep, -> { includes(:event, :event_ticket) }
 
     validates :first_name, presence: true
     validates :last_name, presence: true

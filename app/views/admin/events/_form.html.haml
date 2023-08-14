@@ -7,33 +7,25 @@
       = render '/admin/events/form_content', event: event
 
   - if event.persisted? && !event.external_registration?
-    = tab 'Tickets' do
+    = tab 'Tickets & Products' do
       %h2 Tickets
       - datatable = Admin::EffectiveEventTicketsDatatable.new(event_id: event.id)
       = render_inline_datatable(datatable)
 
-    = tab 'Products' do
       %h2 Products
       - datatable = Admin::EffectiveEventProductsDatatable.new(event_id: event.id)
       = render_inline_datatable(datatable)
 
-    = tab 'Email' do
-      %p Click New to add one or more emails.
+    -# = tab 'Registrations' do
+    -#   %h2 Registrations
+    -#   - datatable = Admin::EffectiveEventRegistrationsDatatable.new(event_id: event.id)
+    -#   .mb-4= render_inline_datatable(datatable)
 
-      - datatable = Admin::EffectiveEventNotificationsDatatable.new(event_id: event.id)
-      = render_datatable(datatable, inline: true, simple: true)
-
-    = tab 'Registrations' do
-      %h2 Registrations
-      - datatable = Admin::EffectiveEventRegistrationsDatatable.new(event_id: event.id)
-      .mb-4= render_inline_datatable(datatable)
-
-    = tab 'Registrants' do
+    = tab 'Registrants & Addons' do
       %h2 Registrants
       - datatable = Admin::EffectiveEventRegistrantsDatatable.new(event_id: event.id)
       .mb-4= render_inline_datatable(datatable)
 
-    = tab 'Add-ons' do
       %h2 Add-ons
       - datatable = Admin::EffectiveEventAddonsDatatable.new(event_id: event.id)
       .mb-4= render_inline_datatable(datatable)
@@ -41,7 +33,12 @@
     = tab 'Wizard' do
       = render '/admin/events/form_event_registration_content', event: event
 
-  - if event.persisted?
+    = tab 'Email' do
+      %p Click New to add one or more emails.
+
+      - datatable = Admin::EffectiveEventNotificationsDatatable.new(event_id: event.id)
+      = render_datatable(datatable, inline: true, simple: true)
+
     = tab 'Access' do
       = render '/admin/events/form_access', event: event
 
