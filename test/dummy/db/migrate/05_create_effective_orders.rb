@@ -1,5 +1,5 @@
-class CreateEffectiveOrders < ActiveRecord::Migration[4.2]
-  def self.up
+class CreateEffectiveOrders < ActiveRecord::Migration[6.0]
+  def change
     create_table :orders do |t|
       t.integer   :user_id
       t.string    :user_type
@@ -10,8 +10,13 @@ class CreateEffectiveOrders < ActiveRecord::Migration[4.2]
       t.integer   :parent_id
       t.string    :parent_type
 
-      t.string    :state
+      t.string    :status
+      t.text      :status_steps
+
       t.datetime  :purchased_at
+
+      t.integer   :purchased_by_id
+      t.string    :purchased_by_type
 
       t.text      :note
       t.text      :note_to_buyer
@@ -47,7 +52,7 @@ class CreateEffectiveOrders < ActiveRecord::Migration[4.2]
 
       t.string    :name
       t.integer   :quantity
-      t.integer   :price, :default => 0
+      t.integer   :price
       t.boolean   :tax_exempt
 
       t.timestamps
@@ -133,15 +138,5 @@ class CreateEffectiveOrders < ActiveRecord::Migration[4.2]
       t.timestamps
     end
 
-  end
-
-  def self.down
-    drop_table :orders
-    drop_table :order_items
-    drop_table :carts
-    drop_table :cart_items
-    drop_table :customers
-    drop_table :subscriptions
-    drop_table :products
   end
 end
