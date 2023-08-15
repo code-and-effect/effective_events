@@ -1,6 +1,9 @@
 module Effective
   class EventRegistrationsController < ApplicationController
-    before_action(:authenticate_user!) if defined?(Devise)
+
+    if defined?(Devise)
+      before_action :authenticate_user!, unless: -> { action_name == 'new' || (action_name == 'show' && params[:id] == 'start') }
+    end
 
     include Effective::WizardController
 
