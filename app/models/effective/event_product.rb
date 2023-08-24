@@ -2,6 +2,8 @@
 
 module Effective
   class EventProduct < ActiveRecord::Base
+    self.table_name = (EffectiveEvents.event_products_table_name || :event_products).to_s
+
     acts_as_archived
 
     belongs_to :event
