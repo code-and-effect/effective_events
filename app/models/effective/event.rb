@@ -2,6 +2,8 @@
 
 module Effective
   class Event < ActiveRecord::Base
+    self.table_name = (EffectiveEvents.events_table_name || :events).to_s
+
     if defined?(PgSearch)
       include PgSearch::Model
 
@@ -41,7 +43,6 @@ module Effective
     acts_as_tagged if respond_to?(:acts_as_tagged)
     acts_as_role_restricted if respond_to?(:acts_as_role_restricted)
 
-    self.table_name = EffectiveEvents.events_table_name.to_s
 
     effective_resource do
       title                  :string

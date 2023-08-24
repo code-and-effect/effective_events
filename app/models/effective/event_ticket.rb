@@ -2,6 +2,8 @@
 
 module Effective
   class EventTicket < ActiveRecord::Base
+    self.table_name = (EffectiveEvents.event_tickets_table_name || :event_tickets).to_s
+
     acts_as_archived
 
     belongs_to :event

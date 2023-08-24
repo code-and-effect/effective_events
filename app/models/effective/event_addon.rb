@@ -5,6 +5,8 @@
 
 module Effective
   class EventAddon < ActiveRecord::Base
+    self.table_name = (EffectiveEvents.event_addons_table_name || :event_addons).to_s
+
     acts_as_purchasable
     acts_as_archived
 

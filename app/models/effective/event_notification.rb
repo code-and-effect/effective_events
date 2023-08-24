@@ -1,5 +1,7 @@
 module Effective
   class EventNotification < ActiveRecord::Base
+    self.table_name = (EffectiveEvents.event_notifications_table_name || :event_notifications).to_s
+
     log_changes(to: :event) if respond_to?(:log_changes)
 
     belongs_to :event

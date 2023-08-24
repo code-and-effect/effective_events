@@ -2,6 +2,8 @@
 
 module Effective
   class EventRegistrant < ActiveRecord::Base
+    self.table_name = (EffectiveEvents.event_registrants_table_name || :event_registrants).to_s
+
     acts_as_purchasable
     acts_as_archived
 
