@@ -21,4 +21,4 @@
       - date_range.each_slice(7) do |week|
         %tr
           - week.each do |day|
-            - instance_exec(day, calendar.sorted_events_for(day), &passed_block)
+            = capture_haml(day, sorted_events.fetch(day, []), &passed_block)
