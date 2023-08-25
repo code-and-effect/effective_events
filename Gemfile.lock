@@ -1,13 +1,13 @@
 PATH
   remote: .
   specs:
-    effective_events (0.6.13)
+    effective_events (0.7.0)
       effective_bootstrap
       effective_datatables (>= 4.0.0)
       effective_orders
       effective_resources
       rails (>= 6.0.0)
-      simple_calendar
+      simple_calendar (< 3)
 
 GEM
   remote: https://rubygems.org/
@@ -112,11 +112,11 @@ GEM
       railties (>= 4.1.0)
       responders
       warden (~> 1.2.3)
-    effective_addresses (1.10.4)
+    effective_addresses (1.11.0)
       carmen
       coffee-rails
       effective_resources
-      rails (>= 3.2.0)
+      rails
     effective_bootstrap (0.10.4)
       bootstrap (< 5)
       coffee-rails
@@ -141,7 +141,7 @@ GEM
       effective_resources
       liquid
       rails (>= 3.2.0)
-    effective_orders (6.7.3)
+    effective_orders (6.8.1)
       coffee-rails
       effective_addresses
       effective_bootstrap
@@ -275,8 +275,8 @@ GEM
       childprocess (>= 0.5, < 5.0)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2)
-    simple_calendar (3.0.1)
-      rails (>= 6.1)
+    simple_calendar (2.4.3)
+      rails (>= 3.0)
     sprockets (4.0.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
