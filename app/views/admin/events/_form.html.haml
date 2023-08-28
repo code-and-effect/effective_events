@@ -23,6 +23,9 @@
 
     = tab 'Registrants & Addons' do
       %h2 Registrants
+      .mb-4
+        %small.text-muted Please refresh the page after archiving/unarchiving here to display an accurate Registered count on the Tickets & Products tab
+
       - datatable = Admin::EffectiveEventRegistrantsDatatable.new(event_id: event.id)
       .mb-4= render_inline_datatable(datatable)
 

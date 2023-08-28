@@ -24,7 +24,10 @@ module Admin
         end
       end
 
-      col :purchased_event_registrants_count, label: 'Registered'
+      col :purchased_event_registrants_count, label: 'Registered' do |event|
+        event.event_registrants.purchased.unarchived.count
+      end
+
       col :capacity, visible: false
       col :capacity_available, visible: false
 
