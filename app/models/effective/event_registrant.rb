@@ -72,11 +72,11 @@ module Effective
     end
 
     def tax_exempt
-      event_ticket.tax_exempt
+      event_ticket&.tax_exempt
     end
 
     def qb_item_name
-      event_ticket.qb_item_name
+      event_ticket&.qb_item_name
     end
 
     # This is the Admin Save and Mark Paid action
