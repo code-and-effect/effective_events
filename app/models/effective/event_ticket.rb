@@ -70,7 +70,7 @@ module Effective
     end
 
     def purchased_event_registrants_count
-      purchased_event_registrants.length
+      purchased_event_registrants.reject(&:archived?).length
     end
 
   end

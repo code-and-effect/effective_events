@@ -64,7 +64,7 @@ module Effective
     end
 
     def purchased_event_addons_count
-      purchased_event_addons.length
+      purchased_event_addons.reject(&:archived?).length
     end
 
   end
