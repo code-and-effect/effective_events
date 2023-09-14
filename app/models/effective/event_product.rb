@@ -34,9 +34,6 @@ module Effective
     scope :sorted, -> { order(:position) }
     scope :deep, -> { with_rich_text_body.includes(:purchased_event_addons) }
 
-    scope :archived, -> { where(archived: true) }
-    scope :unarchived, -> { where(archived: false) }
-
     before_validation(if: -> { event.present? }) do
       self.position ||= (event.event_products.map(&:position).compact.max || -1) + 1
     end

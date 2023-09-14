@@ -35,9 +35,6 @@ module Effective
     scope :sorted, -> { order(:position) }
     scope :deep, -> { with_rich_text_body.includes(:event, :purchased_event_registrants) }
 
-    scope :archived, -> { where(archived: true) }
-    scope :unarchived, -> { where(archived: false) }
-
     before_validation(if: -> { event.present? }) do
       self.position ||= (event.event_tickets.map(&:position).compact.max || -1) + 1
     end
