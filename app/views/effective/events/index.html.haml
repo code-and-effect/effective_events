@@ -8,7 +8,7 @@
   - results = @event_search.results(page: params[:page])
 
   - if @event_search.present? && results.length == 0
-    .alert.alert-info There are no results for your search. Please try again.
+    .alert.alert-info.mb-3 There are no results for your search. Please try again.
 
   .row
     .col-md-3

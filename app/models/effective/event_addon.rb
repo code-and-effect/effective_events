@@ -42,6 +42,8 @@ module Effective
 
     scope :sorted, -> { order(:id) }
     scope :deep, -> { includes(:event, :event_product) }
+    scope :archived, -> { where(archived: true) }
+    scope :unarchived, -> { where(archived: false) }
 
     before_validation(if: -> { event_registration.present? }) do
       self.event ||= event_registration.event
