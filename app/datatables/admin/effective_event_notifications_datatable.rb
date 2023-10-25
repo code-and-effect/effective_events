@@ -12,10 +12,7 @@ class Admin::EffectiveEventNotificationsDatatable < Effective::Datatable
 
     col :event
     col :category
-
-    col :from do |event|
-      simple_format(event.from)
-    end
+    col :from
 
     # col :reminder do |poll_notification|
     #   case poll_notification.category
