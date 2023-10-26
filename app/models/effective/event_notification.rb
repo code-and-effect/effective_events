@@ -76,10 +76,8 @@ module Effective
     validates :subject, presence: true
     validates :body, presence: true
 
-    if EffectiveEvents.use_effective_email_templates
-      validates :body, liquid: true
-      validates :subject, liquid: true
-    end
+    validates :body, liquid: true
+    validates :subject, liquid: true
 
     # validates :reminder, if: -> { reminder? || upcoming_reminder? || before_event_ends? },
     #   presence: true, uniqueness: { scope: [:event_id, :category], message: 'already exists' }

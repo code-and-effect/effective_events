@@ -34,6 +34,5 @@ EffectiveEvents.setup do |config|
   # config.mailer_admin = nil       # Default To value for Admin correspondence
   # config.mailer_subject = nil     # Proc.new method used to customize Subject
 
-  # Use effective email templates for event notifications
-  config.use_effective_email_templates = true
+  # We always use effective email templates for event notifications
 end
