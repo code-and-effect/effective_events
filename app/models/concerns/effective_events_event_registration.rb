@@ -94,12 +94,12 @@ module EffectiveEventsEventRegistration
 
     # Validate all items are available
     validate(unless: -> { current_step == :checkout || done? }) do
-      event_registrants.reject { |er| er.purchased? || er.event_ticket&.available? }.each do |item|
+      sold_out_event_registrants.each do |item|
         errors.add(:base, "The #{item.event_ticket} ticket is sold out and no longer available for purchase")
         item.errors.add(:event_ticket_id, "#{item.event_ticket} is unavailable for purchase")
       end
 
-      event_addons.reject { |ep| ep.purchased? || ep.event_product&.available? }.each do |item|
+      sold_out_event_addons.each do |item|
         errors.add(:base, "The #{item.event_product} product is sold out and no longer available for purchase")
         item.errors.add(:event_product_id, "#{item.event_product} is unavailable for purchase")
       end
@@ -118,6 +118,14 @@ module EffectiveEventsEventRegistration
     def after_submit_purchased!
       notifications = event.event_notifications.select(&:registrant_purchased?)
       notifications.each { |notification| notification.notify!(event_registrants: event_registrants) }
+    end
+
+    def sold_out_event_registrants
+      event_registrants.reject { |er| er.purchased? || er.event_ticket&.available? }
+    end
+
+    def sold_out_event_addons
+      event_addons.reject { |ep| ep.purchased? || ep.event_product&.available? }
     end
 
   end
