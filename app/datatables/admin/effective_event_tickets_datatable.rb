@@ -11,6 +11,7 @@ module Admin
       col :updated_at, visible: false
       col :created_at, visible: false
       col :id, visible: false
+      col :archived, visible: false
 
       col :event
 
