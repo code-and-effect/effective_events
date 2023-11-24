@@ -56,6 +56,13 @@ module EffectiveEventsEventRegistration
     has_many :orders, -> { order(:id) }, as: :parent, class_name: 'Effective::Order', dependent: :nullify
     accepts_nested_attributes_for :orders
 
+    # Effective Namespace
+    # For coupon fees
+    if defined?(EffectiveMemberships)
+      has_many :fees, -> { order(:id) }, as: :parent, class_name: 'Effective::Fee', dependent: :nullify
+      accepts_nested_attributes_for :fees, reject_if: :all_blank, allow_destroy: true
+    end
+
     effective_resource do
       # Acts as Statused
       status                 :string, permitted: false
@@ -112,7 +119,13 @@ module EffectiveEventsEventRegistration
 
     # All Fees and Orders
     def submit_fees
-      (event_registrants + event_addons)
+      if owner.respond_to?(:outstanding_coupon_fees) # effective_memberships_owner
+        # Order item price reduction handled by reduce_order_item_coupon_fee_price in acts_as_purchasable_wizard
+        Array(owner.outstanding_coupon_fees).each { |fee| fees << fee unless fees.include?(fee) }
+        (event_registrants + event_addons + fees)
+      else
+        (event_registrants + event_addons)
+      end
     end
 
     def after_submit_purchased!
