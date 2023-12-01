@@ -6,7 +6,6 @@ module Effective
 
     if defined?(PgSearch)
       include PgSearch::Model
-
       multisearchable against: [:body]
     end
 
@@ -43,7 +42,6 @@ module Effective
     acts_as_tagged if respond_to?(:acts_as_tagged)
     acts_as_role_restricted if respond_to?(:acts_as_role_restricted)
 
-
     effective_resource do
       title                  :string
 
@@ -72,7 +70,12 @@ module Effective
     end
 
     scope :sorted, -> { order(start_at: :desc) }
-    scope :deep, -> { includes(:event_registrants, :event_tickets) }
+
+    scope :deep, -> { 
+      base = includes(:event_registrants, :event_tickets, :rich_texts) 
+      base = base.includes(:pg_search_document) if defined?(PgSearch)
+      base
+    }
 
     scope :published, -> { where(draft: false).where(arel_table[:published_at].lt(Time.zone.now)) }
     scope :unpublished, -> { where(draft: true).where(arel_table[:published_at].gteq(Time.zone.now)) }

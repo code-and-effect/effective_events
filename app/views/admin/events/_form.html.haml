@@ -45,6 +45,7 @@
     = tab 'Access' do
       = render '/admin/events/form_access', event: event
 
-    - if event.respond_to?(:log_changes_datatable)
+  - if event.persisted?
+    - if event.respond_to?(:logs_datatable)
       = tab "Logs" do
-        = render_inline_datatable(event.log_changes_datatable)
+        = render_inline_datatable(event.logs_datatable)

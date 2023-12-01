@@ -37,7 +37,7 @@ module Admin
     end
 
     collection do
-      scope = Effective::EventRegistrant.deep.purchased_or_deferred.includes(:purchased_order, :owner)
+      scope = Effective::EventRegistrant.deep.purchased_or_deferred
 
       if attributes[:event_id].present?
         scope = scope.where(event: event)

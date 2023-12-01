@@ -77,7 +77,7 @@ module EffectiveEventsEventRegistration
       timestamps
     end
 
-    scope :deep, -> { includes(:owner, :event, :event_registrants) }
+    scope :deep, -> { includes(:owner, :event_registrants, :event_addons, event: [:event_products, :event_tickets]) }
     scope :sorted, -> { order(:id) }
 
     scope :in_progress, -> { where.not(status: [:submitted]) }
