@@ -1,5 +1,5 @@
 -# In progress registration
-- registration = EffectiveEvents.EventRegistration.in_progress.for(current_user).first
+- registration = EffectiveEvents.EventRegistration.in_progress.includes(event: :event_products).for(current_user).first
 
 - datatable = EffectiveResources.best('EffectiveEventRegistrationsDatatable').new(self, namespace: :effective)
 
