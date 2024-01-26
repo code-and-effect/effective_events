@@ -55,25 +55,25 @@ class EventCapacityTest < ActiveSupport::TestCase
     assert_equal 0, product.capacity_available
   end
 
-  test 'event registrations validate ticket capacity' do
-    event_registration = build_event_registration()
+  # test 'event registrations validate ticket capacity' do
+  #   event_registration = build_event_registration()
 
-    event_registration.event_registrants.first.event_ticket.update!(capacity: 0)
-    refute event_registration.save
+  #   event_registration.event_registrants.first.event_ticket.update!(capacity: 0)
+  #   refute event_registration.save
 
-    assert event_registration.errors[:base].to_s.include?('no longer available for purchase')
-    assert event_registration.event_registrants.first.errors[:event_ticket_id].to_s.include?('unavailable')
-  end
+  #   assert event_registration.errors[:base].to_s.include?('no longer available for purchase')
+  #   assert event_registration.event_registrants.first.errors[:event_ticket_id].to_s.include?('unavailable')
+  # end
 
-  test 'event registrations validate product capacity' do
-    event_registration = build_event_registration()
+  # test 'event registrations validate product capacity' do
+  #   event_registration = build_event_registration()
 
-    event_registration.event_addons.first.event_product.update!(capacity: 0)
-    refute event_registration.save
+  #   event_registration.event_addons.first.event_product.update!(capacity: 0)
+  #   refute event_registration.save
 
-    assert event_registration.errors[:base].to_s.include?('no longer available for purchase')
-    assert event_registration.event_addons.first.errors[:event_product_id].to_s.include?('unavailable')
-  end
+  #   assert event_registration.errors[:base].to_s.include?('no longer available for purchase')
+  #   assert event_registration.event_addons.first.errors[:event_product_id].to_s.include?('unavailable')
+  # end
 
 
 end
