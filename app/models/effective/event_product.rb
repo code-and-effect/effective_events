@@ -9,7 +9,8 @@ module Effective
     belongs_to :event
 
     has_many :event_addons
-    has_many :purchased_event_addons, -> { EventAddon.purchased }, class_name: 'Effective::EventAddon'
+    has_many :purchased_event_addons, -> { EventAddon.purchased.unarchived }, class_name: 'Effective::EventAddon'
+    has_many :registered_event_addons, -> { EventAddon.registered.unarchived }, class_name: 'Effective::EventAddon'
 
     log_changes(to: :event) if respond_to?(:log_changes)
 
@@ -45,23 +46,17 @@ module Effective
       title.presence || 'New Event Product'
     end
 
-    # Available for purchase
-    def available?
-      return false if archived?
-      capacity_available?
-    end
-
-    def capacity_available?
-      capacity.blank? || (capacity_available > 0)
-    end
-
     def capacity_available
       return nil if capacity.blank?
-      [(capacity - purchased_event_addons_count), 0].max
+      [(capacity - registered_event_addons_count), 0].max
+    end
+
+    def registered_event_addons_count
+      registered_event_addons.length
     end
 
     def purchased_event_addons_count
-      purchased_event_addons.reject(&:archived?).length
+      purchased_event_addons.length
     end
 
   end

@@ -24,13 +24,21 @@ module Admin
         end
       end
 
-      col :purchased_event_addons_count, label: 'Purchased'
+      col :registered_event_addons_count, label: 'Registered'
+      col :purchased_event_addons_count, label: 'Purchased', visible: false
+
       col :capacity, visible: false
       col :capacity_available, visible: false
 
-      col :purchased_event_addons, label: 'Name' do |product|
-        product.purchased_event_addons.reject(&:archived?).sort_by(&:to_s).map do |purchase|
-          content_tag(:div, purchase.owner.to_s, class: 'col-resource_item')
+      col :registered_event_addons, label: 'Registered Names' do |product|
+        product.registered_event_addons.reject(&:archived?).sort_by(&:to_s).map do |addon|
+          content_tag(:div, addon.owner.to_s, class: 'col-resource_item')
+        end.join.html_safe
+      end
+
+      col :purchased_event_addons, label: 'Purchased Names', visible: false do |product|
+        product.purchased_event_addons.reject(&:archived?).sort_by(&:to_s).map do |addon|
+          content_tag(:div, addon.owner.to_s, class: 'col-resource_item')
         end.join.html_safe
       end
 

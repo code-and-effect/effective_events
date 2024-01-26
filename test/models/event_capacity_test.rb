@@ -6,13 +6,16 @@ class EventCapacityTest < ActiveSupport::TestCase
     ticket.capacity = 3
     ticket.save!
 
-    assert ticket.available?
-    assert_equal 0, ticket.purchased_event_registrants_count
-    assert_equal 3, ticket.capacity_available
+    event = ticket.event
 
-    registrant = build_event_registrant(event_ticket: ticket, event: ticket.event)
-    registrant2 = build_event_registrant(event_ticket: ticket, event: ticket.event)
-    registrant3 = build_event_registrant(event_ticket: ticket, event: ticket.event)
+    assert event.event_ticket_available?(ticket, quantity: 3)
+    refute event.event_ticket_available?(ticket, quantity: 4)
+
+    assert_equal 0, ticket.purchased_event_registrants_count
+
+    registrant = build_event_registrant(event_ticket: ticket, event: event)
+    registrant2 = build_event_registrant(event_ticket: ticket, event: event)
+    registrant3 = build_event_registrant(event_ticket: ticket, event: event)
 
     registrant.save!
     registrant2.save!
@@ -22,10 +25,10 @@ class EventCapacityTest < ActiveSupport::TestCase
     order.purchase!
 
     ticket.reload
+    event = ticket.event
 
-    refute ticket.available?
+    refute event.event_ticket_available?(ticket, quantity: 1)
     assert_equal 3, ticket.purchased_event_registrants_count
-    assert_equal 0, ticket.capacity_available
   end
 
   test 'event products have capacity' do
@@ -33,13 +36,15 @@ class EventCapacityTest < ActiveSupport::TestCase
     product.capacity = 3
     product.save!
 
-    assert product.available?
-    assert_equal 0, product.purchased_event_addons_count
-    assert_equal 3, product.capacity_available
+    event = product.event
 
-    addon = build_event_addon(event_product: product, event: product.event)
-    addon2 = build_event_addon(event_product: product, event: product.event)
-    addon3 = build_event_addon(event_product: product, event: product.event)
+    assert event.event_product_available?(product, quantity: 3)
+    refute event.event_product_available?(product, quantity: 4)
+    assert_equal 0, product.purchased_event_addons_count
+
+    addon = build_event_addon(event_product: product, event: event)
+    addon2 = build_event_addon(event_product: product, event: event)
+    addon3 = build_event_addon(event_product: product, event: event)
 
     addon.save!
     addon2.save!
@@ -49,10 +54,10 @@ class EventCapacityTest < ActiveSupport::TestCase
     order.purchase!
 
     product.reload
+    event = product.event
 
-    refute product.available?
+    refute event.event_product_available?(product, quantity: 1)
     assert_equal 3, product.purchased_event_addons_count
-    assert_equal 0, product.capacity_available
   end
 
   # test 'event registrations validate ticket capacity' do
