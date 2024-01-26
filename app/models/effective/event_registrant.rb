@@ -41,6 +41,7 @@ module Effective
 
     scope :sorted, -> { order(:last_name) }
     scope :deep, -> { includes(:event, :event_ticket) }
+    scope :registered, -> { purchased_or_deferred.unarchived }
 
     validates :first_name, presence: true
     validates :last_name, presence: true

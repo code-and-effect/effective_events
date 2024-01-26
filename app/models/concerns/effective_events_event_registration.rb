@@ -105,16 +105,17 @@ module EffectiveEventsEventRegistration
       self.errors.add(:event_registrants, "can't be blank") unless present_event_registrants.present?
     end
 
-    # Validate all items are available
-    validate(unless: -> { current_step == :checkout || done? }) do
-      sold_out_event_registrants.each do |item|
-        errors.add(:base, "The #{item.event_ticket} ticket is sold out and no longer available for purchase")
-        item.errors.add(:event_ticket_id, "#{item.event_ticket} is unavailable for purchase")
+    # Validate all tickets are available for registration
+    validate(if: -> { current_step == :tickets }) do
+      unavailable_event_tickets.each do |event_ticket|
+        errors.add(:base, "The requested number of #{event_ticket} tickets are not available")
       end
+    end
 
-      sold_out_event_addons.each do |item|
-        errors.add(:base, "The #{item.event_product} product is sold out and no longer available for purchase")
-        item.errors.add(:event_product_id, "#{item.event_product} is unavailable for purchase")
+    # Validate all products are available for registration
+    validate(if: -> { current_step == :addons }) do
+      unavailable_event_products.each do |event_product|
+        errors.add(:base, "The requested number of #{event_product} add-ons are not available")
       end
     end
 
@@ -138,15 +139,6 @@ module EffectiveEventsEventRegistration
       notifications = event.event_notifications.select(&:registrant_purchased?)
       notifications.each { |notification| notification.notify!(event_registrants: event_registrants) }
     end
-
-    def sold_out_event_registrants
-      event_registrants.reject { |er| er.purchased? || er.event_ticket&.available? }
-    end
-
-    def sold_out_event_addons
-      event_addons.reject { |ep| ep.purchased? || ep.event_product&.available? }
-    end
-
   end
 
   # Instance Methods
@@ -206,10 +198,34 @@ module EffectiveEventsEventRegistration
     event_addons
   end
 
+  def unavailable_event_tickets
+    unavailable = []
+
+    present_event_registrants.map(&:event_ticket).group_by { |t| t }.each do |event_ticket, event_tickets|
+      unavailable << event_ticket unless event.event_ticket_available?(event_ticket, quantity: event_tickets.length)
+    end
+
+    unavailable
+  end
+
+  def unavailable_event_products
+    unavailable = []
+
+    present_event_addons.map(&:event_product).group_by { |p| p }.each do |event_product, event_products|
+      unavailable << event_product unless event.event_product_available?(event_product, quantity: event_products.length)
+    end
+
+    unavailable
+  end
+
   private
 
   def present_event_registrants
-    event_registrants.reject(&:marked_for_destruction?)
+    event_registrants.reject(&:marked_for_destruction?).reject(&:archived?)
+  end
+
+  def present_event_addons
+    event_addons.reject(&:marked_for_destruction?).reject(&:archived?)
   end
 
 end

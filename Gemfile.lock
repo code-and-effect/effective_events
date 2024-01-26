@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    effective_events (0.10.0)
+    effective_events (0.10.2)
       effective_bootstrap
       effective_datatables (>= 4.0.0)
       effective_email_templates
@@ -113,7 +113,7 @@ GEM
       railties (>= 4.1.0)
       responders
       warden (~> 1.2.3)
-    effective_addresses (1.11.0)
+    effective_addresses (1.11.1)
       carmen
       coffee-rails
       effective_resources
@@ -128,7 +128,7 @@ GEM
       rails (>= 4.0.0)
       sassc
       sprockets-rails
-    effective_datatables (4.20.6)
+    effective_datatables (4.22.1)
       coffee-rails
       effective_bootstrap
       effective_resources
@@ -143,7 +143,7 @@ GEM
       effective_resources
       liquid
       rails
-    effective_orders (6.9.2)
+    effective_orders (6.9.8)
       coffee-rails
       effective_addresses
       effective_bootstrap
@@ -171,7 +171,7 @@ GEM
     ffi (1.16.3)
     globalid (1.0.0)
       activesupport (>= 5.0)
-    haml (6.2.3)
+    haml (6.3.0)
       temple (>= 0.8.2)
       thor
       tilt
