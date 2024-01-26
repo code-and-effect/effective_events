@@ -24,6 +24,10 @@ module Effective
     has_many :event_notifications, -> { order(:id) }, inverse_of: :event, dependent: :destroy
     accepts_nested_attributes_for :event_notifications, allow_destroy: true
 
+    # Used by the registration_available checks
+    has_many :registered_event_registrants, -> { EventRegistrant.registered }, class_name: 'Effective::EventRegistrant', inverse_of: :event
+    has_many :registered_event_addons, -> { EventAddon.registered }, class_name: 'Effective::EventAddon', inverse_of: :event
+
     # rich_text_body - Used by the select step
     has_many_rich_texts
 
@@ -186,7 +190,8 @@ module Effective
     end
 
     def sold_out?
-      false
+      return false unless event_tickets.present?
+      event_tickets.none? { |event_ticket| event_ticket_available?(event_ticket, quantity: 1) }
     end
 
     def early_bird?
@@ -227,6 +232,36 @@ module Effective
 
     def start_time
       start_at
+    end
+
+    # Can I register/purchase this many new event tickets?
+    def event_ticket_available?(event_ticket, quantity:)
+      raise('expected an EventTicket') unless event_ticket.kind_of?(Effective::EventTicket)
+      raise('expected quantity to be greater than 0') unless quantity.to_i > 0
+
+      return false if event_ticket.archived?
+      return true if event_ticket.capacity.blank?   # No capacity enforced for this ticket
+
+      # Total number already sold
+      registered = registered_event_registrants.count { |r| r.event_ticket_id == event_ticket.id }
+
+      # If there's capacity for this many more
+      (registered + quantity) <= event_ticket.capacity
+    end
+
+    # Can I register/purchase this many new event products?
+    def event_product_available?(event_product, quantity:)
+      raise('expected an EventProduct') unless event_product.kind_of?(Effective::EventProduct)
+      raise('expected quantity to be greater than 0') unless quantity.to_i > 0
+
+      return false if event_product.archived?
+      return true if event_product.capacity.blank?   # No capacity enforced for this product
+
+      # Total number already sold
+      registered = registered_event_addons.count { |r| r.event_product_id == event_product.id }
+
+      # If there's capacity for this many more
+      (registered + quantity) <= event_product.capacity
     end
 
   end
