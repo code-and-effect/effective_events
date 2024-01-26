@@ -23,8 +23,8 @@ module Admin
         col :event_product, search: :string
       end
 
-      col :purchased_order
-      col :owner
+      col :purchased_order, visible: false
+      col :owner, visible: false
 
       col :first_name
       col :last_name

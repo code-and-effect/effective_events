@@ -20,7 +20,7 @@ module EffectiveEventsHelper
       remaining = (ticket.capacity.present? ? "#{ticket.capacity_available} remaining" : nil)
 
       label = [title, price, remaining].compact.join(' - ')
-      disabled = { disabled: :disabled } unless (authorized || ticket.available?)
+      disabled = { disabled: :disabled } unless (authorized || event.event_ticket_available?(ticket, quantity: 1))
 
       [label, ticket.to_param, disabled].compact
     end
@@ -39,7 +39,7 @@ module EffectiveEventsHelper
       remaining = (product.capacity.present? ? "#{product.capacity_available} remaining" : nil)
 
       label = [title, price, remaining].compact.join(' - ')
-      disabled = { disabled: :disabled } unless (authorized || product.available?)
+      disabled = { disabled: :disabled } unless (authorized || event.event_product_available?(product, quantity: 1))
 
       [label, product.to_param, disabled].compact
     end

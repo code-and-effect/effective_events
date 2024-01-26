@@ -8,8 +8,8 @@ class EventsTest < ActiveSupport::TestCase
     assert_equal 3, event.event_tickets.length
     assert_equal 2, event.event_products.length
 
-    event.event_tickets.each { |event_ticket| assert event_ticket.available? }
-    event.event_products.each { |event_product| assert event_product.available? }
+    event.event_tickets.each { |event_ticket| assert event.event_ticket_available?(event_ticket, quantity: 1) }
+    event.event_products.each { |event_product| assert event.event_product_available?(event_product, quantity: 1) }
 
     refute event.draft?
     refute event.sold_out?

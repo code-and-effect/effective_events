@@ -9,7 +9,8 @@ module Effective
     belongs_to :event
 
     has_many :event_registrants
-    has_many :purchased_event_registrants, -> { EventRegistrant.purchased }, class_name: 'Effective::EventRegistrant'
+    has_many :purchased_event_registrants, -> { EventRegistrant.purchased.unarchived }, class_name: 'Effective::EventRegistrant'
+    has_many :registered_event_registrants, -> { EventRegistrant.registered.unarchived }, class_name: 'Effective::EventRegistrant'
 
     log_changes(to: :event) if respond_to?(:log_changes)
 
@@ -51,23 +52,17 @@ module Effective
       event.early_bird? ? early_bird_price : regular_price
     end
 
-    # Available for purchase
-    def available?
-      return false if archived?
-      capacity_available?
-    end
-
-    def capacity_available?
-      capacity.blank? || (capacity_available > 0)
-    end
-
     def capacity_available
       return nil if capacity.blank?
-      [(capacity - purchased_event_registrants_count), 0].max
+      [(capacity - registered_event_registrants_count), 0].max
+    end
+
+    def registered_event_registrants_count
+      registered_event_registrants.length
     end
 
     def purchased_event_registrants_count
-      purchased_event_registrants.reject(&:archived?).length
+      purchased_event_registrants.length
     end
 
   end
