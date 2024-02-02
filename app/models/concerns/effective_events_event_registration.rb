@@ -127,12 +127,18 @@ module EffectiveEventsEventRegistration
     # All Fees and Orders
     def submit_fees
       if owner.respond_to?(:outstanding_coupon_fees) # effective_memberships_owner
-        # Order item price reduction handled by reduce_order_item_coupon_fee_price in acts_as_purchasable_wizard
-        Array(owner.outstanding_coupon_fees).each { |fee| fees << fee unless fees.include?(fee) }
         (event_registrants + event_addons + fees)
       else
         (event_registrants + event_addons)
       end
+    end
+
+    def apply_outstanding_coupon_fees
+      return unless owner.respond_to?(:outstanding_coupon_fees)
+
+      Array(owner.outstanding_coupon_fees).each { |fee| fees << fee unless fees.include?(fee) }
+
+      fees.select { |fee| fee.try(:coupon_fee?) }
     end
 
     def after_submit_purchased!

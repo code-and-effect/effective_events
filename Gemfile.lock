@@ -1,7 +1,22 @@
+GIT
+  remote: https://github.com/code-and-effect/effective_memberships.git
+  revision: 0866f358f0621e86a1618f621e5a3cab03c55859
+  specs:
+    effective_memberships (0.32.11)
+      effective_bootstrap
+      effective_datatables (>= 4.0.0)
+      effective_email_templates
+      effective_orders
+      effective_products
+      effective_resources
+      effective_roles
+      rails (>= 6.0.0)
+      wicked
+
 PATH
   remote: .
   specs:
-    effective_events (0.10.2)
+    effective_events (0.11.0)
       effective_bootstrap
       effective_datatables (>= 4.0.0)
       effective_email_templates
@@ -151,9 +166,20 @@ GEM
       effective_resources
       rails (>= 4.0.0)
       sassc
-    effective_resources (2.18.5)
+    effective_products (0.3.2)
+      effective_bootstrap
+      effective_datatables (>= 4.0.0)
+      effective_orders
+      effective_resources
+      effective_roles
+      rails (>= 6.0.0)
+      wicked
+    effective_resources (2.19.5)
       rails
       sprockets-rails
+    effective_roles (2.5.0)
+      effective_resources
+      rails
     effective_test_bot (1.2.9)
       capybara (>= 2.15)
       effective_resources
@@ -305,6 +331,8 @@ GEM
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    wicked (2.0.0)
+      railties (>= 3.0.7)
     xpath (3.2.0)
       nokogiri (~> 1.8)
     zeitwerk (2.5.1)
@@ -316,6 +344,8 @@ DEPENDENCIES
   devise
   effective_developer
   effective_events!
+  effective_memberships!
+  effective_roles
   effective_test_bot
   pry-byebug
   psych (< 4)

@@ -1,4 +1,4 @@
-class CreateEffectiveAddresses < ActiveRecord::Migration[5.0]
+class CreateEffectiveAddresses < ActiveRecord::Migration[6.0]
   def change
     create_table :addresses do |t|
       t.string :addressable_type
