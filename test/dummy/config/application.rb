@@ -11,6 +11,8 @@ require 'haml'
 require 'effective_addresses'
 require 'effective_orders'
 require 'effective_email_templates'
+require 'effective_memberships'
+require 'effective_roles'
 require 'effective_events'
 
 module Dummy
