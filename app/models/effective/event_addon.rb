@@ -50,7 +50,7 @@ module Effective
     end
 
     before_validation(if: -> { event_product.present? }) do
-      self.price ||= event_product.price
+      assign_attributes(price: event_product.price) unless purchased?
     end
 
     with_options(if: -> { new_record? }) do
