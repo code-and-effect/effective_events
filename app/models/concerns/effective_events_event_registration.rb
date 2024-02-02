@@ -124,21 +124,17 @@ module EffectiveEventsEventRegistration
       event&.event_products.present? ? wizard_step_keys : (wizard_step_keys - [:addons])
     end
 
+    def find_or_build_submit_fees
+      with_outstanding_coupon_fees(submit_fees)
+    end
+
     # All Fees and Orders
     def submit_fees
-      if owner.respond_to?(:outstanding_coupon_fees) # effective_memberships_owner
+      if defined?(EffectiveMemberships)
         (event_registrants + event_addons + fees)
       else
         (event_registrants + event_addons)
       end
-    end
-
-    def apply_outstanding_coupon_fees
-      return unless owner.respond_to?(:outstanding_coupon_fees)
-
-      Array(owner.outstanding_coupon_fees).each { |fee| fees << fee unless fees.include?(fee) }
-
-      fees.select { |fee| fee.try(:coupon_fee?) }
     end
 
     def after_submit_purchased!

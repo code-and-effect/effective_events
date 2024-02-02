@@ -53,7 +53,7 @@ module Effective
     end
 
     before_validation(if: -> { event_ticket.present? }) do
-      self.price ||= event_ticket.price
+      assign_attributes(price: event_ticket.price) unless purchased?
     end
 
     def to_s
