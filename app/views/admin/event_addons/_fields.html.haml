@@ -1,0 +1,16 @@
+.card.mb-4
+  .card-body
+    - if f.object.purchased?
+      = f.static_field :event_product, label: 'Purchased event add-ons'
+    - else
+      - # Admin form includes archived event products
+      = f.select :event_product_id, effective_events_event_products_collection(event, :admin), label: 'Add-on'
+
+    .row
+      .col-lg= f.text_field :first_name, required: true
+      .col-lg= f.text_field :last_name, required: true
+
+    .row
+      .col-lg= f.email_field :email, required: true
+
+    = f.text_area :notes, label: 'Notes'
