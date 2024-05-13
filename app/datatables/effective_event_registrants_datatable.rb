@@ -27,7 +27,16 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
     col :company, visible: false
     col :number, visible: false, label: 'Designations'
 
-    col :notes
+    col :response1, visible: false
+    col :response2, visible: false
+    col :response3, visible: false
+    col :notes, visible: false
+
+    col :details do |registrant|
+      [registrant.response1.presence, registrant.response2.presence, registrant.response3.presence, registrant.notes.presence].compact.map do |response|
+        content_tag(:div, response)
+      end.join.html_safe
+    end
 
     col :price, as: :price
 

@@ -13,33 +13,35 @@
     - else
       = f.hidden_field :blank_registrant, value: false
 
-    - ticket_ids = event.event_tickets.map(&:id)
-    - member_ticket_ids = event.event_tickets.select(&:member_only?).map(&:id)
-    - normal_ticket_ids = event.event_tickets.reject(&:member_only?).map(&:id)
-
     = f.hide_if(:blank_registrant, true) do
-      - # Member-only ticket
-      = f.show_if_any(:event_ticket_id, member_ticket_ids) do
-        -# User
-        - klass = (f.object.user || current_user).class
-        - ajax_url = (@select2_users_ajax_path || effective_memberships.member_users_membership_select2_ajax_index_path) unless Rails.env.test?
+      - event.event_tickets.each do |ticket|
+        = f.show_if(:event_ticket_id, ticket.id) do
+          - if ticket.member_only?
+            - klass = (f.object.user || current_user).class
+            - ajax_url = (@select2_users_ajax_path || effective_memberships.member_users_membership_select2_ajax_index_path) unless Rails.env.test?
 
-        = f.hidden_field :user_type, value: klass.name
-        = f.select :user_id, klass.all, ajax_url: ajax_url, label: 'Member', hint: effective_events_event_tickets_user_hint()
+            = f.hidden_field :user_type, value: klass.name
+            = f.select :user_id, klass.all, ajax_url: ajax_url, label: 'Member', hint: effective_events_event_tickets_user_hint()
 
-      - # Normal ticket
-      = f.show_if_any(:event_ticket_id, normal_ticket_ids) do
-        = f.hidden_field :user_type, value: ''
-        = f.hidden_field :user_id, value: ''
+          - if ticket.member_only? == false
+            .row
+              .col-lg= f.text_field :first_name
+              .col-lg= f.text_field :last_name
+              .col-lg= f.text_field :number, label: 'Professional Designations', hint: 'member or registrant number'
 
-        .row
-          .col-lg= f.text_field :first_name, required: true
-          .col-lg= f.text_field :last_name, required: true
-          .col-lg= f.text_field :number, label: 'Professional Designations', hint: 'member or registrant number'
+            .row
+              .col-lg= f.email_field :email
+              .col-lg= f.text_field :company
 
-        .row
-          .col-lg= f.email_field :email, required: true
-          .col-lg= f.text_field :company
+          - # All tickets
+          - if ticket.question1.present?
+            = f.text_field :response1, label: ticket.question1
 
-      = f.show_if_any(:event_ticket_id, ticket_ids) do
-        = f.text_area :notes, label: 'Dietary restrictions or other notes'
+          - if ticket.question2.present?
+            = f.text_field :response2, label: ticket.question2
+
+          - if ticket.question3.present?
+            = f.text_field :response3, label: ticket.question3
+
+          - if ticket.question1.blank? && ticket.question2.blank? && ticket.question3.blank?
+            = f.text_area :notes, label: 'Dietary restrictions or other notes'

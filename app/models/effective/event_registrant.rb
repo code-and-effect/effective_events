@@ -34,6 +34,11 @@ module Effective
 
       blank_registrant      :boolean
 
+      # Question Responses
+      question1             :text
+      question2             :text
+      question3             :text
+
       archived              :boolean
 
       # Acts as Purchasable

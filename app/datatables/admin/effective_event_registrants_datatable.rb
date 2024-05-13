@@ -34,6 +34,10 @@ module Admin
       col :number, label: 'Designations'
       col :notes, label: 'Restrictions and notes'
 
+      col :response1, visible: false
+      col :response2, visible: false
+      col :response3, visible: false
+
       actions_col
     end
 

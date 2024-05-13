@@ -37,6 +37,10 @@ module Admin
       col :capacity, visible: false
       col :capacity_available, visible: false
 
+      col :question1, visible: false
+      col :question2, visible: false
+      col :question3, visible: false
+
       actions_col
     end
 

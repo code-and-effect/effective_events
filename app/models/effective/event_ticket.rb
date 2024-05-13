@@ -23,6 +23,11 @@ module Effective
       # Behaviour
       member_only                 :boolean # You must be a member to purchase this ticket. Must select an existing member for EventRegistrant.
 
+      # Questions
+      question1                   :text
+      question2                   :text
+      question3                   :text
+
       # Pricing
       regular_price               :integer
       early_bird_price            :integer

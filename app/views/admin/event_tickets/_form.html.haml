@@ -1,19 +1,29 @@
 = effective_form_with(model: [:admin, event_ticket], engine: true) do |f|
   = f.hidden_field :event_id
 
-  = f.text_field :title
-  = f.check_box :member_only, hint: 'Must be a member to purchase this ticket. Will display a dropdown of all members to select from.'
-  = f.number_field :capacity, hint: 'The number of registrations will be limited to capacity. Leave blank for unlimited capacity.'
+  = card('Ticket') do
+    = f.text_field :title
 
-  .row
-    .col= f.price_field :regular_price, hint: 'A price of $0 will allow a checkout for free.'
-    .col= f.price_field :early_bird_price, hint: 'A price of $0 will allow a checkout for free. Leave blank for no early bird price.'
+    .row
+      .col= f.number_field :capacity, hint: 'The number of registrations will be limited to capacity. Leave blank for unlimited capacity.'
+      .col= f.check_box :member_only, hint: 'Must be a member to purchase. Will display a dropdown of all members to select from.'
 
-  = f.check_box :tax_exempt
+    .row
+      .col= f.price_field :regular_price, hint: 'A price of $0 will allow a checkout for free.'
+      .col= f.price_field :early_bird_price, hint: 'A price of $0 will allow a checkout for free. Leave blank for no early bird price.'
 
-  - if defined?(EffectiveQbSync)
-    = f.text_field :qb_item_name, label: 'QuickBooks item name'
+    .row
+      - if defined?(EffectiveQbSync)
+        .col= f.text_field :qb_item_name, label: 'QuickBooks item name'
+      .col= f.check_box :tax_exempt
 
-  = f.check_box :archived, label: 'Archive this ticket. It will be unavailable for purchase.'
+    = f.check_box :archived, label: 'Archive this ticket. It will be unavailable for purchase.'
+
+  = card('Questions') do
+    %p Add upto 3 questions
+
+    = f.text_field :question1, label: 'Question 1'
+    = f.text_field :question2, label: 'Question 2'
+    = f.text_field :question3, label: 'Question 3'
 
   = effective_submit(f)
