@@ -20,21 +20,26 @@ module Effective
     # This fee when checked out through the event registration
     belongs_to :event_registration, polymorphic: true, optional: true
 
+    # Required for member-only tickets. The user attending.
+    belongs_to :user, polymorphic: true, optional: true
+
     effective_resource do
-      first_name    :string
-      last_name     :string
-      email         :string
+      first_name            :string
+      last_name             :string
+      email                 :string
 
-      company       :string
-      number        :string
-      notes         :text
+      company               :string
+      number                :string
+      notes                 :text
 
-      archived      :boolean
+      blank_registrant      :boolean
+
+      archived              :boolean
 
       # Acts as Purchasable
-      price             :integer
-      qb_item_name      :string
-      tax_exempt        :boolean
+      price                 :integer
+      qb_item_name          :string
+      tax_exempt            :boolean
 
       timestamps
     end
@@ -43,17 +48,28 @@ module Effective
     scope :deep, -> { includes(:event, :event_ticket) }
     scope :registered, -> { purchased_or_deferred.unarchived }
 
-    validates :first_name, presence: true
-    validates :last_name, presence: true
-    validates :email, presence: true, email: true
-
     before_validation(if: -> { event_registration.present? }) do
       self.event ||= event_registration.event
       self.owner ||= event_registration.owner
     end
 
+    before_validation(if: -> { user.present? }) do
+      assign_attributes(first_name: user.first_name, last_name: user.last_name, email: user.email)
+    end
+
     before_validation(if: -> { event_ticket.present? }) do
       assign_attributes(price: event_ticket.price) unless purchased?
+    end
+
+    validates :blank_registrant, inclusion: { in: [false] }, unless: -> { event&.allow_blank_registrants? }
+    validates :user_id, uniqueness: { scope: [:event_id], allow_blank: true, message: 'is already registered for this event' }
+
+    with_options(unless: -> { blank_registrant? }) do
+      validates :user, presence: true, if: -> { event_ticket&.member_only? }
+
+      validates :first_name, presence: true
+      validates :last_name, presence: true
+      validates :email, presence: true, email: true
     end
 
     def to_s
@@ -65,11 +81,11 @@ module Effective
     end
 
     def name
-      "#{first_name} #{last_name}"
+      first_name.present? ? "#{first_name} #{last_name}" : "GUEST"
     end
 
     def last_first_name
-      "#{last_name}, #{first_name}"
+      first_name.present? ? "#{last_name}, #{first_name}" : "GUEST"
     end
 
     def tax_exempt

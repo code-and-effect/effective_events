@@ -8,22 +8,25 @@
   - if event.class.respond_to?(:acts_as_tagged?)
     = render 'effective/tags/fields', f: f
 
-  = f.datetime_field :published_at, label: 'Publish date', hint: 'When should this be displayed on the website.'
   = f.check_box :draft, hint: 'Save this event as a draft. It will not be accessible on the website.'
+  = f.datetime_field :published_at, label: 'Publish date', hint: 'When should this be displayed on the website.'
 
   - if f.object.persisted? || f.object.errors.include?(:slug)
     - current_url = (effective_events.event_url(f.object) rescue nil)
     = f.text_field :slug, hint: "The slug controls this event's internet address. Be careful, changing the slug will break links that other websites may have to the old address.<br>#{('This event is currently reachable via ' + link_to(current_url.gsub(f.object.slug, '<strong>' + f.object.slug + '</strong>').html_safe, current_url)) if current_url }".html_safe
 
-  = f.datetime_field :start_at, label: "Event Start"
-  = f.datetime_field :end_at, label: "Event End"
+  .row
+    .col= f.datetime_field :start_at, label: "Event Start"
+    .col= f.datetime_field :end_at, label: "Event End"
 
-  %h2 Registration Opens
+  %h2 Registration
   %p The online registration and purchase for this event will be available between:
   = f.datetime_field :registration_start_at, label: "Registration Start"
   = f.datetime_field :registration_end_at, label: "Registration End"
   = f.datetime_field :early_bird_end_at, label: "Early Bird End",
     hint: 'Event tickets can be purchased for early bird pricing before this date. Afterwards regular pricing applies.'
+
+  = f.check_box :allow_blank_registrants, label: "Yes, allow blank ticket registrations", hint: "Allow event tickets to be purchased without adding a name. The purchaser may return to add names later."
 
   = f.check_box :external_registration, label: "Yes, the registration for this event is handled by another website"
 

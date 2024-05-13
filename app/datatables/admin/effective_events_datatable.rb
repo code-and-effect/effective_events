@@ -42,6 +42,8 @@ module Admin
       # col :event_registrants, search: :string
       # col :event_addons, search: :string
 
+      col :allow_blank_registrants
+
       col :roles, visible: false
       col :authenticate_user, visible: false
 

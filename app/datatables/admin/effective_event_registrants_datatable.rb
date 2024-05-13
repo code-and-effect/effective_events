@@ -26,6 +26,7 @@ module Admin
 
       col :purchased_order, visible: false
 
+      col :user
       col :first_name
       col :last_name
       col :email

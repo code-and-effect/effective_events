@@ -18,6 +18,7 @@ module Admin
       col :title
       col :regular_price, as: :price
       col :early_bird_price, as: :price
+      col :member_only
 
       col :capacity_to_s, label: 'Capacity' do |ticket|
         if ticket.capacity.present?

@@ -17,18 +17,21 @@ module Effective
     has_rich_text :body
 
     effective_resource do
-      title                 :string
-      capacity              :integer
+      title                       :string
+      capacity                    :integer
+
+      # Behaviour
+      member_only                 :boolean # You must be a member to purchase this ticket. Must select an existing member for EventRegistrant.
 
       # Pricing
-      regular_price         :integer
-      early_bird_price      :integer
+      regular_price               :integer
+      early_bird_price            :integer
 
-      qb_item_name          :string
-      tax_exempt            :boolean
+      qb_item_name                :string
+      tax_exempt                  :boolean
 
-      position              :integer
-      archived              :boolean
+      position                    :integer
+      archived                    :boolean
 
       timestamps
     end

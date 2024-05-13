@@ -2,10 +2,13 @@
   = f.hidden_field :event_id
 
   = f.text_field :title
+  = f.check_box :member_only, hint: 'Must be a member to purchase this ticket. Will display a dropdown of all members to select from.'
   = f.number_field :capacity, hint: 'The number of registrations will be limited to capacity. Leave blank for unlimited capacity.'
 
-  = f.price_field :regular_price, hint: 'A price of $0 will allow a checkout for free.'
-  = f.price_field :early_bird_price, hint: 'A price of $0 will allow a checkout for free.'
+  .row
+    .col= f.price_field :regular_price, hint: 'A price of $0 will allow a checkout for free.'
+    .col= f.price_field :early_bird_price, hint: 'A price of $0 will allow a checkout for free. Leave blank for no early bird price.'
+
   = f.check_box :tax_exempt
 
   - if defined?(EffectiveQbSync)

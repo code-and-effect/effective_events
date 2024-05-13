@@ -66,6 +66,8 @@ module Effective
       external_registration       :boolean
       external_registration_url   :string
 
+      allow_blank_registrants     :boolean
+
       # Access
       roles_mask             :integer
       authenticate_user      :boolean
@@ -82,7 +84,7 @@ module Effective
     }
 
     scope :published, -> { where(draft: false).where(arel_table[:published_at].lt(Time.zone.now)) }
-    scope :unpublished, -> { where(draft: true).where(arel_table[:published_at].gteq(Time.zone.now)) }
+    scope :unpublished, -> { where(draft: true).or(where(arel_table[:published_at].gteq(Time.zone.now))) }
 
     scope :upcoming, -> { where(arel_table[:end_at].gt(Time.zone.now)) }
     scope :past, -> { where(arel_table[:end_at].lteq(Time.zone.now)) }
@@ -134,27 +136,27 @@ module Effective
     validates :registration_end_at, presence: true, unless: -> { external_registration? }
 
     validate(if: -> { start_at && end_at }) do
-      self.errors.add(:end_at, 'must be after start date') unless start_at < end_at
+      errors.add(:end_at, 'must be after start date') unless start_at < end_at
     end
 
     validate(if: -> { start_at && registration_start_at }) do
-      self.errors.add(:registration_start_at, 'must be before start date') unless registration_start_at < start_at
+      errors.add(:registration_start_at, 'must be before start date') unless registration_start_at < start_at
     end
 
     validate(if: -> { registration_start_at && registration_end_at }) do
-      self.errors.add(:registration_end_at, 'must be after start registration date') unless registration_start_at < registration_end_at
+      errors.add(:registration_end_at, 'must be after start registration date') unless registration_start_at < registration_end_at
     end
 
     validate(if: -> { start_at && early_bird_end_at }) do
-      self.errors.add(:early_bird_end_at, 'must be before start date') unless early_bird_end_at < start_at
+      errors.add(:early_bird_end_at, 'must be before start date') unless early_bird_end_at < start_at
     end
 
     validate(if: -> { file.attached? }) do
-      self.errors.add(:file, 'must be an image') unless file.image?
+      errors.add(:file, 'must be an image') unless file.image?
     end
 
     validate(if: -> { category.present? }) do
-      self.errors.add(:category, 'is not included in the list') unless EffectiveEvents.categories.include?(category)
+      errors.add(:category, 'is not included in the list') unless EffectiveEvents.categories.include?(category)
     end
 
     def to_s
