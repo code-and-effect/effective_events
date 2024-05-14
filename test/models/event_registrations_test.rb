@@ -29,7 +29,8 @@ class EventRegistrationsTest < ActiveSupport::TestCase
     order.purchase!
 
     event_registration.reload
-    assert event_registration.submitted?
+    assert event_registration.was_submitted?
+    assert event_registration.completed?
     assert event_registration.done?
   end
 

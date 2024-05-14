@@ -153,6 +153,7 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
 
       # Dates
       t.datetime :submitted_at
+      t.datetime :completed_at
 
       t.datetime :updated_at
       t.datetime :created_at

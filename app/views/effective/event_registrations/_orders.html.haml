@@ -1,4 +1,4 @@
-- if event_registration.submit_order&.purchased?
+- if event_registration.submit_order.present?
   .card.mb-4
     .card-body
       = render(event_registration.submit_order)

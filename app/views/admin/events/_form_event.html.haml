@@ -1,23 +1,26 @@
 = effective_form_with(model: [:admin, event], engine: true) do |f|
   = f.text_field :title, label: "Title"
 
-  - categories = EffectiveEvents.categories
-  - if categories.present?
-    = f.select :category, categories, hint: 'optional category'
-
-  - if event.class.respond_to?(:acts_as_tagged?)
-    = render 'effective/tags/fields', f: f
-
-  = f.check_box :draft, hint: 'Save this event as a draft. It will not be accessible on the website.'
-  = f.datetime_field :published_at, label: 'Publish date', hint: 'When should this be displayed on the website.'
-
   - if f.object.persisted? || f.object.errors.include?(:slug)
     - current_url = (effective_events.event_url(f.object) rescue nil)
     = f.text_field :slug, hint: "The slug controls this event's internet address. Be careful, changing the slug will break links that other websites may have to the old address.<br>#{('This event is currently reachable via ' + link_to(current_url.gsub(f.object.slug, '<strong>' + f.object.slug + '</strong>').html_safe, current_url)) if current_url }".html_safe
 
   .row
-    .col= f.datetime_field :start_at, label: "Event Start"
-    .col= f.datetime_field :end_at, label: "Event End"
+    .col
+      - categories = EffectiveEvents.categories
+      - if categories.present?
+        = f.select :category, categories, hint: 'optional category'
+    .col
+      - if event.class.respond_to?(:acts_as_tagged?)
+        = render 'effective/tags/fields', f: f
+
+  = f.check_box :draft, hint: 'Save this event as a draft. It will not be accessible on the website.'
+  .row
+    .col-md-6= f.datetime_field :published_at, label: 'Publish date', hint: 'When should this be displayed on the website.'
+
+  .row
+    .col-md-6= f.datetime_field :start_at, label: "Event Start"
+    .col-md-6= f.datetime_field :end_at, label: "Event End"
 
   %h2 Registration
   %p The online registration and purchase for this event will be available between:
