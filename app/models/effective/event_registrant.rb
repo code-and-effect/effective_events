@@ -72,7 +72,6 @@ module Effective
       assign_price()
     end
 
-    validates :blank_registrant, inclusion: { in: [false] }, unless: -> { event&.allow_blank_registrants? }
     validates :user_id, uniqueness: { scope: [:event_id], allow_blank: true, message: 'is already registered for this event' }
     validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
