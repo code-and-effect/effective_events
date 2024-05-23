@@ -5,12 +5,33 @@
     = f.text_field :title
 
     .row
-      .col= f.number_field :capacity, hint: 'The number of registrations will be limited to capacity. Leave blank for unlimited capacity.'
-      .col= f.check_box :member_only, hint: 'Must be a member to purchase. Will display a dropdown of all members to select from.'
+      .col= f.select :category, Effective::EventTicket::CATEGORIES, hint: "Determines who can purchase this ticket at which price"
+      .col= f.number_field :capacity, hint: "The number of registrations will be limited to capacity.<br>Leave blank for unlimited capacity."
 
-    .row
-      .col= f.price_field :regular_price, hint: 'A price of $0 will allow a checkout for free.'
-      .col= f.price_field :early_bird_price, hint: 'A price of $0 will allow a checkout for free. Leave blank for no early bird price.'
+    = f.show_if(:category, 'Member and Non-Member') do
+      .alert.alert-info.mb-4
+        %strong Member and Non-Member
+        Anyone will be able to purchase this ticket. They can select a member from the dropdown to receive the member pricing.
+        Or, they can enter a first name, last name and email to receive the regular pricing.
+
+    = f.show_if(:category, 'Member Only') do
+      .alert.alert-info.mb-4
+        %strong Member-Only
+        Only members will be able to purchase this ticket. They must select a member from the dropdown. Only the member price applies.
+
+    = f.show_if(:category, 'Non-Member') do
+      .alert.alert-info.mb-4
+        %strong Non-Member
+        Anyone will be able to purchase this ticket. The purchaser will be asked for a first name, last name and email. Will not display the dropdown of members. Only the regular price applies.
+
+    - if f.object.event&.early_bird_end_at.present?
+      = f.price_field :early_bird_price, hint: 'A price of $0 will allow a checkout for free. Leave blank for no early bird price.'
+
+    = f.show_if_any(:category, ['Member and Non-Member', 'Non-Member']) do
+      = f.price_field :regular_price, hint: 'A price of $0 will allow a checkout for free.'
+
+    = f.show_if_any(:category, ['Member and Non-Member', 'Member Only']) do
+      = f.price_field :member_price, hint: 'A price of $0 will allow a checkout for free when selecting a member.'
 
     .row
       - if defined?(EffectiveQbSync)

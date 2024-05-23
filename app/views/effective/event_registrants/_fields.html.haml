@@ -15,33 +15,21 @@
 
     = f.hide_if(:blank_registrant, true) do
       - event.event_tickets.each do |ticket|
+        - next if ticket.member_only? && !current_user&.is?(:member)
+
         = f.show_if(:event_ticket_id, ticket.id) do
-          - if ticket.member_only?
-            - klass = (f.object.user || current_user).class
-            - ajax_url = (@select2_users_ajax_path || effective_memberships.member_users_membership_select2_ajax_index_path) unless Rails.env.test?
+          - if ticket.regular?
+            = render('effective/event_registrants/fields_regular', f: f)
+          - elsif ticket.member_only?
+            = render('effective/event_registrants/fields_member_only', f: f)
+          - elsif ticket.non_member?
+            = render('effective/event_registrants/fields_non_member', f: f)
+          - else
+            - raise("Unexpected ticket category: #{ticket.category || 'nil'}")
 
-            = f.hidden_field :user_type, value: klass.name
-            = f.select :user_id, klass.all, ajax_url: ajax_url, label: 'Member', hint: effective_events_event_tickets_user_hint()
+          = render('effective/event_registrants/fields_questions', f: f, ticket: ticket)
 
-          - if ticket.member_only? == false
-            .row
-              .col-lg= f.text_field :first_name
-              .col-lg= f.text_field :last_name
-              .col-lg= f.text_field :number, label: 'Professional Designations', hint: 'member or registrant number'
-
-            .row
-              .col-lg= f.email_field :email
-              .col-lg= f.text_field :company
-
-          - # All tickets
-          - if ticket.question1.present?
-            = f.text_field :response1, label: ticket.question1
-
-          - if ticket.question2.present?
-            = f.text_field :response2, label: ticket.question2
-
-          - if ticket.question3.present?
-            = f.text_field :response3, label: ticket.question3
-
-          - if ticket.question1.blank? && ticket.question2.blank? && ticket.question3.blank?
-            = f.text_area :notes, label: 'Dietary restrictions or other notes'
+    = f.show_if(:blank_registrant, true) do
+      - event.event_tickets.select { |ticket| ticket.regular? }.each do |ticket|
+        = f.show_if(:event_ticket_id, ticket.id) do
+          = f.check_box :member_registrant, label: 'Yes, this ticket will be for a member'

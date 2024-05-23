@@ -27,12 +27,14 @@ module Effective
       first_name            :string
       last_name             :string
       email                 :string
-
       company               :string
+
+      # Historical. Not used anymore.
       number                :string
       notes                 :text
 
       blank_registrant      :boolean
+      member_registrant     :boolean
 
       # Question Responses
       question1             :text
@@ -58,16 +60,21 @@ module Effective
       self.owner ||= event_registration.owner
     end
 
+    before_validation(if: -> { blank_registrant? }) do
+      assign_attributes(user: nil, first_name: nil, last_name: nil, email: nil, company: nil)
+    end
+
     before_validation(if: -> { user.present? }) do
       assign_attributes(first_name: user.first_name, last_name: user.last_name, email: user.email)
     end
 
-    before_validation(if: -> { event_ticket.present? }) do
-      assign_attributes(price: event_ticket.price) unless purchased?
+    before_validation(if: -> { event_ticket.present? }, unless: -> { purchased? }) do
+      assign_price()
     end
 
     validates :blank_registrant, inclusion: { in: [false] }, unless: -> { event&.allow_blank_registrants? }
     validates :user_id, uniqueness: { scope: [:event_id], allow_blank: true, message: 'is already registered for this event' }
+    validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
     with_options(unless: -> { blank_registrant? }) do
       validates :user, presence: true, if: -> { event_ticket&.member_only? }
@@ -93,6 +100,10 @@ module Effective
       first_name.present? ? "#{last_name}, #{first_name}" : "GUEST"
     end
 
+    def member_present?
+      user&.is?(:member) || (blank_registrant? && member_registrant?)
+    end
+
     def tax_exempt
       event_ticket&.tax_exempt
     end
@@ -111,6 +122,29 @@ module Effective
       order.mark_as_purchased!
 
       true
+    end
+
+    private
+
+    def assign_price
+      raise('is already purchased') if purchased?
+
+      raise('expected an event') if event.blank?
+      raise('expected an event ticket') if event_ticket.blank?
+
+      price = if event.early_bird?
+        event_ticket.early_bird_price # Early Bird Pricing
+      elsif event_ticket.non_member?
+        event_ticket.regular_price # Non Member Tickets only have one price
+      elsif event_ticket.member_only?
+        event_ticket.member_price  # Member-Only Tickets only have one price
+      elsif event_ticket.regular?
+        (member_present? ? event_ticket.member_price : event_ticket.regular_price)
+      else
+        raise("Unexpected event ticket price calculation")
+      end
+
+      assign_attributes(price: price)
     end
 
   end

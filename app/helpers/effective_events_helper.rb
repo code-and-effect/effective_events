@@ -7,6 +7,23 @@ module EffectiveEventsHelper
     end
   end
 
+  def effective_events_ticket_price(event, ticket)
+    raise('expected an Effective::Event') unless event.kind_of?(Effective::Event)
+    raise('expected an Effective::EventTicket') unless ticket.kind_of?(Effective::EventTicket)
+
+    prices = [
+      (ticket.early_bird_price if event.early_bird?), 
+      (ticket.member_price unless ticket.non_member?),
+      (ticket.regular_price unless ticket.member_only?)
+    ].compact.sort.uniq
+
+    if prices.length > 1
+      "#{(prices.first == 0 ? '$0' : price_to_currency(prices.first))} to #{(prices.last == 0 ? '$0' : price_to_currency(prices.last))}"
+    else
+      (prices.first == 0 ? '$0' : price_to_currency(prices.first))
+    end
+  end
+
   def effective_events_event_tickets_collection(event, namespace = nil)
     raise('expected an Effective::Event') unless event.kind_of?(Effective::Event)
 
@@ -16,7 +33,8 @@ module EffectiveEventsHelper
 
     tickets.map do |ticket|
       title = ticket.to_s
-      price = (ticket.price == 0 ? '$0' : price_to_currency(ticket.price))
+      price = effective_events_ticket_price(event, ticket)
+
       remaining = (ticket.capacity.present? ? "#{ticket.capacity_available} remaining" : nil)
 
       label = [title, price, remaining].compact.join(' - ')

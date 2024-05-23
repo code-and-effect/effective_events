@@ -38,15 +38,15 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
 
       t.string :title
       t.integer :capacity
+      t.string :category
 
       t.integer :regular_price
+      t.integer :member_price
       t.integer :early_bird_price
 
       t.text :question1
       t.text :question2
       t.text :question3
-
-      t.boolean :member_only, default: false
 
       t.string :qb_item_name
       t.boolean :tax_exempt, default: false
@@ -79,6 +79,7 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.text :notes
 
       t.boolean :blank_registrant, default: false
+      t.boolean :member_registrant, default: false
 
       t.text :response1
       t.text :response2

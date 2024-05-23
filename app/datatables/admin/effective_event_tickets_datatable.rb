@@ -16,15 +16,17 @@ module Admin
       col :event
 
       col :title
+      col :member_price, as: :price
       col :regular_price, as: :price
       col :early_bird_price, as: :price
-      col :member_only
 
       col :capacity_to_s, label: 'Capacity' do |ticket|
         if ticket.capacity.present?
           "#{ticket.capacity_available} remaining / #{ticket.capacity} total"
         end
       end
+
+      col :category, visible: false
 
       col :registered_event_registrants_count, label: 'Registered' do |event|
         event.event_registrants.registered.unarchived.count
@@ -34,8 +36,8 @@ module Admin
         event.event_registrants.purchased.unarchived.count
       end
 
-      col :capacity, visible: false
       col :capacity_available, visible: false
+      col :capacity, label: 'Capacity Total', visible: false
 
       col :question1, visible: false
       col :question2, visible: false
