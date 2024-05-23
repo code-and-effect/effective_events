@@ -12,10 +12,14 @@
       - next if ticket.member_only? && !current_user&.is?(:member)
 
       = f.show_if(:event_ticket_id, ticket.id) do
-        - if event&.allow_blank_registrants?
+        - if event.allow_blank_registrants? && (f.object.new_record? || f.object.blank_registrant?)
           = f.check_box :blank_registrant, label: "I will return and add this ticket's information later"
         - else
           = f.hidden_field :blank_registrant, value: false
+
+        - if ticket.regular?
+          = f.show_if(:blank_registrant, true, nested: true) do 
+            = f.check_box :member_registrant, label: 'Yes, this ticket will be for a member'
 
         = f.show_if(:blank_registrant, false, nested: true) do
           - if ticket.regular?
@@ -29,59 +33,3 @@
 
           = render('effective/event_registrants/fields_questions', f: f, ticket: ticket)
 
-        - if ticket.regular?
-          = f.show_if(:blank_registrant, true) do 
-            = f.check_box :member_registrant, label: 'Yes, this ticket will be for a member'
-
-
-
-    -# = f.show_if(:blank_registrant, false) do
-    -#   - event.event_tickets.each do |ticket|
-    -#     - next if ticket.member_only? && !current_user&.is?(:member)
-
-    -#     = f.show_if(:event_ticket_id, ticket.id) do
-    -#       - if ticket.regular?
-    -#         = render('effective/event_registrants/fields_regular', f: f)
-    -#       - elsif ticket.member_only?
-    -#         = render('effective/event_registrants/fields_member_only', f: f)
-    -#       - elsif ticket.non_member?
-    -#         = render('effective/event_registrants/fields_non_member', f: f)
-    -#       - else
-    -#         - raise("Unexpected ticket category: #{ticket.category || 'nil'}")
-
-    -#       = render('effective/event_registrants/fields_questions', f: f, ticket: ticket)
-
-    -# = f.show_if(:blank_registrant, true) do
-    -#   - event.event_tickets.select { |ticket| ticket.regular? }.each do |ticket|
-    -#     = f.show_if(:event_ticket_id, ticket.id) do
-    -#       = f.check_box :member_registrant, label: 'Yes, this ticket will be for a member'
-
-
-
-
-
-    -# - if event&.allow_blank_registrants?
-    -#   = f.check_box :blank_registrant, label: "I will return and add this ticket's information later"
-    -# - else
-    -#   = f.hidden_field :blank_registrant, value: false
-
-    -# = f.show_if(:blank_registrant, false) do
-    -#   - event.event_tickets.each do |ticket|
-    -#     - next if ticket.member_only? && !current_user&.is?(:member)
-
-    -#     = f.show_if(:event_ticket_id, ticket.id) do
-    -#       - if ticket.regular?
-    -#         = render('effective/event_registrants/fields_regular', f: f)
-    -#       - elsif ticket.member_only?
-    -#         = render('effective/event_registrants/fields_member_only', f: f)
-    -#       - elsif ticket.non_member?
-    -#         = render('effective/event_registrants/fields_non_member', f: f)
-    -#       - else
-    -#         - raise("Unexpected ticket category: #{ticket.category || 'nil'}")
-
-    -#       = render('effective/event_registrants/fields_questions', f: f, ticket: ticket)
-
-    -# = f.show_if(:blank_registrant, true) do
-    -#   - event.event_tickets.select { |ticket| ticket.regular? }.each do |ticket|
-    -#     = f.show_if(:event_ticket_id, ticket.id) do
-    -#       = f.check_box :member_registrant, label: 'Yes, this ticket will be for a member'
