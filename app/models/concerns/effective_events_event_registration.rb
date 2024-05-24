@@ -241,9 +241,7 @@ module EffectiveEventsEventRegistration
   def unavailable_event_tickets
     unavailable = []
 
-    changed_event_registrants = present_event_registrants.select { |er| er.new_record? || er.event_ticket_id_changed? }
-
-    changed_event_registrants.map(&:event_ticket).group_by { |t| t }.each do |event_ticket, event_tickets|
+    present_event_registrants.map(&:event_ticket).group_by { |t| t }.each do |event_ticket, event_tickets|
       unavailable << event_ticket unless event.event_ticket_available?(event_ticket, quantity: event_tickets.length)
     end
 
@@ -253,9 +251,7 @@ module EffectiveEventsEventRegistration
   def unavailable_event_products
     unavailable = []
 
-    changed_event_products = present_event_addons.select { |er| er.new_record? || er.event_product_id_changed? }
-
-    changed_event_products.map(&:event_product).group_by { |p| p }.each do |event_product, event_products|
+    present_event_addons.map(&:event_product).group_by { |p| p }.each do |event_product, event_products|
       unavailable << event_product unless event.event_product_available?(event_product, quantity: event_products.length)
     end
 
