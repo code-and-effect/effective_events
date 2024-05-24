@@ -125,6 +125,10 @@ module EffectiveEventsEventRegistration
     # If we're submitted. Try to move to completed.
     before_save(if: -> { submitted? }) { try_completed! }
 
+    def payment_date_in_future?
+      false
+    end
+
     def can_visit_step?(step)
       return false if step == :complete && !completed?
       return true if step == :complete && completed?
@@ -216,7 +220,7 @@ module EffectiveEventsEventRegistration
         first_name: owner.try(:first_name),
         last_name: owner.try(:last_name),
         email: owner.try(:email),
-        company: owner.try(:company),
+        company: owner.try(:company)
       )
     end
 
