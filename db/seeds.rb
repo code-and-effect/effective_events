@@ -27,6 +27,7 @@ event.event_tickets.create!(
   capacity: 10,
   regular_price: 100_00,
   early_bird_price: 50_00,
+  member_price: 75_00,
   qb_item_name: 'Tickets'
 )
 
@@ -35,6 +36,7 @@ event.event_tickets.create!(
   capacity: 20,
   regular_price: 200_00,
   early_bird_price: 150_00,
+  member_price: 75_00,
   qb_item_name: 'Tickets'
 )
 
@@ -43,6 +45,7 @@ event.event_tickets.create!(
   capacity: nil,
   regular_price: 200_00,
   early_bird_price: 150_00,
+  member_price: 75_00,
   qb_item_name: 'Tickets'
 )
 

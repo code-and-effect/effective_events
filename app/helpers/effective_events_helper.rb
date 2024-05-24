@@ -7,16 +7,37 @@ module EffectiveEventsHelper
     end
   end
 
+  def effective_events_ticket_price(event, ticket)
+    raise('expected an Effective::Event') unless event.kind_of?(Effective::Event)
+    raise('expected an Effective::EventTicket') unless ticket.kind_of?(Effective::EventTicket)
+
+    prices = [
+      (ticket.early_bird_price if event.early_bird?), 
+      (ticket.regular_price if ticket.regular? || ticket.member_or_non_member?),
+      (ticket.member_price if ticket.member_only? || ticket.member_or_non_member?)
+    ].compact.sort.uniq
+
+    if prices.length > 1
+      "#{(prices.first == 0 ? '$0' : price_to_currency(prices.first))} to #{(prices.last == 0 ? '$0' : price_to_currency(prices.last))}"
+    else
+      (prices.first == 0 ? '$0' : price_to_currency(prices.first))
+    end
+  end
+
   def effective_events_event_tickets_collection(event, namespace = nil)
     raise('expected an Effective::Event') unless event.kind_of?(Effective::Event)
 
     # Allow an admin to assign archived tickets
     authorized = (namespace == :admin)
+    member = current_user.try(:is_any?, :member)
+
     tickets = (authorized ? event.event_tickets : event.event_tickets.reject(&:archived?))
+    tickets = tickets.reject { |ticket| ticket.member_only? } unless (authorized || member)
 
     tickets.map do |ticket|
       title = ticket.to_s
-      price = (ticket.price == 0 ? '$0' : price_to_currency(ticket.price))
+      price = effective_events_ticket_price(event, ticket)
+
       remaining = (ticket.capacity.present? ? "#{ticket.capacity_available} remaining" : nil)
 
       label = [title, price, remaining].compact.join(' - ')
@@ -44,4 +65,16 @@ module EffectiveEventsHelper
       [label, product.to_param, disabled].compact
     end
   end
+
+  def effective_events_event_tickets_user_hint
+    url = if current_user.class.try(:effective_memberships_organization_user?)
+      organization = current_user.membership_organizations.first || current_user.organizations.first
+      effective_memberships.edit_organization_path(organization, anchor: 'tab-representatives') if organization
+    end
+    
+    return if url.blank?
+
+    "Can't find the person you need? <a href='#{url}' target='blank'>Click here</a> to add them to your organization."
+  end
+
 end

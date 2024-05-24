@@ -35,25 +35,31 @@ module EffectiveEventsTestBuilder
 
     event.event_tickets.build(
       title: 'Ticket A 10 Seats',
+      category: 'Regular',
       capacity: 10,
       regular_price: 100_00,
       early_bird_price: 50_00,
+      member_price: 75_00,
       qb_item_name: 'Tickets'
     )
 
     event.event_tickets.build(
       title: 'Ticket B 20 Seats',
+      category: 'Regular',
       capacity: 20,
       regular_price: 200_00,
       early_bird_price: 150_00,
+      member_price: 75_00,
       qb_item_name: 'Tickets'
     )
 
     event.event_tickets.build(
       title: 'Ticket C Unlimited Seats',
+      category: 'Regular',
       capacity: nil,
       regular_price: 200_00,
       early_bird_price: 150_00,
+      member_price: 75_00,
       qb_item_name: 'Tickets'
     )
 
@@ -112,7 +118,9 @@ module EffectiveEventsTestBuilder
     Effective::EventTicket.new(
       event: event,
       title: 'Test Event Ticket',
+      category: 'Regular',
       regular_price: 100_00,
+      member_price: 75_00,
       early_bird_price: 50_00,
       tax_exempt: false
     )

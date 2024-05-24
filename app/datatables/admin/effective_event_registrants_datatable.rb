@@ -26,12 +26,15 @@ module Admin
 
       col :purchased_order, visible: false
 
+      col :user
       col :first_name
       col :last_name
       col :email
-      col :company
-      col :number, label: 'Designations'
-      col :notes, label: 'Restrictions and notes'
+      col :company, visible: false
+
+      col :response1
+      col :response2
+      col :response3
 
       actions_col
     end

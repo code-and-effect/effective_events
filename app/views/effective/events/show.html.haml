@@ -48,7 +48,7 @@
                 %br
                 %ul
                   - @event.event_tickets.each do |ticket|
-                    %li= "#{ticket} (#{price_to_currency(ticket.price)})"
+                    %li= "#{ticket} (#{effective_events_ticket_price(@event, ticket)})"
 
             -# - if @event.event_products.present?
             -#   %li

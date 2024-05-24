@@ -4,7 +4,13 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
   datatable do
 
     col :name do |er|
-      "#{er.first_name} #{er.last_name}<br><small>#{mail_to(er.email)}</small>"
+      if er.first_name.present?
+        "#{er.first_name} #{er.last_name}<br><small>#{mail_to(er.email)}</small>"
+      elsif er.owner.present?
+        er.owner.to_s + ' - GUEST'
+      else
+        'Unknown'
+      end
     end
 
     col :event_ticket, search: :string, label: 'Ticket' do |er|
@@ -14,13 +20,21 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
       ].compact.join('<br>').html_safe
     end
 
+    col :user, visible: false
     col :first_name, visible: false
     col :last_name, visible: false
     col :email, visible: false
     col :company, visible: false
-    col :number, visible: false, label: 'Designations'
 
-    col :notes
+    col :response1, visible: false
+    col :response2, visible: false
+    col :response3, visible: false
+
+    col :details do |registrant|
+      [registrant.response1.presence, registrant.response2.presence, registrant.response3.presence].compact.map do |response|
+        content_tag(:div, response)
+      end.join.html_safe
+    end
 
     col :price, as: :price
 

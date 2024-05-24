@@ -23,7 +23,8 @@ module EffectiveEventsEventRegistration
 
     acts_as_statused(
       :draft,      # Just Started
-      :submitted   # All done
+      :submitted,  # Order has been submitted with a deferred payment processor.
+      :completed   # All done. Order purchased.
     )
 
     acts_as_wizard(
@@ -33,7 +34,8 @@ module EffectiveEventsEventRegistration
       summary: 'Review',
       billing: 'Billing Address',
       checkout: 'Checkout',
-      submitted: 'Submitted'
+      submitted: 'Submitted',
+      complete: 'Completed'
     )
 
     acts_as_purchasable_wizard
@@ -70,6 +72,7 @@ module EffectiveEventsEventRegistration
 
       # Dates
       submitted_at           :datetime
+      completed_at           :datetime
 
       # Acts as Wizard
       wizard_steps           :text, permitted: false
@@ -85,9 +88,9 @@ module EffectiveEventsEventRegistration
     }
 
     scope :sorted, -> { order(:id) }
-
-    scope :in_progress, -> { where.not(status: [:submitted]) }
-    scope :done, -> { where(status: [:submitted]) }
+    
+    scope :in_progress, -> { where(status: [:draft, :submitted]) }
+    scope :done, -> { where(status: :completed) }
 
     scope :for, -> (user) { where(owner: user) }
 
@@ -119,6 +122,16 @@ module EffectiveEventsEventRegistration
       end
     end
 
+    # If we're submitted. Try to move to completed.
+    before_save(if: -> { submitted? }) { try_completed! }
+
+    def can_visit_step?(step)
+      return false if step == :complete && !completed?
+      return true if step == :complete && completed?
+
+      can_revisit_completed_steps(step)
+    end
+
     def required_steps
       return self.class.test_required_steps if Rails.env.test? && self.class.test_required_steps.present?
       event&.event_products.present? ? wizard_step_keys : (wizard_step_keys - [:addons])
@@ -137,6 +150,14 @@ module EffectiveEventsEventRegistration
       end
     end
 
+    # When the submit_order is deferred or purchased, we call submit!
+    # When the order is a deferred payment processor, we continue to the :submitted step
+    # When the order is a regular processor, the before_save will call complete! and we continue to the :complete step
+    # Purchasing the order later on will automatically call 
+    def submit_wizard_on_deferred_order?
+      true
+    end
+
     def after_submit_purchased!
       notifications = event.event_notifications.select(&:registrant_purchased?)
       notifications.each { |notification| notification.notify!(event_registrants: event_registrants) }
@@ -149,11 +170,29 @@ module EffectiveEventsEventRegistration
   end
 
   def in_progress?
-    draft?
+    draft? || submitted?
   end
 
   def done?
-    submitted?
+    completed?
+  end
+
+  def try_completed!
+    return false unless submitted?
+    return false unless submit_order&.purchased?
+    complete!
+  end
+
+  def complete!
+    raise('event registration must be submitted to complete!') unless submitted?
+    raise('expected a purchased order') unless submit_order&.purchased?
+
+    wizard_steps[:checkout] ||= Time.zone.now
+    wizard_steps[:submitted] ||= Time.zone.now
+    wizard_steps[:complete] = Time.zone.now
+
+    completed!
+    true
   end
 
   # Find or build
@@ -178,7 +217,6 @@ module EffectiveEventsEventRegistration
         last_name: owner.try(:last_name),
         email: owner.try(:email),
         company: owner.try(:company),
-        number: owner.try(:membership).try(:number) || owner.try(:number)
       )
     end
 
@@ -203,7 +241,9 @@ module EffectiveEventsEventRegistration
   def unavailable_event_tickets
     unavailable = []
 
-    present_event_registrants.map(&:event_ticket).group_by { |t| t }.each do |event_ticket, event_tickets|
+    changed_event_registrants = present_event_registrants.select { |er| er.new_record? || er.event_ticket_id_changed? }
+
+    changed_event_registrants.map(&:event_ticket).group_by { |t| t }.each do |event_ticket, event_tickets|
       unavailable << event_ticket unless event.event_ticket_available?(event_ticket, quantity: event_tickets.length)
     end
 
@@ -213,7 +253,9 @@ module EffectiveEventsEventRegistration
   def unavailable_event_products
     unavailable = []
 
-    present_event_addons.map(&:event_product).group_by { |p| p }.each do |event_product, event_products|
+    changed_event_products = present_event_addons.select { |er| er.new_record? || er.event_product_id_changed? }
+
+    changed_event_products.map(&:event_product).group_by { |p| p }.each do |event_product, event_products|
       unavailable << event_product unless event.event_product_available?(event_product, quantity: event_products.length)
     end
 

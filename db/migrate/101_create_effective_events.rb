@@ -22,6 +22,8 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.boolean :external_registration, default: false
       t.string :external_registration_url
 
+      t.boolean :allow_blank_registrants, default: false
+
       t.integer :roles_mask
       t.boolean :authenticate_user, default: false
 
@@ -36,9 +38,15 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
 
       t.string :title
       t.integer :capacity
+      t.string :category
 
       t.integer :regular_price
+      t.integer :member_price
       t.integer :early_bird_price
+
+      t.text :question1
+      t.text :question2
+      t.text :question3
 
       t.string :qb_item_name
       t.boolean :tax_exempt, default: false
@@ -59,6 +67,9 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.integer :event_registration_id
       t.string :event_registration_type
 
+      t.integer :user_id
+      t.string :user_type
+
       t.string :first_name
       t.string :last_name
       t.string :email
@@ -66,6 +77,13 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.string :company
       t.string :number
       t.text :notes
+
+      t.boolean :blank_registrant, default: false
+      t.boolean :member_registrant, default: false
+
+      t.text :response1
+      t.text :response2
+      t.text :response3
 
       t.integer :purchased_order_id
       t.integer :price
@@ -136,6 +154,7 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
 
       # Dates
       t.datetime :submitted_at
+      t.datetime :completed_at
 
       t.datetime :updated_at
       t.datetime :created_at
