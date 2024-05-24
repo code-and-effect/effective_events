@@ -24,7 +24,9 @@ class EffectiveEventRegistrationsDatatable < Effective::Datatable
       if er.draft?
         dropdown_link_to('Continue', effective_events.event_event_registration_build_path(er.event, er, er.next_step), 'data-turbolinks' => false)
         dropdown_link_to('Delete', effective_events.event_event_registration_path(er.event, er), 'data-confirm': "Really delete #{er}?", 'data-method': :delete)
-      else
+      elsif er.submitted?
+        dropdown_link_to('Continue', effective_events.event_event_registration_build_path(er.event, er, er.next_step), 'data-turbolinks' => false)
+      elsif er.completed?
         dropdown_link_to('Show', effective_events.event_event_registration_path(er.event, er))
 
         # Register Again
@@ -32,7 +34,6 @@ class EffectiveEventRegistrationsDatatable < Effective::Datatable
           url = er.event.external_registration_url.presence || effective_events.new_event_event_registration_path(er.event)
           dropdown_link_to('Register Again', url)
         end
-
       end
     end
   end
