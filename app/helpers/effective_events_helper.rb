@@ -70,7 +70,9 @@ module EffectiveEventsHelper
     url = if current_user.class.try(:effective_memberships_organization_user?)
       organization = current_user.membership_organizations.first || current_user.organizations.first
       effective_memberships.edit_organization_path(organization, anchor: 'tab-representatives') if organization
-    end || '/dashboard'
+    end
+    
+    return if url.blank?
 
     "Can't find the person you need? <a href='#{url}' target='blank'>Click here</a> to add them to your organization."
   end
