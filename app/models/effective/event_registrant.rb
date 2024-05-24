@@ -29,10 +29,6 @@ module Effective
       email                 :string
       company               :string
 
-      # Historical. Not used anymore.
-      number                :string
-      notes                 :text
-
       blank_registrant      :boolean
       member_registrant     :boolean
 
@@ -48,6 +44,10 @@ module Effective
       qb_item_name          :string
       tax_exempt            :boolean
 
+      # Historical. Not used anymore.
+      number                :string
+      notes                 :text
+
       timestamps
     end
 
@@ -61,7 +61,7 @@ module Effective
     end
 
     before_validation(if: -> { blank_registrant? }) do
-      assign_attributes(user: nil, first_name: nil, last_name: nil, email: nil, company: nil)
+      assign_attributes(user: nil, first_name: nil, last_name: nil, email: nil)
     end
 
     before_validation(if: -> { user.present? }) do
@@ -74,13 +74,25 @@ module Effective
 
     validates :user_id, uniqueness: { scope: [:event_id], allow_blank: true, message: 'is already registered for this event' }
     validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
+    validates :email, email: true
 
-    with_options(unless: -> { blank_registrant? }) do
-      validates :user, presence: true, if: -> { event_ticket&.member_only? }
+    # Member Only Ticket
+    with_options(if: -> { event_ticket&.member_only? }, unless: -> { blank_registrant? }) do
+      validates :user_id, presence: { message: 'Please select a member' }
+    end
 
+    # Regular Ticket
+    with_options(if: -> { event_ticket&.regular? }, unless: -> { blank_registrant? }) do
       validates :first_name, presence: true
       validates :last_name, presence: true
-      validates :email, presence: true, email: true
+      validates :email, presence: true
+    end
+
+    with_options(if: -> { event_ticket&.member_or_non_member? && !blank_registrant? }) do
+      validates :user_id, presence: { message: 'Please select a member' }, unless: -> { first_name.present? || last_name.present? || email.present? }
+      validates :first_name, presence: true, unless: -> { user.present? }
+      validates :last_name, presence: true, unless: -> { user.present? }
+      validates :email, presence: true, unless: -> { user.present? }
     end
 
     def to_s
@@ -133,11 +145,11 @@ module Effective
 
       price = if event.early_bird?
         event_ticket.early_bird_price # Early Bird Pricing
-      elsif event_ticket.non_member?
-        event_ticket.regular_price # Non Member Tickets only have one price
-      elsif event_ticket.member_only?
-        event_ticket.member_price  # Member-Only Tickets only have one price
       elsif event_ticket.regular?
+        event_ticket.regular_price
+      elsif event_ticket.member_only?
+        event_ticket.member_price
+      elsif event_ticket.member_or_non_member?
         (member_present? ? event_ticket.member_price : event_ticket.regular_price)
       else
         raise("Unexpected event ticket price calculation")

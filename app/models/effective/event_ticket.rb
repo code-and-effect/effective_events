@@ -16,7 +16,7 @@ module Effective
 
     has_rich_text :body
 
-    CATEGORIES = ['Member and Non-Member', 'Member Only', 'Non-Member']
+    CATEGORIES = ['Regular', 'Member Only', 'Member or Non-Member']
 
     effective_resource do
       title                       :string
@@ -54,10 +54,10 @@ module Effective
     validates :title, presence: true, uniqueness: { scope: [:event_id] }
     validates :category, presence: true
 
-    validates :regular_price, presence: true, if: -> { regular? || non_member? }
+    validates :regular_price, presence: true, if: -> { member_or_non_member? || regular? }
     validates :regular_price, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
 
-    validates :member_price, presence: true, if: -> { regular? || member_only? }
+    validates :member_price, presence: true, if: -> { member_or_non_member? || member_only? }
     validates :member_price, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
 
     validates :early_bird_price, presence: true, if: -> { event&.early_bird_end_at.present? }
@@ -85,15 +85,15 @@ module Effective
     end
 
     def regular?
-      category == 'Member and Non-Member'
+      category == 'Regular'
     end
 
     def member_only?
       category == 'Member Only'
     end
 
-    def non_member?
-      category == 'Non-Member'
+    def member_or_non_member?
+      category == 'Member or Non-Member'
     end
   end
 end

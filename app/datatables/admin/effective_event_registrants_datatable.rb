@@ -30,13 +30,11 @@ module Admin
       col :first_name
       col :last_name
       col :email
-      col :company
-      col :number, label: 'Designations'
-      col :notes, label: 'Restrictions and notes'
+      col :company, visible: false
 
-      col :response1, visible: false
-      col :response2, visible: false
-      col :response3, visible: false
+      col :response1
+      col :response2
+      col :response3
 
       actions_col
     end

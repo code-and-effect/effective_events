@@ -13,8 +13,8 @@ module EffectiveEventsHelper
 
     prices = [
       (ticket.early_bird_price if event.early_bird?), 
-      (ticket.member_price unless ticket.non_member?),
-      (ticket.regular_price unless ticket.member_only?)
+      (ticket.regular_price if ticket.regular? || ticket.member_or_non_member?),
+      (ticket.member_price if ticket.member_only? || ticket.member_or_non_member?)
     ].compact.sort.uniq
 
     if prices.length > 1

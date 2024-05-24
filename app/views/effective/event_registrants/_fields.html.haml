@@ -17,7 +17,7 @@
         - else
           = f.hidden_field :blank_registrant, value: false
 
-        - if ticket.regular?
+        - if ticket.member_or_non_member?
           = f.show_if(:blank_registrant, true, nested: true) do 
             = f.check_box :member_registrant, label: 'Yes, this ticket will be for a member'
 
@@ -26,8 +26,8 @@
             = render('effective/event_registrants/fields_regular', f: f)
           - elsif ticket.member_only?
             = render('effective/event_registrants/fields_member_only', f: f)
-          - elsif ticket.non_member?
-            = render('effective/event_registrants/fields_non_member', f: f)
+          - elsif ticket.member_or_non_member?
+            = render('effective/event_registrants/fields_member_or_non_member', f: f)
           - else
             - raise("Unexpected ticket category: #{ticket.category || 'nil'}")
 

@@ -217,7 +217,6 @@ module EffectiveEventsEventRegistration
         last_name: owner.try(:last_name),
         email: owner.try(:email),
         company: owner.try(:company),
-        number: owner.try(:membership).try(:number) || owner.try(:number)
       )
     end
 
