@@ -44,7 +44,7 @@ module Effective
       qb_item_name          :string
       tax_exempt            :boolean
 
-      # Historical. Not used anymore.
+      # Historical. Not used anymore. TO BE DELETED.
       number                :string
       notes                 :text
 

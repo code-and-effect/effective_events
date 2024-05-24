@@ -16,7 +16,7 @@ module Effective
     # If the event is no longer registerable, do not let them continue
     def redirect_unless_registerable
       return if resource.blank?
-      return if resource.submitted?
+      return if resource.was_submitted?
       return if resource.event.blank?
       return if resource.event.registerable?
       return if resource.submit_order&.deferred?

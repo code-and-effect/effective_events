@@ -26,7 +26,7 @@ module Admin
 
       col :purchased_order, visible: false
 
-      col :user
+      col :user, label: 'Member'
       col :first_name
       col :last_name
       col :email

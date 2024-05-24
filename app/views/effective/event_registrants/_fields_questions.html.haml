@@ -1,5 +1,5 @@
 - if ticket.questions.present?
-  %p Please answer the following questions:
+  %p Please answer the following questions (optional):
 
   - if ticket.question1.present?
     = f.text_field :response1, label: ticket.question1

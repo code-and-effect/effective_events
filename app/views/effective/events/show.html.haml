@@ -40,7 +40,7 @@
               %br
               = @event.registration_end_at.strftime("%b %d, %Y %I:%M%P")
 
-        - if @event.event_tickets.present? #|| @event.event_products.present?
+        - if @event.event_tickets.present?
           %ul.list-unstyled
             - if @event.event_tickets.present?
               %li
@@ -49,14 +49,6 @@
                 %ul
                   - @event.event_tickets.each do |ticket|
                     %li= "#{ticket} (#{effective_events_ticket_price(@event, ticket)})"
-
-            -# - if @event.event_products.present?
-            -#   %li
-            -#     %label Add-ons
-            -#     %br
-            -#     %ul
-            -#       - @event.event_products.each do |product|
-            -#         %li= "#{product} (#{price_to_currency(product.price)})"
 
         %hr
 

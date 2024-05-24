@@ -20,7 +20,7 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
       ].compact.join('<br>').html_safe
     end
 
-    col :user, visible: false
+    col :user, label: 'Member', visible: false
     col :first_name, visible: false
     col :last_name, visible: false
     col :email, visible: false
