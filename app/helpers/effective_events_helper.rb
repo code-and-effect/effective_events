@@ -66,7 +66,15 @@ module EffectiveEventsHelper
     end
   end
 
-  def effective_events_event_tickets_user_hint
+  def effective_events_event_registrant_user_collection(event_registrant)
+    raise("expected an Effective::EventRegistrant") unless event_registrant.kind_of?(Effective::EventRegistrant)
+
+    Array(event_registrant.event_registration&.event_ticket_member_users).map do |user|
+      ["<span>#{user}</span> <small>#{user.email}</small>", user.to_param]
+    end
+  end
+
+  def effective_events_event_registrant_user_hint
     url = if current_user.class.try(:effective_memberships_organization_user?)
       organization = current_user.membership_organizations.first || current_user.organizations.first
       effective_memberships.edit_organization_path(organization, anchor: 'tab-representatives') if organization

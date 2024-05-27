@@ -27,7 +27,12 @@ class EffectiveEventRegistrationsDatatable < Effective::Datatable
       elsif er.submitted?
         dropdown_link_to('Continue', effective_events.event_event_registration_build_path(er.event, er, er.next_step), 'data-turbolinks' => false)
       elsif er.completed?
-        dropdown_link_to('Show', effective_events.event_event_registration_path(er.event, er))
+
+        if EffectiveResources.authorized?(self, :update_blank_registrants, er)
+          dropdown_link_to('Continue', effective_events.event_event_registration_path(er.event, er))
+        else
+          dropdown_link_to('Show', effective_events.event_event_registration_path(er.event, er))
+        end
 
         # Register Again
         if er.event.registerable?

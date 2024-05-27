@@ -20,6 +20,8 @@ EffectiveEvents::Engine.routes.draw do
     resources :events, only: [:index, :show] do
       resources :event_registrations, only: [:new, :show, :destroy] do
         resources :build, controller: :event_registrations, only: [:show, :update]
+
+        put :update_blank_registrants, on: :member
       end
     end
   end
