@@ -267,6 +267,13 @@ module EffectiveEventsEventRegistration
     unavailable
   end
 
+  def event_ticket_member_users
+    raise("expected owner to be a user") if owner.class.try(:effective_memberships_organization?)
+    users = [owner] + owner.try(:organizations).try(:flat_map, &:users)
+
+    users.select { |user| user.is_any?(:member) }.uniq
+  end
+
   private
 
   def present_event_registrants

@@ -1,6 +1,3 @@
 - # Choose member
-- klass = (f.object.user || current_user).class
-- ajax_url = (@select2_users_ajax_path || effective_memberships.member_users_membership_select2_ajax_index_path) unless Rails.env.test?
-
-= f.hidden_field :user_type, value: klass.name
-= f.select :user_id, klass.all, ajax_url: ajax_url, label: 'Member', required: true, hint: effective_events_event_tickets_user_hint()
+= f.hidden_field :user_type, value: current_user.class.name
+= f.select :user_id, effective_events_event_registrant_user_collection(f.object), required: true, hint: effective_events_event_registrant_user_hint()
