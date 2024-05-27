@@ -125,13 +125,18 @@ module EffectiveEventsEventRegistration
     # If we're submitted. Try to move to completed.
     before_save(if: -> { submitted? }) { try_completed! }
 
-    def payment_date_in_future?
+    def future_payment_date?
       false
     end
 
     def can_visit_step?(step)
       return false if step == :complete && !completed?
       return true if step == :complete && completed?
+
+      # If they submitted payment with a deferred processor then lock down the steps.
+      if submitted? && !future_payment_date?
+        return (step == :submitted) 
+      end
 
       can_revisit_completed_steps(step)
     end
