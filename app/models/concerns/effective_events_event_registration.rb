@@ -65,8 +65,6 @@ module EffectiveEventsEventRegistration
       accepts_nested_attributes_for :fees, reject_if: :all_blank, allow_destroy: true
     end
 
-    PERMITTED_EVENT_REGISTRANT_CHANGES = ["first_name", "last_name", "email", "company", "user_id", "user_type", "blank_registrant", "response1", "response2", "response3"]
-
     effective_resource do
       # Acts as Statused
       status                 :string, permitted: false
@@ -284,7 +282,7 @@ module EffectiveEventsEventRegistration
       raise('unable to make changes to event while updating blank registrants')
     end
 
-    if event_registrants.any? { |er| (er.changes.keys - PERMITTED_EVENT_REGISTRANT_CHANGES).present? }
+    if event_registrants.any? { |er| (er.changes.keys - Effective::EventRegistrant::PERMITTED_BLANK_REGISTRANT_CHANGES).present? }
       raise('unable to make changes to event registrants while updating blank registrants')
     end
 

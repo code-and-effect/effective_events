@@ -4,6 +4,8 @@ module Effective
   class EventRegistrant < ActiveRecord::Base
     self.table_name = (EffectiveEvents.event_registrants_table_name || :event_registrants).to_s
 
+    PERMITTED_BLANK_REGISTRANT_CHANGES = ["first_name", "last_name", "email", "company", "user_id", "user_type", "blank_registrant", "response1", "response2", "response3"]
+
     acts_as_purchasable
     acts_as_archived
 
