@@ -65,6 +65,8 @@ module EffectiveEventsEventRegistration
       accepts_nested_attributes_for :fees, reject_if: :all_blank, allow_destroy: true
     end
 
+    PERMITTED_EVENT_REGISTRANT_CHANGES = ["first_name", "last_name", "email", "company", "user_id", "user_type", "blank_registrant", "response1", "response2", "response3"]
+
     effective_resource do
       # Acts as Statused
       status                 :string, permitted: false
@@ -269,9 +271,32 @@ module EffectiveEventsEventRegistration
 
   def event_ticket_member_users
     raise("expected owner to be a user") if owner.class.try(:effective_memberships_organization?)
-    users = [owner] + owner.try(:organizations).try(:flat_map, &:users)
+    users = [owner] + (owner.try(:organizations).try(:flat_map, &:users) || [])
 
     users.select { |user| user.is_any?(:member) }.uniq
+  end
+
+  def update_blank_registrants!
+    # This method is called by the user on a submitted or completed event registration.
+    # Allow them to update blank registrants
+    # Don't let them hack the form and change any information.
+    if changes.present? || previous_changes.present?
+      raise('unable to make changes to event while updating blank registrants')
+    end
+
+    if event_registrants.any? { |er| (er.changes.keys - PERMITTED_EVENT_REGISTRANT_CHANGES).present? }
+      raise('unable to make changes to event registrants while updating blank registrants')
+    end
+
+    if event_registrants.any? { |er| er.blank_registrant_was == false && er.changes.present? }
+      raise('unable to make changes to non-blank registrant while updating blank registrants')
+    end
+
+    if event_addons.any? { |ea| ea.changes.present? }
+      raise('unable to make changes to event addons while updating blank registrants')
+    end
+
+    save!
   end
 
   private

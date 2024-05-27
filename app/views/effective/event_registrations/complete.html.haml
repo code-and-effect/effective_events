@@ -11,6 +11,12 @@
     = link_to "Return to Dashboard", return_to_dashboard_path, class: 'btn btn-lg btn-primary btn-block'
 
   = render 'effective/event_registrations/summary', event_registration: resource
+
+  - if resource.event.allow_blank_registrants? && EffectiveResources.authorized?(self, :update_blank_registrants, resource)
+    = card do
+      %h3 Incomplete Ticket Information
+      = render 'effective/event_registrations/form_blank_registrants', event_registration: resource
+
   = render 'effective/event_registrations/event_registration', event_registration: resource
   = render 'effective/event_registrations/orders', event_registration: resource
 
