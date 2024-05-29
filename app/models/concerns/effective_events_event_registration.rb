@@ -150,6 +150,10 @@ module EffectiveEventsEventRegistration
       with_outstanding_coupon_fees(submit_fees)
     end
 
+    def delayed_payment_attributes
+      { delayed_payment: event&.delayed_payment, delayed_payment_date: event&.delayed_payment_date }
+    end
+
     # All Fees and Orders
     def submit_fees
       if defined?(EffectiveMemberships)

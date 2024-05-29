@@ -22,19 +22,33 @@
     .col-md-6= f.datetime_field :start_at, label: "Event Start"
     .col-md-6= f.datetime_field :end_at, label: "Event End"
 
-  %h2 Registration
-  %p The online registration and purchase for this event will be available between:
-  = f.datetime_field :registration_start_at, label: "Registration Start"
-  = f.datetime_field :registration_end_at, label: "Registration End"
-  = f.datetime_field :early_bird_end_at, label: "Early Bird End",
-    hint: 'Event tickets can be purchased for early bird pricing before this date. Afterwards regular pricing applies.'
+  %hr
 
-  = f.check_box :allow_blank_registrants, label: "Yes, allow blank ticket registrations", hint: "Allow event tickets to be purchased without adding a name. The purchaser may return to add names later."
+  .row
+    .col-md-6
+      %h2 Registration
+      %p The online registration and purchase for this event will be available between:
+      = f.datetime_field :registration_start_at, label: "Registration Start"
+      = f.datetime_field :registration_end_at, label: "Registration End"
+      = f.datetime_field :early_bird_end_at, label: "Early Bird End",
+        hint: 'Event tickets can be purchased for early bird pricing before this date. Afterwards regular pricing applies.'
 
-  = f.check_box :external_registration, label: "Yes, the registration for this event is handled by another website"
+      = f.check_box :allow_blank_registrants, label: "Yes, allow blank ticket registrations", hint: "Allow event tickets to be purchased without adding a name. The purchaser may return to add names later."
 
-  = f.show_if(:external_registration, true) do
-    = f.url_field :external_registration_url, hint: "The url for external event registration. Must start with http(s)://"
+      = f.check_box :external_registration, label: "Yes, the registration for this event is handled by another website"
+
+      = f.show_if(:external_registration, true) do
+        = f.url_field :external_registration_url, hint: "The url for external event registration. Must start with http(s)://"
+    
+    .col-md-6
+      - if EffectiveOrders.delayed?
+        %h2 Delayed Payments
+        %p The online payment for this event will be charged as follows:
+
+        = f.check_box :delayed_payment, label: "Yes, this is a delayed payment event", hint: "Allow registrations for this event without paying immediately.<br>A secure token representing their credit card will be saved and charged automatically on the following payment date."
+
+        = f.show_if(:delayed_payment, true) do
+          = f.date_field :delayed_payment_date, label: "Delayed Payment Charge Date", hint: "The date that the credit card will be charged. Expects a date in the future, probably after the registration end date."
 
   = f.submit do
     = f.save 'Save'
