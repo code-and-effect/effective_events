@@ -27,6 +27,9 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.integer :roles_mask
       t.boolean :authenticate_user, default: false
 
+      t.boolean :delayed_payment, default: false
+      t.date :delayed_payment_date
+
       t.timestamps
     end
 

@@ -2,9 +2,8 @@
   = render 'effective/event_registrations/content', resource: resource
 
   - if resource.submit_order.deferred?
-    .card
-      .card-body
-        = render_checkout_step2(resource.submit_order, purchased_url: wizard_path(:complete), deferred_url: wizard_path(:submitted), declined_url: wizard_path(:checkout))
+    = card do
+      = render_checkout_step2(resource.submit_order, purchased_url: wizard_path(:complete), deferred_url: wizard_path(:submitted), declined_url: wizard_path(:checkout))
   - elsif resource.event.registerable? == false
     .alert.alert-danger Your selected event is no longer available for registration.
   - elsif resource.unavailable_event_tickets.present?
@@ -12,7 +11,6 @@
   - elsif resource.unavailable_event_products.present?
     .alert.alert-danger Your selected number of event add-ons are no longer available.
   - else
-    .card
-      .card-body
-        = render_checkout_step2(resource.submit_order, purchased_url: wizard_path(:complete), deferred_url: wizard_path(:submitted), declined_url: wizard_path(:checkout))
+    = card do
+      = render_checkout_step2(resource.submit_order, purchased_url: wizard_path(:complete), deferred_url: wizard_path(:submitted), declined_url: wizard_path(:checkout))
 

@@ -68,6 +68,10 @@ module Effective
 
       allow_blank_registrants     :boolean
 
+      # Delayed Payments feature
+      delayed_payment             :boolean
+      delayed_payment_date        :date
+
       # Access
       roles_mask             :integer
       authenticate_user      :boolean
@@ -131,9 +135,14 @@ module Effective
     validates :published_at, presence: true, unless: -> { draft? }
     validates :start_at, presence: true
     validates :end_at, presence: true
+    validates :external_registration_url, url: true
 
     validates :registration_start_at, presence: true, unless: -> { external_registration? }
     validates :registration_end_at, presence: true, unless: -> { external_registration? }
+
+    validates :delayed_payment, inclusion: { in: [false], message: "cannot be used for external registration events" }, if: -> { external_registration? }
+    validates :delayed_payment_date, presence: true, if: -> { delayed_payment? }
+    validates :delayed_payment_date, absence: true, unless: -> { delayed_payment? }
 
     validate(if: -> { start_at && end_at }) do
       errors.add(:end_at, 'must be after start date') unless start_at < end_at
@@ -149,6 +158,14 @@ module Effective
 
     validate(if: -> { start_at && early_bird_end_at }) do
       errors.add(:early_bird_end_at, 'must be before start date') unless early_bird_end_at < start_at
+    end
+
+    validate(if: -> { delayed_payment? }) do
+      errors.add(:delayed_payment, 'no delayed payment processor available') unless EffectiveOrders.try(:delayed?)
+    end
+
+    validate(if: -> { delayed_payment_date && registration_end_at }) do
+      errors.add(:delayed_payment_date, 'must be after registration end date') unless registration_end_at < delayed_payment_date
     end
 
     validate(if: -> { file.attached? }) do
