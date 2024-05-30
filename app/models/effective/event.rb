@@ -142,6 +142,7 @@ module Effective
 
     validates :delayed_payment, inclusion: { in: [false], message: "cannot be used for external registration events" }, if: -> { external_registration? }
     validates :delayed_payment_date, presence: true, if: -> { delayed_payment? }
+    validates :delayed_payment_date, absence: true, unless: -> { delayed_payment? }
 
     validate do
       errors.add(:delayed_payment, 'no delayed payment processor available') unless EffectiveOrders.delayed?
@@ -161,6 +162,10 @@ module Effective
 
     validate(if: -> { start_at && early_bird_end_at }) do
       errors.add(:early_bird_end_at, 'must be before start date') unless early_bird_end_at < start_at
+    end
+
+    validate(if: -> { delayed_payment_date && registration_end_at }) do
+      errors.add(:delayed_payment_date, 'must be after registration end date') unless registration_end_at < delayed_payment_date
     end
 
     validate(if: -> { file.attached? }) do

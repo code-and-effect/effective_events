@@ -47,8 +47,11 @@
 
         = f.check_box :delayed_payment, label: "Yes, this is a delayed payment event", hint: "Allow registrations for this event without paying immediately.<br>A secure token representing their credit card will be saved and charged automatically on the following payment date."
 
+        = f.hide_if(:delayed_payment, true) do
+          = f.hidden_field :delayed_payment_date, value: ''
+
         = f.show_if(:delayed_payment, true) do
-          = f.date_field :delayed_payment_date, label: "Delayed Payment Charge Date", hint: "The date that the credit card will be charged. Expects a date in the future, probably after the registration end date."
+          = f.date_field :delayed_payment_date, label: "Delayed Payment Charge Date", hint: "The date that the credit card will be charged. Expects a date in the future, after the registration end date. Changing this date will not affect previously generated event registration delayed payment orders."
 
   = f.submit do
     = f.save 'Save'
