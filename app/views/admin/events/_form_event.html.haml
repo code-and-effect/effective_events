@@ -41,7 +41,7 @@
         = f.url_field :external_registration_url, hint: "The url for external event registration. Must start with http(s)://"
     
     .col-md-6
-      - if EffectiveOrders.delayed?
+      - if EffectiveOrders.try(:delayed?)
         %h2 Delayed Payments
         %p The online payment for this event will be charged as follows:
 

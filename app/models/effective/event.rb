@@ -144,10 +144,6 @@ module Effective
     validates :delayed_payment_date, presence: true, if: -> { delayed_payment? }
     validates :delayed_payment_date, absence: true, unless: -> { delayed_payment? }
 
-    validate do
-      errors.add(:delayed_payment, 'no delayed payment processor available') unless EffectiveOrders.delayed?
-    end
-
     validate(if: -> { start_at && end_at }) do
       errors.add(:end_at, 'must be after start date') unless start_at < end_at
     end
@@ -162,6 +158,10 @@ module Effective
 
     validate(if: -> { start_at && early_bird_end_at }) do
       errors.add(:early_bird_end_at, 'must be before start date') unless early_bird_end_at < start_at
+    end
+
+    validate(if: -> { delayed_payment? }) do
+      errors.add(:delayed_payment, 'no delayed payment processor available') unless EffectiveOrders.try(:delayed?)
     end
 
     validate(if: -> { delayed_payment_date && registration_end_at }) do

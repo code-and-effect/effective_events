@@ -495,6 +495,8 @@ ActiveRecord::Schema.define(version: 101) do
     t.boolean "allow_blank_registrants", default: false
     t.integer "roles_mask"
     t.boolean "authenticate_user", default: false
+    t.boolean "delayed_payment", default: false
+    t.date "delayed_payment_date"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["end_at"], name: "index_events_on_end_at"
