@@ -9,6 +9,14 @@ class EventRegistrationsTest < ActiveSupport::TestCase
     assert_equal 2, event_registration.event_addons.length
   end
 
+  test 'event registration with delayed payment date' do
+    event_registration = build_event_registration()
+    delayed_payment_attributes = { delayed_payment: true, delayed_payment_date: (event_registration.event.registration_end_at + 1.day).to_date }
+
+    event_registration.event.assign_attributes(delayed_payment_attributes)
+    assert_equal delayed_payment_attributes, event_registration.delayed_payment_attributes
+  end
+
   test 'event with external registration is invalid for registration' do
     event_registration = build_event_registration()
     event_registration.event.update_column(:external_registration, true)
