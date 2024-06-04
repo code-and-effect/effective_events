@@ -6,17 +6,34 @@
 - if registration.present?
   %h2 In Progress Event Registrations
 
-  %p
-    Your registration for
-    = link_to(registration.event, effective_events.event_path(registration.event))
-    is incomplete
+  - if registration.draft?
+    %p
+      Your registration for
+      = link_to(registration.event, effective_events.event_path(registration.event))
+      is incomplete
 
-  %p
-    Please
-    = link_to("Continue registration for #{registration.event}", effective_events.event_event_registration_build_path(registration.event, registration, registration.next_step), 'data-turbolinks' => false, class: 'btn btn-primary')
-    or you can
-    = link_to('Abandon registration', effective_events.event_event_registration_path(registration.event, registration), 'data-confirm': "Really delete #{registration}?", 'data-method': :delete, class: 'btn btn-danger')
-    to register for another event.
+    %p
+      Please
+      = link_to("Continue registration for #{registration.event}", effective_events.event_event_registration_build_path(registration.event, registration, registration.next_step), 'data-turbolinks' => false, class: 'btn btn-primary')
+      or you can
+      = link_to('Abandon registration', effective_events.event_event_registration_path(registration.event, registration), 'data-confirm': "Really delete registration for #{registration.event}?", 'data-method': :delete, class: 'btn btn-danger')
+      to register for another event.
+
+  - if registration.submitted?
+    %p 
+      Your registration for
+      = link_to(registration.event, effective_events.event_path(registration.event))
+      has been submitted. You're all done!
+
+  - if registration.submitted? && registration.event.delayed_payment_date_upcoming?
+    %p= registration.submit_order.delayed_payment_info
+
+  - if registration.submitted? && registration.event.delayed_payment_date_upcoming? && registration.can_visit_step?(:tickets)
+    %p 
+      You can #{link_to('change your registration', effective_events.event_event_registration_build_path(registration.event, registration, :tickets))} until the payment date
+      or
+      = link_to('abandon registration', effective_events.event_event_registration_path(registration.event, registration), 'data-confirm': "Really delete registration for #{registration.event}?", 'data-method': :delete)
+      to cancel and register for another event.
 
   %hr
 

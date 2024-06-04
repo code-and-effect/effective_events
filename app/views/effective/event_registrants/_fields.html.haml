@@ -22,6 +22,8 @@
             = f.check_box :member_registrant, label: 'Yes, this ticket will be for a member'
 
         = f.show_if(:blank_registrant, false, nested: true) do
+          %hr
+
           - if ticket.regular?
             = render('effective/event_registrants/fields_regular', f: f)
           - elsif ticket.member_only?

@@ -92,6 +92,9 @@ module EffectiveEventsEventRegistration
     scope :in_progress, -> { where(status: [:draft, :submitted]) }
     scope :done, -> { where(status: :completed) }
 
+    scope :delayed, -> { where(event_id: Effective::Event.delayed) }
+    scope :not_delayed, -> { where.not(event_id: Effective::Event.delayed) }
+
     scope :for, -> (user) { where(owner: user) }
 
     # All Steps validations
@@ -125,19 +128,25 @@ module EffectiveEventsEventRegistration
     # If we're submitted. Try to move to completed.
     before_save(if: -> { submitted? }) { try_completed! }
 
-    def future_payment_date?
-      false
+    def delayed_payment_date_upcoming?
+      event&.delayed_payment_date_upcoming?
     end
 
     def can_visit_step?(step)
       return false if step == :complete && !completed?
       return true if step == :complete && completed?
 
-      # If they submitted payment with a deferred processor then lock down the steps.
-      if submitted? && !future_payment_date?
+      # If submitted with a cheque/phone deferred (but not delayed) processor then lock down the steps.
+      if submitted? && !delayed_payment_date_upcoming?
         return (step == :submitted) 
       end
 
+      # Add ability to edit registrations up until payment date
+      if submitted? && delayed_payment_date_upcoming?
+        return can_revisit_completed_steps(step)
+      end
+
+      # Default
       can_revisit_completed_steps(step)
     end
 
@@ -190,6 +199,16 @@ module EffectiveEventsEventRegistration
     completed?
   end
 
+  def tickets!
+    after_commit { update_submit_fees_and_order! } if submit_order.present?
+    save!
+  end
+
+  def addons!
+    after_commit { update_submit_fees_and_order! } if submit_order.present?
+    save!
+  end
+
   def try_completed!
     return false unless submitted?
     return false unless submit_order&.purchased?
@@ -225,12 +244,7 @@ module EffectiveEventsEventRegistration
     if event_registrants.blank?
       raise('expected owner and event to be present') unless owner && event
 
-      event_registrants.build(
-        first_name: owner.try(:first_name),
-        last_name: owner.try(:last_name),
-        email: owner.try(:email),
-        company: owner.try(:company)
-      )
+      event_registrants.build()
     end
 
     event_registrants

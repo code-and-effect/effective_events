@@ -4,6 +4,9 @@
   - raise('expected a submitted event_registration') unless resource.submitted?
   - raise('expected a deffered event_registration submit_order') unless resource.submit_order&.deferred?
 
+  - if resource.event.delayed?
+    - raise('expected event delayed_payment_date to match order delayed_payment_date') unless resource.event.delayed_payment_date == resource.submit_order.delayed_payment_date
+
   .mb-4
     = link_to "Return to Dashboard", return_to_dashboard_path, class: 'btn btn-lg btn-primary btn-block'
 
@@ -13,6 +16,15 @@
     = card do
       %h3 Incomplete Ticket Information
       = render 'effective/event_registrations/form_blank_registrants', event_registration: resource
+
+  - if resource.delayed_payment_date_upcoming? && resource.can_visit_step?(:tickets)
+    - order = resource.submit_order
+
+    = card do
+      %h3 All done
+      %p Your registration for #{resource.event} has been submitted. You're all done!
+      %p= resource.submit_order.delayed_payment_info
+      %p You can #{link_to('change your registration', wizard_path(:tickets))} until the payment date.
 
   = render 'effective/event_registrations/event_registration', event_registration: resource
   = render 'effective/event_registrations/orders', event_registration: resource

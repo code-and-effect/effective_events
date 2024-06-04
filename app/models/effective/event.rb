@@ -131,6 +131,10 @@ module Effective
       scope
     }
 
+    scope :delayed, -> { where(delayed_payment: true).where.not(delayed_payment_date: nil) }
+    scope :delayed_payment_date_past, -> { delayed.where(arel_table[:delayed_payment_date].lteq(Time.zone.today)) }
+    scope :delayed_payment_date_upcoming, -> { delayed.where(arel_table[:delayed_payment_date].gt(Time.zone.today)) }
+
     validates :title, presence: true, length: { maximum: 255 }
     validates :published_at, presence: true, unless: -> { draft? }
     validates :start_at, presence: true
@@ -281,6 +285,15 @@ module Effective
 
       # If there's capacity for this many more
       (registered + quantity) <= event_product.capacity
+    end
+
+    def delayed?
+      delayed_payment? && delayed_payment_date.present?
+    end
+
+    def delayed_payment_date_upcoming?
+      return false unless delayed?
+      delayed_payment_date > Time.zone.now.to_date
     end
 
   end
