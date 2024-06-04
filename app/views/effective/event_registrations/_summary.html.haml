@@ -23,3 +23,8 @@
           %td
             - event_registration.orders.each do |order|
               = link_to(order, effective_orders.order_path(order))
+
+      - if event_registration.event.delayed?
+        %tr
+          %th Payment Date
+          %td= event_registration.event.delayed_payment_date.strftime('%F')

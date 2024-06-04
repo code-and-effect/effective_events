@@ -9,4 +9,8 @@
         = f.has_many :event_registrants, f.object.build_event_registrants do |fr|
           = render('effective/event_registrants/fields', f: fr, event: f.object.event, namespace: :events)
 
+        - if resource.delayed_payment_date_upcoming? && resource.submit_order.present?
+          .alert.alert-info If the price of your registration changes, your order will be automatically updated.
+
+        %hr
         = f.save 'Save and Continue'

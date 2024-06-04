@@ -1,6 +1,6 @@
 - # Choose member
 = f.hidden_field :user_type, value: current_user.class.name
-= f.select :user_id, effective_events_event_registrant_user_collection(f.object), required: true, hint: effective_events_event_registrant_user_hint()
+= f.select :user_id, effective_events_event_registrant_user_collection(f.object), hint: effective_events_event_registrant_user_hint()
 
 = f.show_if(:user_id, '', nested: true) do
   %p.text-center - or -

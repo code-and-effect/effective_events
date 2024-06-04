@@ -16,4 +16,8 @@
         = f.has_many :event_addons, f.object.build_event_addons do |fp|
           = render('effective/event_addons/fields', f: fp, event: f.object.event)
 
+        - if resource.delayed_payment_date_upcoming? && resource.submit_order.present?
+          .alert.alert-info If the price of your registration changes, your order will be automatically updated.
+
+        %hr
         = f.save 'Save and Continue'
