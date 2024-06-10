@@ -35,13 +35,14 @@ module Effective
       member_registrant     :boolean
 
       waitlisted            :boolean
+      promoted              :boolean      # An admin marked this registrant as promoted from the waitlist
+      registered_at         :datetime     # When the order is deferred or purchased
 
       # Question Responses
       question1             :text
       question2             :text
       question3             :text
 
-      position              :integer
       archived              :boolean
 
       # Acts as Purchasable
@@ -57,8 +58,10 @@ module Effective
     end
 
     scope :sorted, -> { order(:last_name) }
-    scope :deep, -> { includes(:event, :event_ticket) }
-    scope :registered, -> { purchased_or_deferred.unarchived }
+    scope :deep, -> { includes(:event, :event_ticket, :owner) }
+
+    #scope :registered, -> { purchased_or_deferred.unarchived }
+    scope :registered, -> { where.not(registered_at: nil) }
 
     before_validation(if: -> { event_registration.present? }) do
       self.event ||= event_registration.event
@@ -113,11 +116,17 @@ module Effective
     end
 
     def title
-      [event_ticket.to_s, last_first_name, ('WAITLIST' if waitlisted?)].compact.join(' - ')
+      [event_ticket.to_s, name, ('WAITLIST' if waitlisted_not_promoted?)].compact.join(' - ')
     end
 
     def name
-      first_name.present? ? "#{first_name} #{last_name}" : "GUEST"
+      if first_name.present?
+        "#{first_name} #{last_name}"
+      elsif owner.present?
+        owner.to_s + ' - GUEST'
+      else
+        'GUEST'
+      end
     end
 
     def last_first_name
@@ -136,8 +145,20 @@ module Effective
       event_ticket&.qb_item_name
     end
 
+    def registered?
+      registered_at.present?
+    end
+
+    # Called by an event_registration after_defer and after_purchase
+    def registered!
+      self.registered_at ||= Time.zone.now
+      save!
+    end
+
     # This is the Admin Save and Mark Paid action
     def mark_paid!
+      raise('todo') # this should be updated to just set registered!
+
       raise('expected a blank event registration') if event_registration.present?
 
       save!
@@ -148,44 +169,26 @@ module Effective
       true
     end
 
-    def add_to_waitlist!
+    def promote!
       raise('expected a waitlist? event_ticket') unless event_ticket.waitlist?
 
-      update!(waitlisted: true)
+      update!(promoted: true)
       orders.reject(&:purchased?).each { |order| order.update_purchasable_attributes! }
 
       true
     end
 
-    def promote_from_waitlist!
+    def unpromote!
       raise('expected a waitlist? event_ticket') unless event_ticket.waitlist?
 
-      update!(waitlisted: false)
+      update!(promoted: false)
       orders.reject(&:purchased?).each { |order| order.update_purchasable_attributes! }
 
       true
     end
-  
+
     def registered?
-      purchased_or_deferred?
-    end
-
-    def <=>(other)
-      if purchased? && !other.purchased?
-        -1
-      elsif !purchased? && other.purchased?
-        1
-      elsif deferred? && !other.deferred?
-        -1
-      elsif !deferred? && other.deferred?
-        1
-      elsif purchased? && other.purchased?
-        purchased_at <=> other.purchased_at
-      elsif deferred? && other.deferred?
-        deferred_at <=> other.deferred_at
-      else
-        (id || 0) <=> (other.id || 0)
-      end
+      registered_at.present?
     end
 
     def event_ticket_price
@@ -205,11 +208,17 @@ module Effective
       end
     end
 
+    def waitlisted_not_promoted?
+      (waitlisted? && !promoted?)
+    end
+
     private
 
     def assign_price
       raise('is already purchased') if purchased?
-      assign_attributes(price: (waitlisted ? 0 : event_ticket_price))
+
+      price = waitlisted_not_promoted? ? 0 : event_ticket_price
+      assign_attributes(price: price)
     end
 
   end

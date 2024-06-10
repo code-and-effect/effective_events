@@ -12,7 +12,7 @@ module Effective
     accepts_nested_attributes_for :event_registrants
 
     has_many :purchased_event_registrants, -> { EventRegistrant.purchased.unarchived }, class_name: 'Effective::EventRegistrant'
-    has_many :registered_event_registrants, -> { EventRegistrant.registered.unarchived }, class_name: 'Effective::EventRegistrant'
+    has_many :registered_event_registrants, -> { EventRegistrant.registered.unarchived.order(:registered_at).order(:id) }, class_name: 'Effective::EventRegistrant'
 
     log_changes(to: :event) if respond_to?(:log_changes)
 
@@ -74,12 +74,23 @@ module Effective
       title.presence || 'New Event Ticket'
     end
 
+    # This is supposed to be an indempotent big update the world thing
     def update_waitlist!
-      sorted_event_registrants.each_with_index do |event_registrant, index|
-        event_registrant.assign_attributes(position: index + 1)
-        event_registrant.assign_attributes(waitlisted: (waitlist? && index >= capacity)) unless event_registrant.purchased?
-        event_registrant.save!
-      end
+      return false unless waitlist?
+
+      changed_event_registrants = registered_event_registrants.each_with_index.map do |event_registrant, index|
+        next if event_registrant.purchased?
+
+        waitlisted_was = event_registrant.waitlisted?
+        waitlisted = (waitlist? && index >= capacity)
+        next if waitlisted == waitlisted_was
+
+        event_registrant.update!(waitlisted: waitlisted) # Updates price
+        event_registrant
+      end.compact
+
+      orders = changed_event_registrants.flat_map { |event_registrant| event_registrant.deferred_orders }.compact.uniq
+      orders.each { |order| order.update_purchasable_attributes! }
 
       true
     end
@@ -113,26 +124,26 @@ module Effective
       category == 'Member or Non-Member'
     end
 
-    # purchased, defered, id
-    def sorted_event_registrants
-      event_registrants.sort do |a, b|
-        if a.purchased? && !b.purchased?
-          -1
-        elsif !a.purchased? && b.purchased?
-          1
-        elsif a.deferred? && !b.deferred?
-          -1
-        elsif !a.deferred? && b.deferred?
-          1
-        elsif a.purchased? && b.purchased?
-          a.purchased_at <=> b.purchased_at
-        elsif a.deferred? && b.deferred?
-          a.deferred_at <=> b.deferred_at
-        else
-          (a.id || 0) <=> (b.id || 0)
-        end
-      end
-    end
+    # # purchased, defered, id
+    # def sorted_event_registrants
+    #   event_registrants.sort do |a, b|
+    #     if a.purchased? && !b.purchased?
+    #       -1
+    #     elsif !a.purchased? && b.purchased?
+    #       1
+    #     elsif a.deferred? && !b.deferred?
+    #       -1
+    #     elsif !a.deferred? && b.deferred?
+    #       1
+    #     elsif a.purchased? && b.purchased?
+    #       a.purchased_at <=> b.purchased_at
+    #     elsif a.deferred? && b.deferred?
+    #       a.deferred_at <=> b.deferred_at
+    #     else
+    #       (a.id || 0) <=> (b.id || 0)
+    #     end
+    #   end
+    # end
 
   end
 end

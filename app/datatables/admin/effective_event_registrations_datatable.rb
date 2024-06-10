@@ -7,7 +7,8 @@ class Admin::EffectiveEventRegistrationsDatatable < Effective::Datatable
     col :created_at, label: 'Created', visible: false
     col :updated_at, label: 'Updated', visible: false
 
-    col :submitted_at, label: 'Submitted', visible: false, as: :date
+    col :submitted_at, label: 'Submitted', as: :date
+    col :completed_at, label: 'Completed', as: :date
 
     col :event, search: :string
     col :owner
@@ -20,7 +21,7 @@ class Admin::EffectiveEventRegistrationsDatatable < Effective::Datatable
   end
 
   collection do
-    EffectiveEvents.EventRegistration.all.deep.done
+    EffectiveEvents.EventRegistration.all.deep.where.not(status: :draft)
   end
 
 end

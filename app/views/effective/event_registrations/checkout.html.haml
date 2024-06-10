@@ -3,17 +3,17 @@
 
   - if resource.submit_order.deferred?
     = card do
-      = render_checkout_step2(resource.submit_order, purchased_url: wizard_path(:complete), deferred_url: wizard_path(:submitted), declined_url: wizard_path(:checkout))
+      = render_checkout_step2(resource.submit_order, purchased_url: wizard_path(:complete), deferred_url: wizard_path(:submitted), declined_url: wizard_path(:checkout), skip_order: resource.submit_order.delayed?)
   - elsif resource.event.registerable? == false
     .alert.alert-danger Your selected event is no longer available for registration.
   - elsif resource.unavailable_event_tickets.present?
     .alert.alert-danger Your selected number of event tickets are no longer available.
   - elsif resource.unavailable_event_products.present?
     .alert.alert-danger Your selected number of event add-ons are no longer available.
+
   - else
     = card do
-      = render_checkout_step2(resource.submit_order, purchased_url: wizard_path(:complete), deferred_url: wizard_path(:submitted), declined_url: wizard_path(:checkout))
-
+      = render_checkout_step2(resource.submit_order, purchased_url: wizard_path(:complete), deferred_url: wizard_path(:submitted), declined_url: wizard_path(:checkout), skip_order: resource.submit_order.delayed?)
 
   - if resource.submit_order.delayed? && resource.submit_order.deferred?
     = link_to 'Save and Continue', wizard_path(:submitted), class: 'btn btn-primary'

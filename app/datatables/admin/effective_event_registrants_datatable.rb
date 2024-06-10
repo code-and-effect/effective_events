@@ -8,10 +8,14 @@ module Admin
     end
 
     datatable do
+      order :registered_at, :asc
+
       col :updated_at, visible: false
       col :created_at, visible: false
       col :id, visible: false
       col :archived, visible: false
+
+      col :registered_at
 
       col :event
 
@@ -25,15 +29,35 @@ module Admin
       end
 
       col :waitlisted do |registrant|
-        'Waitlisted' if registrant.waitlisted?
+        if registrant.promoted?
+          'Promoted'
+        elsif registrant.waitlisted?
+          'Waitlisted'
+        else
+          '-'
+        end
       end
 
-      col :purchased_order, visible: false
+      col :promoted, visible: false
 
+      col :name do |er|
+        if er.first_name.present?
+          "#{er.first_name} #{er.last_name}<br><small>#{mail_to(er.email)}</small>"
+        elsif er.owner.present?
+          er.owner.to_s + ' - GUEST'
+        else
+          'Unknown'
+        end
+      end
+      
       col :user, label: 'Member'
-      col :first_name
-      col :last_name
-      col :email
+
+      col :orders, visible: false
+      col :price, as: :price
+
+      col :first_name, visible: false
+      col :last_name, visible: false
+      col :email, visible: false
       col :company, visible: false
 
       col :response1
@@ -44,7 +68,7 @@ module Admin
     end
 
     collection do
-      scope = Effective::EventRegistrant.deep.purchased_or_deferred
+      scope = Effective::EventRegistrant.deep.registered
 
       if attributes[:event_id].present?
         scope = scope.where(event: event)

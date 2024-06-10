@@ -18,6 +18,9 @@ module EffectiveEventsEventRegistration
   end
 
   included do
+    # Needs to be first up here. Before the acts_as_purchasable_parent one voids the order
+    around_destroy :around_destroy_deferred_event_registration, if: -> { submit_order&.deferred? }
+
     acts_as_purchasable_parent
     acts_as_tokened
 
@@ -128,6 +131,15 @@ module EffectiveEventsEventRegistration
     # If we're submitted. Try to move to completed.
     before_save(if: -> { submitted? }) { try_completed! }
 
+    def around_destroy_deferred_event_registration
+      raise('expecting a deferred submit order') unless submit_order&.deferred?
+
+      waitlisted_event_tickets_was = event_tickets().select(&:waitlist?)
+      yield
+      waitlisted_event_tickets_was.each { |event_ticket| event_ticket.update_waitlist! }
+      true
+    end
+
     def delayed_payment_date_upcoming?
       event&.delayed_payment_date_upcoming?
     end
@@ -180,7 +192,13 @@ module EffectiveEventsEventRegistration
       true
     end
 
+    def after_submit_deferred!
+      update_deferred_event_registration!
+    end
+
     def after_submit_purchased!
+      event_registrants.each { |event_registrant| event_registrant.registered! }
+
       notifications = event.event_notifications.select(&:registrant_purchased?)
       notifications.each { |notification| notification.notify!(event_registrants: event_registrants) }
     end
@@ -199,16 +217,10 @@ module EffectiveEventsEventRegistration
     completed?
   end
 
-  def update_event_tickets_waitlist!
-    event_tickets.each(&:update_waitlist!)
-  end
-
   def tickets!
     after_commit do
-      update_event_tickets_waitlist!
-
-      event_registrants.reload
       update_submit_fees_and_order! if submit_order.present?
+      update_deferred_event_registration! if submit_order&.deferred?
     end
 
     save!
@@ -335,6 +347,18 @@ module EffectiveEventsEventRegistration
   end
 
   private
+
+  def update_deferred_event_registration!
+    raise('expected a deferred submit order') unless submit_order&.deferred?
+
+    # Mark registered anyone who hasn't been registered yet. They are now!
+    event_registrants.reject(&:registered?).each { |event_registrant| event_registrant.registered! }
+
+    # Update the waitlist for any event tickets
+    event_tickets.select(&:waitlist?).each { |event_ticket| event_ticket.update_waitlist! }
+
+    true
+  end
 
   def present_event_registrants
     event_registrants.reject(&:marked_for_destruction?).reject(&:archived?)

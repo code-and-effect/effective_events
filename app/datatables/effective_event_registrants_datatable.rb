@@ -2,6 +2,7 @@
 
 class EffectiveEventRegistrantsDatatable < Effective::Datatable
   datatable do
+    order :id
 
     col :name do |er|
       if er.first_name.present?
@@ -13,13 +14,12 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
       end
     end
 
-    col :id
-    col :position
+    col :id, visible: false
 
     col :event_ticket, search: :string, label: 'Ticket' do |er|
       [
         er.event_ticket.to_s,
-        (content_tag(:span, 'Waitlist', class: 'badge badge-warning') if er.waitlisted?),
+        (content_tag(:span, 'Waitlist', class: 'badge badge-warning') if er.waitlisted_not_promoted?),
         (content_tag(:span, 'Archived', class: 'badge badge-warning') if er.event_ticket&.archived?)
       ].compact.join('<br>').html_safe
     end

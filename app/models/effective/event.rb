@@ -25,8 +25,8 @@ module Effective
     accepts_nested_attributes_for :event_notifications, allow_destroy: true
 
     # Used by the registration_available checks
-    has_many :registered_event_registrants, -> { EventRegistrant.registered }, class_name: 'Effective::EventRegistrant', inverse_of: :event
-    has_many :registered_event_addons, -> { EventAddon.registered }, class_name: 'Effective::EventAddon', inverse_of: :event
+    has_many :registered_event_registrants, -> { EventRegistrant.registered.unarchived }, class_name: 'Effective::EventRegistrant', inverse_of: :event
+    has_many :registered_event_addons, -> { EventAddon.registered.unarchived }, class_name: 'Effective::EventAddon', inverse_of: :event
 
     # rich_text_body - Used by the select step
     has_many_rich_texts

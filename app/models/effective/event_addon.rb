@@ -42,7 +42,7 @@ module Effective
 
     scope :sorted, -> { order(:id) }
     scope :deep, -> { includes(:event, :event_product) }
-    scope :registered, -> { purchased_or_deferred.unarchived }
+    scope :registered, -> { purchased_or_deferred }
 
     before_validation(if: -> { event_registration.present? }) do
       self.event ||= event_registration.event
