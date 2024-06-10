@@ -41,6 +41,7 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
 
       t.string :title
       t.integer :capacity
+      t.boolean :waitlist, default: false
       t.string :category
 
       t.integer :regular_price
@@ -83,6 +84,7 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
 
       t.boolean :blank_registrant, default: false
       t.boolean :member_registrant, default: false
+      t.boolean :waitlisted, default: false
 
       t.text :response1
       t.text :response2

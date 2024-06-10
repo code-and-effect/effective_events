@@ -34,11 +34,14 @@ module Effective
       blank_registrant      :boolean
       member_registrant     :boolean
 
+      waitlisted            :boolean
+
       # Question Responses
       question1             :text
       question2             :text
       question3             :text
 
+      position              :integer
       archived              :boolean
 
       # Acts as Purchasable
@@ -62,6 +65,10 @@ module Effective
       self.owner ||= event_registration.owner
     end
 
+    # before_validation(if: -> { event_registration.blank? && event_ticket.present? }) do
+    #   self.position ||= (event_ticket.event_registrants.map { |er| er.position }.compact.max || 0) + 1
+    # end
+
     before_validation(if: -> { blank_registrant? }) do
       assign_attributes(user: nil, first_name: nil, last_name: nil, email: nil)
     end
@@ -72,6 +79,10 @@ module Effective
 
     before_validation(if: -> { event_ticket.present? }, unless: -> { purchased? }) do
       assign_price()
+    end
+
+    validate(if: -> { event_ticket.present? }, unless: -> { purchased? }) do
+      errors.add(:waitlisted, 'is not permitted for a non-waitlist event ticket') if waitlisted? && !event_ticket.waitlist?
     end
 
     validates :user_id, uniqueness: { scope: [:event_id], allow_blank: true, message: 'is already registered for this event' }
@@ -102,7 +113,7 @@ module Effective
     end
 
     def title
-      "#{event_ticket} - #{last_first_name}"
+      [event_ticket.to_s, last_first_name, ('WAITLIST' if waitlisted?)].compact.join(' - ')
     end
 
     def name
@@ -137,15 +148,51 @@ module Effective
       true
     end
 
-    private
+    def add_to_waitlist!
+      raise('expected a waitlist? event_ticket') unless event_ticket.waitlist?
 
-    def assign_price
-      raise('is already purchased') if purchased?
+      update!(waitlisted: true)
+      orders.reject(&:purchased?).each { |order| order.update_purchasable_attributes! }
 
+      true
+    end
+
+    def promote_from_waitlist!
+      raise('expected a waitlist? event_ticket') unless event_ticket.waitlist?
+
+      update!(waitlisted: false)
+      orders.reject(&:purchased?).each { |order| order.update_purchasable_attributes! }
+
+      true
+    end
+  
+    def registered?
+      purchased_or_deferred?
+    end
+
+    def <=>(other)
+      if purchased? && !other.purchased?
+        -1
+      elsif !purchased? && other.purchased?
+        1
+      elsif deferred? && !other.deferred?
+        -1
+      elsif !deferred? && other.deferred?
+        1
+      elsif purchased? && other.purchased?
+        purchased_at <=> other.purchased_at
+      elsif deferred? && other.deferred?
+        deferred_at <=> other.deferred_at
+      else
+        (id || 0) <=> (other.id || 0)
+      end
+    end
+
+    def event_ticket_price
       raise('expected an event') if event.blank?
       raise('expected an event ticket') if event_ticket.blank?
 
-      price = if event.early_bird?
+      if event.early_bird?
         event_ticket.early_bird_price # Early Bird Pricing
       elsif event_ticket.regular?
         event_ticket.regular_price
@@ -156,8 +203,13 @@ module Effective
       else
         raise("Unexpected event ticket price calculation")
       end
+    end
 
-      assign_attributes(price: price)
+    private
+
+    def assign_price
+      raise('is already purchased') if purchased?
+      assign_attributes(price: (waitlisted ? 0 : event_ticket_price))
     end
 
   end

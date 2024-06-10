@@ -24,6 +24,10 @@ module Admin
         col :event_ticket, search: :string
       end
 
+      col :waitlisted do |registrant|
+        'Waitlisted' if registrant.waitlisted?
+      end
+
       col :purchased_order, visible: false
 
       col :user, label: 'Member'

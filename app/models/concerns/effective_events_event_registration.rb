@@ -199,13 +199,26 @@ module EffectiveEventsEventRegistration
     completed?
   end
 
+  def update_event_tickets_waitlist!
+    event_tickets.each(&:update_waitlist!)
+  end
+
   def tickets!
-    after_commit { update_submit_fees_and_order! } if submit_order.present?
+    after_commit do
+      update_event_tickets_waitlist!
+
+      event_registrants.reload
+      update_submit_fees_and_order! if submit_order.present?
+    end
+
     save!
   end
 
   def addons!
-    after_commit { update_submit_fees_and_order! } if submit_order.present?
+    after_commit do
+      update_submit_fees_and_order! if submit_order.present?
+    end
+
     save!
   end
 
@@ -265,11 +278,17 @@ module EffectiveEventsEventRegistration
     event_addons
   end
 
+  def event_tickets
+    present_event_registrants.map(&:event_ticket).uniq
+  end
+
   def unavailable_event_tickets
     unavailable = []
 
     present_event_registrants.map(&:event_ticket).group_by { |t| t }.each do |event_ticket, event_tickets|
-      unavailable << event_ticket unless event.event_ticket_available?(event_ticket, quantity: event_tickets.length)
+      unless event_ticket.waitlist? || event.event_ticket_available?(event_ticket, quantity: event_tickets.length)
+        unavailable << event_ticket 
+      end
     end
 
     unavailable

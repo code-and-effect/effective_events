@@ -13,9 +13,13 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
       end
     end
 
+    col :id
+    col :position
+
     col :event_ticket, search: :string, label: 'Ticket' do |er|
       [
         er.event_ticket.to_s,
+        (content_tag(:span, 'Waitlist', class: 'badge badge-warning') if er.waitlisted?),
         (content_tag(:span, 'Archived', class: 'badge badge-warning') if er.event_ticket&.archived?)
       ].compact.join('<br>').html_safe
     end
@@ -36,8 +40,8 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
       end.join.html_safe
     end
 
-    col :price, as: :price
-
+    # This is the non-waitlisted full price
+    col :event_ticket_price, as: :price, label: 'Price'
     col :archived, visible: false
 
     # no actions_col

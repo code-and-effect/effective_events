@@ -8,7 +8,9 @@ module Effective
 
     belongs_to :event
 
-    has_many :event_registrants
+    has_many :event_registrants, -> { order(:id) }, inverse_of: :event_ticket
+    accepts_nested_attributes_for :event_registrants
+
     has_many :purchased_event_registrants, -> { EventRegistrant.purchased.unarchived }, class_name: 'Effective::EventRegistrant'
     has_many :registered_event_registrants, -> { EventRegistrant.registered.unarchived }, class_name: 'Effective::EventRegistrant'
 
@@ -20,7 +22,9 @@ module Effective
 
     effective_resource do
       title                       :string
+
       capacity                    :integer
+      waitlist                    :boolean 
 
       category                    :string
 
@@ -63,8 +67,21 @@ module Effective
     validates :early_bird_price, presence: true, if: -> { event&.early_bird_end_at.present? }
     validates :early_bird_price, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
 
+    validates :capacity, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
+    validates :capacity, numericality: { greater_than_or_equal_to: 1, message: 'must have a non-zero capacity when using waitlist' }, if: -> { waitlist? }
+
     def to_s
       title.presence || 'New Event Ticket'
+    end
+
+    def update_waitlist!
+      sorted_event_registrants.each_with_index do |event_registrant, index|
+        event_registrant.assign_attributes(position: index + 1)
+        event_registrant.assign_attributes(waitlisted: (waitlist? && index >= capacity)) unless event_registrant.purchased?
+        event_registrant.save!
+      end
+
+      true
     end
 
     def capacity_available
@@ -95,5 +112,27 @@ module Effective
     def member_or_non_member?
       category == 'Member or Non-Member'
     end
+
+    # purchased, defered, id
+    def sorted_event_registrants
+      event_registrants.sort do |a, b|
+        if a.purchased? && !b.purchased?
+          -1
+        elsif !a.purchased? && b.purchased?
+          1
+        elsif a.deferred? && !b.deferred?
+          -1
+        elsif !a.deferred? && b.deferred?
+          1
+        elsif a.purchased? && b.purchased?
+          a.purchased_at <=> b.purchased_at
+        elsif a.deferred? && b.deferred?
+          a.deferred_at <=> b.deferred_at
+        else
+          (a.id || 0) <=> (b.id || 0)
+        end
+      end
+    end
+
   end
 end

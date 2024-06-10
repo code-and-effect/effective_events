@@ -1,0 +1,13 @@
+en:
+  effective_events:
+    name: 'Effective Events'
+    acronym: 'Events'
+
+  activerecord:
+    models:
+      effective/event: 'Event'
+      effective/event_registrant: 'Event Registrant'
+
+    attributes:
+      effective/event_registrant:
+        user: 'Member'
