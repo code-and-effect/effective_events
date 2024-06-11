@@ -429,6 +429,9 @@ ActiveRecord::Schema.define(version: 101) do
     t.text "notes"
     t.boolean "blank_registrant", default: false
     t.boolean "member_registrant", default: false
+    t.boolean "waitlisted", default: false
+    t.boolean "promoted", default: false
+    t.datetime "registered_at"
     t.text "response1"
     t.text "response2"
     t.text "response3"
@@ -462,6 +465,7 @@ ActiveRecord::Schema.define(version: 101) do
     t.integer "event_id"
     t.string "title"
     t.integer "capacity"
+    t.boolean "waitlist", default: false
     t.string "category"
     t.integer "regular_price"
     t.integer "member_price"
@@ -658,6 +662,12 @@ ActiveRecord::Schema.define(version: 101) do
     t.integer "surcharge"
     t.integer "surcharge_tax"
     t.integer "total"
+    t.boolean "delayed_payment", default: false
+    t.date "delayed_payment_date"
+    t.text "delayed_payment_intent"
+    t.integer "delayed_payment_total"
+    t.datetime "delayed_payment_purchase_ran_at"
+    t.text "delayed_payment_purchase_result"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["user_id"], name: "index_orders_on_user_id"

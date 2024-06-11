@@ -128,7 +128,7 @@ GEM
       railties (>= 4.1.0)
       responders
       warden (~> 1.2.3)
-    effective_addresses (1.11.1)
+    effective_addresses (1.11.4)
       carmen
       coffee-rails
       effective_resources
@@ -158,7 +158,7 @@ GEM
       effective_resources
       liquid
       rails
-    effective_orders (6.9.8)
+    effective_orders (6.13.1)
       coffee-rails
       effective_addresses
       effective_bootstrap
@@ -174,7 +174,7 @@ GEM
       effective_roles
       rails (>= 6.0.0)
       wicked
-    effective_resources (2.19.6)
+    effective_resources (2.22.1)
       rails
       sprockets-rails
     effective_roles (2.5.0)

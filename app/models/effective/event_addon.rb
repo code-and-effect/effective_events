@@ -84,6 +84,10 @@ module Effective
       event_product.qb_item_name
     end
 
+    def registered?
+      purchased_or_deferred?
+    end
+
     # This is the Admin Save and Mark Paid action
     def mark_paid!
       raise('expected a blank event registration') if event_registration.present?

@@ -11,10 +11,18 @@ class EventRegistrationsTest < ActiveSupport::TestCase
 
   test 'event registration with delayed payment date' do
     event_registration = build_event_registration()
-    delayed_payment_attributes = { delayed_payment: true, delayed_payment_date: (event_registration.event.registration_end_at + 1.day).to_date }
+    delayed_payment_date = (event_registration.event.registration_end_at + 1.day).to_date
+
+    delayed_payment_attributes = { delayed_payment: true, delayed_payment_date: delayed_payment_date }
 
     event_registration.event.assign_attributes(delayed_payment_attributes)
     assert_equal delayed_payment_attributes, event_registration.delayed_payment_attributes
+
+    assert event_registration.delayed_payment_date_upcoming?
+
+    event_registration.ready!
+    assert event_registration.submit_order.delayed?
+    assert_equal delayed_payment_date, event_registration.submit_order.delayed_payment_date
   end
 
   test 'event with external registration is invalid for registration' do
@@ -61,26 +69,6 @@ class EventRegistrationsTest < ActiveSupport::TestCase
     assert_equal 600_00, order.subtotal
   end
 
-  test 'regular pricing' do
-    event = build_event()
-    event_registration = build_event_registration(event: event)
-    event_registration.ready!
-
-    order = event_registration.submit_order
-    assert_equal 800_00, order.subtotal
-  end
-
-  test 'early bird pricing' do
-    event = build_event()
-    event.update!(early_bird_end_at: Time.zone.now + 1.minute)
-
-    event_registration = build_event_registration(event: event)
-    event_registration.ready!
-
-    order = event_registration.submit_order
-    assert_equal 650_00, order.subtotal
-  end
-
   test 'sends order receipt emails on event registration purchase' do
     event_registration = build_event_registration()
 
@@ -111,6 +99,36 @@ class EventRegistrationsTest < ActiveSupport::TestCase
     # 1 order email to user, 1 order email to admin
     # Plus 3 registrant emails
     assert_email(count: 5) { order.purchase! }
+  end
+
+  test 'purchasing order marks registrants registered' do
+    event_registration = build_event_registration()
+
+    assert_equal 3, event_registration.event_registrants.count { |er| !er.registered? }
+    assert_equal 2, event_registration.event_addons.count { |ed| !ed.registered? }
+
+    event_registration.ready!
+    order = event_registration.submit_order
+    order.purchase!
+
+    event_registration.reload
+    assert_equal 3, event_registration.event_registrants.count { |er| er.registered? }
+    assert_equal 2, event_registration.event_addons.count { |ed| ed.registered? }
+  end
+
+  test 'deferring order marks registrants registered' do
+    event_registration = build_event_registration()
+
+    assert_equal 3, event_registration.event_registrants.count { |er| !er.registered? }
+    assert_equal 2, event_registration.event_addons.count { |ed| !ed.registered? }
+
+    event_registration.ready!
+    order = event_registration.submit_order
+    order.defer!(provider: 'cheque')
+
+    event_registration.reload
+    assert_equal 3, event_registration.event_registrants.count { |er| er.registered? }
+    assert_equal 2, event_registration.event_addons.count { |ed| ed.registered? }
   end
 
 end

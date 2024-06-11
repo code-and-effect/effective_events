@@ -68,10 +68,6 @@ module Effective
       self.owner ||= event_registration.owner
     end
 
-    # before_validation(if: -> { event_registration.blank? && event_ticket.present? }) do
-    #   self.position ||= (event_ticket.event_registrants.map { |er| er.position }.compact.max || 0) + 1
-    # end
-
     before_validation(if: -> { blank_registrant? }) do
       assign_attributes(user: nil, first_name: nil, last_name: nil, email: nil)
     end
@@ -109,6 +105,14 @@ module Effective
       validates :first_name, presence: true, unless: -> { user.present? }
       validates :last_name, presence: true, unless: -> { user.present? }
       validates :email, presence: true, unless: -> { user.present? }
+    end
+
+    after_defer do
+      registered! if event_registration.blank? && !registered?
+    end
+
+    after_purchase do
+      registered! if event_registration.blank? && !registered?
     end
 
     def to_s
@@ -218,6 +222,7 @@ module Effective
       raise('is already purchased') if purchased?
 
       price = waitlisted_not_promoted? ? 0 : event_ticket_price
+
       assign_attributes(price: price)
     end
 
