@@ -88,8 +88,8 @@ module Effective
       purchased_or_deferred?
     end
 
-    # This is the Admin Save and Mark Paid action
-    def mark_paid!
+    # This is the Admin Save and Mark Registered historic action
+    def mark_registered!
       raise('expected a blank event registration') if event_registration.present?
 
       save!

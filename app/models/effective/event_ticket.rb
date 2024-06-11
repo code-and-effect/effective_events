@@ -124,26 +124,5 @@ module Effective
       category == 'Member or Non-Member'
     end
 
-    # # purchased, defered, id
-    # def sorted_event_registrants
-    #   event_registrants.sort do |a, b|
-    #     if a.purchased? && !b.purchased?
-    #       -1
-    #     elsif !a.purchased? && b.purchased?
-    #       1
-    #     elsif a.deferred? && !b.deferred?
-    #       -1
-    #     elsif !a.deferred? && b.deferred?
-    #       1
-    #     elsif a.purchased? && b.purchased?
-    #       a.purchased_at <=> b.purchased_at
-    #     elsif a.deferred? && b.deferred?
-    #       a.deferred_at <=> b.deferred_at
-    #     else
-    #       (a.id || 0) <=> (b.id || 0)
-    #     end
-    #   end
-    # end
-
   end
 end

@@ -159,18 +159,9 @@ module Effective
       save!
     end
 
-    # This is the Admin Save and Mark Paid action
-    def mark_paid!
-      raise('todo') # this should be updated to just set registered!
-
-      raise('expected a blank event registration') if event_registration.present?
-
-      save!
-
-      order = Effective::Order.new(items: self, user: owner)
-      order.mark_as_purchased!
-
-      true
+    # This is the Admin Save and Mark Registered action
+    def mark_registered!
+      registered!
     end
 
     def promote!

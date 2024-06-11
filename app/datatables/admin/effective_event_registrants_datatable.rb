@@ -4,6 +4,7 @@ module Admin
       scope :unarchived, label: "All"
       scope :purchased
       scope :deferred
+      scope :not_purchased
       scope :archived
     end
 
