@@ -13,7 +13,7 @@
       %p
         = ticket
         = ' - '
-        = price_to_currency(registrant.price)
+        = price_to_currency(registrant.event_ticket_price)
 
       = fr.check_box :blank_registrant, label: "I will return and add this ticket's information later"
 

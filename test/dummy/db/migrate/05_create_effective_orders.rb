@@ -40,6 +40,13 @@ class CreateEffectiveOrders < ActiveRecord::Migration[6.0]
       t.integer   :surcharge_tax
       t.integer   :total
 
+      t.boolean   :delayed_payment, default: false
+      t.date      :delayed_payment_date
+      t.text      :delayed_payment_intent
+      t.integer   :delayed_payment_total
+      t.datetime  :delayed_payment_purchase_ran_at
+      t.text      :delayed_payment_purchase_result
+
       t.timestamps
     end
 
@@ -61,7 +68,6 @@ class CreateEffectiveOrders < ActiveRecord::Migration[6.0]
     add_index :order_items, :order_id
     add_index :order_items, :purchasable_id
     add_index :order_items, [:purchasable_type, :purchasable_id]
-
 
     create_table :carts do |t|
       t.integer   :user_id

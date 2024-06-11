@@ -15,18 +15,18 @@ module Effective
     has_many :event_products, -> { EventProduct.sorted }, inverse_of: :event, dependent: :destroy
     accepts_nested_attributes_for :event_products, allow_destroy: true
 
-    has_many :event_registrants, -> { order(:event_ticket_id, :created_at) }, inverse_of: :event
+    has_many :event_registrants, -> { order(:event_ticket_id).order(:id) }, inverse_of: :event
     accepts_nested_attributes_for :event_registrants, allow_destroy: true
 
-    has_many :event_addons, -> { order(:event_product_id, :created_at) }, inverse_of: :event
+    has_many :event_addons, -> { order(:event_product_id).order(:id) }, inverse_of: :event
     accepts_nested_attributes_for :event_addons, allow_destroy: true
 
     has_many :event_notifications, -> { order(:id) }, inverse_of: :event, dependent: :destroy
     accepts_nested_attributes_for :event_notifications, allow_destroy: true
 
     # Used by the registration_available checks
-    has_many :registered_event_registrants, -> { EventRegistrant.registered }, class_name: 'Effective::EventRegistrant', inverse_of: :event
-    has_many :registered_event_addons, -> { EventAddon.registered }, class_name: 'Effective::EventAddon', inverse_of: :event
+    has_many :registered_event_registrants, -> { EventRegistrant.registered.unarchived }, class_name: 'Effective::EventRegistrant', inverse_of: :event
+    has_many :registered_event_addons, -> { EventAddon.registered.unarchived }, class_name: 'Effective::EventAddon', inverse_of: :event
 
     # rich_text_body - Used by the select step
     has_many_rich_texts
@@ -192,6 +192,10 @@ module Effective
       rich_text_excerpt
     end
 
+    def any_waitlist?
+      event_tickets.any? { |et| et.waitlist? }
+    end
+
     def published?
       return false if draft?
       return false if published_at.blank?
@@ -214,6 +218,7 @@ module Effective
 
     def sold_out?
       return false unless event_tickets.present?
+      return false if any_waitlist?
       event_tickets.none? { |event_ticket| event_ticket_available?(event_ticket, quantity: 1) }
     end
 

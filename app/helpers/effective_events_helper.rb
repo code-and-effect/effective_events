@@ -38,10 +38,9 @@ module EffectiveEventsHelper
       title = ticket.to_s
       price = effective_events_ticket_price(event, ticket)
 
-      remaining = (ticket.capacity.present? ? "#{ticket.capacity_available} remaining" : nil)
+      label = [title, price].compact.join(' - ')
 
-      label = [title, price, remaining].compact.join(' - ')
-      disabled = { disabled: :disabled } unless (authorized || event.event_ticket_available?(ticket, quantity: 1))
+      disabled = { disabled: :disabled } unless (authorized || ticket.waitlist? || event.event_ticket_available?(ticket, quantity: 1))
 
       [label, ticket.to_param, disabled].compact
     end

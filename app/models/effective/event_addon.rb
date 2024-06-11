@@ -42,7 +42,7 @@ module Effective
 
     scope :sorted, -> { order(:id) }
     scope :deep, -> { includes(:event, :event_product) }
-    scope :registered, -> { purchased_or_deferred.unarchived }
+    scope :registered, -> { purchased_or_deferred }
 
     before_validation(if: -> { event_registration.present? }) do
       self.event ||= event_registration.event
@@ -84,8 +84,12 @@ module Effective
       event_product.qb_item_name
     end
 
-    # This is the Admin Save and Mark Paid action
-    def mark_paid!
+    def registered?
+      purchased_or_deferred?
+    end
+
+    # This is the Admin Save and Mark Registered historic action
+    def mark_registered!
       raise('expected a blank event registration') if event_registration.present?
 
       save!

@@ -16,6 +16,18 @@ module EffectiveEventsTestBuilder
     build_event().tap { |event| event.save! }
   end
 
+  def build_waitlist_event
+    event = build_event()
+
+    delayed_payment_date = (event.registration_end_at + 1.day).to_date
+
+    event.assign_attributes(delayed_payment: true, delayed_payment_date: delayed_payment_date)
+    event.event_tickets.each { |event_ticket| event_ticket.assign_attributes(capacity: 5, waitlist: true) }
+    event.save!
+
+    event
+  end
+
   def build_event
     now = Time.zone.now
 
@@ -80,7 +92,7 @@ module EffectiveEventsTestBuilder
     event
   end
 
-  def build_event_registration(owner: nil, event: nil)
+  def build_event_registration(owner: nil, event: nil, event_registrants: true, event_addons: true)
     event ||= build_event()
     owner ||= build_user_with_address()
 
@@ -89,22 +101,26 @@ module EffectiveEventsTestBuilder
       owner: owner
     )
 
-    event_registration.event.event_tickets.each_with_index do |event_ticket, index|
-      event_registration.event_registrant(
-        event_ticket: event_ticket,
-        first_name: "First",
-        last_name: "Last #{index+1}",
-        email: "registrant#{index+1}@effective_events.test"
-      )
+    if event_registrants
+      event_registration.event.event_tickets.each_with_index do |event_ticket, index|
+        event_registration.event_registrant(
+          event_ticket: event_ticket,
+          first_name: "First",
+          last_name: "Last #{index+1}",
+          email: "registrant#{index+1}@effective_events.test"
+        )
+      end
     end
 
-    event_registration.event.event_products.each_with_index do |event_product, index|
-      event_registration.event_addon(
-        event_product: event_product,
-        first_name: "First",
-        last_name: "Last #{index+1}",
-        email: "registrant#{index+1}@effective_events.test"
-      )
+    if event_addons
+      event_registration.event.event_products.each_with_index do |event_product, index|
+        event_registration.event_addon(
+          event_product: event_product,
+          first_name: "First",
+          last_name: "Last #{index+1}",
+          email: "registrant#{index+1}@effective_events.test"
+        )
+      end
     end
 
     event_registration.save!

@@ -21,8 +21,16 @@ class EventCapacityTest < ActiveSupport::TestCase
     registrant2.save!
     registrant3.save!
 
+    refute registrant.registered?
+    refute registrant2.registered?
+    refute registrant3.registered?
+
     order = Effective::Order.new(items: [registrant, registrant2, registrant3], user: registrant.owner)
     order.purchase!
+
+    assert registrant.registered?
+    assert registrant2.registered?
+    assert registrant3.registered?
 
     ticket.reload
     event = ticket.event
@@ -59,26 +67,5 @@ class EventCapacityTest < ActiveSupport::TestCase
     refute event.event_product_available?(product, quantity: 1)
     assert_equal 3, product.purchased_event_addons_count
   end
-
-  # test 'event registrations validate ticket capacity' do
-  #   event_registration = build_event_registration()
-
-  #   event_registration.event_registrants.first.event_ticket.update!(capacity: 0)
-  #   refute event_registration.save
-
-  #   assert event_registration.errors[:base].to_s.include?('no longer available for purchase')
-  #   assert event_registration.event_registrants.first.errors[:event_ticket_id].to_s.include?('unavailable')
-  # end
-
-  # test 'event registrations validate product capacity' do
-  #   event_registration = build_event_registration()
-
-  #   event_registration.event_addons.first.event_product.update!(capacity: 0)
-  #   refute event_registration.save
-
-  #   assert event_registration.errors[:base].to_s.include?('no longer available for purchase')
-  #   assert event_registration.event_addons.first.errors[:event_product_id].to_s.include?('unavailable')
-  # end
-
 
 end

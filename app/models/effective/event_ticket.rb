@@ -8,9 +8,11 @@ module Effective
 
     belongs_to :event
 
-    has_many :event_registrants
+    has_many :event_registrants, -> { order(:id) }, inverse_of: :event_ticket
+    accepts_nested_attributes_for :event_registrants
+
     has_many :purchased_event_registrants, -> { EventRegistrant.purchased.unarchived }, class_name: 'Effective::EventRegistrant'
-    has_many :registered_event_registrants, -> { EventRegistrant.registered.unarchived }, class_name: 'Effective::EventRegistrant'
+    has_many :registered_event_registrants, -> { EventRegistrant.registered.unarchived.order(:registered_at).order(:id) }, class_name: 'Effective::EventRegistrant'
 
     log_changes(to: :event) if respond_to?(:log_changes)
 
@@ -20,7 +22,9 @@ module Effective
 
     effective_resource do
       title                       :string
+
       capacity                    :integer
+      waitlist                    :boolean 
 
       category                    :string
 
@@ -63,8 +67,32 @@ module Effective
     validates :early_bird_price, presence: true, if: -> { event&.early_bird_end_at.present? }
     validates :early_bird_price, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
 
+    validates :capacity, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
+    validates :capacity, numericality: { greater_than_or_equal_to: 1, message: 'must have a non-zero capacity when using waitlist' }, if: -> { waitlist? }
+
     def to_s
       title.presence || 'New Event Ticket'
+    end
+
+    # This is supposed to be an indempotent big update the world thing
+    def update_waitlist!
+      return false unless waitlist?
+
+      changed_event_registrants = registered_event_registrants.each_with_index.map do |event_registrant, index|
+        next if event_registrant.purchased?
+
+        waitlisted_was = event_registrant.waitlisted?
+        waitlisted = (waitlist? && index >= capacity)
+        next if waitlisted == waitlisted_was
+
+        event_registrant.update!(waitlisted: waitlisted) # Updates price
+        event_registrant
+      end.compact
+
+      orders = changed_event_registrants.flat_map { |event_registrant| event_registrant.deferred_orders }.compact.uniq
+      orders.each { |order| order.update_purchasable_attributes! }
+
+      true
     end
 
     def capacity_available
@@ -95,5 +123,6 @@ module Effective
     def member_or_non_member?
       category == 'Member or Non-Member'
     end
+
   end
 end

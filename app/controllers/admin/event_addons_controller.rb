@@ -5,6 +5,6 @@ module Admin
 
     include Effective::CrudController
 
-    submit :mark_paid, 'Save and Mark Paid'
+    submit :mark_registered, 'Save and Mark Registered'
   end
 end

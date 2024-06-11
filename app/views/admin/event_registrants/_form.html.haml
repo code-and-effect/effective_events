@@ -11,11 +11,13 @@
   - else
     = f.static_field :owner
 
+  = f.datetime_field :registered_at
+
   = render 'effective/event_registrants/fields', f: f, event: event_registrant.event, namespace: :admin
 
   = f.check_box :archived, label: "Archive this registrant. It will be displayed as archived on the owner's event registration"
 
   - if f.object.new_record?
-    = f.submit 'Save and Mark Paid'
+    = f.submit 'Save and Mark Registered'
   - else
     = f.submit 'Save'

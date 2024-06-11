@@ -40,6 +40,7 @@ module Admin
 
       col :capacity_available, visible: false
       col :capacity, label: 'Capacity Total', visible: false
+      col :waitlist, visible: false
 
       col :question1, visible: false
       col :question2, visible: false
