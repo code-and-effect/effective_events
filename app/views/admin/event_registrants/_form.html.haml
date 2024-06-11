@@ -11,7 +11,7 @@
   - else
     = f.static_field :owner
 
-  = f.datetime_field :registered_at
+  = f.datetime_field :registered_at, required: true
 
   = render 'effective/event_registrants/fields', f: f, event: event_registrant.event, namespace: :admin
 

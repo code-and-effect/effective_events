@@ -23,7 +23,9 @@ module Admin
       col :member_price, as: :price
 
       col :capacity_to_s, label: 'Capacity' do |ticket|
-        if ticket.capacity.present?
+        if ticket.capacity.present? && ticket.waitlist?
+          "#{ticket.capacity_available} remaining / #{ticket.capacity} total. #{ticket.waitlisted_event_registrants_count} waitlisted."
+        elsif ticket.capacity.present?
           "#{ticket.capacity_available} remaining / #{ticket.capacity} total"
         end
       end
@@ -32,6 +34,10 @@ module Admin
 
       col :registered_event_registrants_count, label: 'Registered' do |event|
         event.event_registrants.registered.unarchived.count
+      end
+
+      col :purchased_event_registrants_count, label: 'Deferred', visible: false do |event|
+        event.event_registrants.deferred.unarchived.count
       end
 
       col :purchased_event_registrants_count, label: 'Purchased', visible: false do |event|

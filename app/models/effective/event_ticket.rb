@@ -108,6 +108,14 @@ module Effective
       purchased_event_registrants.length
     end
 
+    def non_waitlisted_event_registrants_count
+      registered_event_registrants.where(waitlisted: false).or(registered_event_registrants.where(waitlisted: true, promoted: true))
+    end
+
+    def waitlisted_event_registrants_count
+      registered_event_registrants.where(waitlisted: true, promoted: false).length
+    end
+
     def questions
       [question1.presence, question2.presence, question3.presence].compact
     end
