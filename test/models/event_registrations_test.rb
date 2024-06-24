@@ -90,7 +90,8 @@ class EventRegistrationsTest < ActiveSupport::TestCase
       event: event,
       from: 'noreply@example.com',
       subject: "#{category} subject",
-      body: "#{category} body"
+      body: "#{category} body",
+      content_type: "text/plain"
     )
 
     event_registration.ready!

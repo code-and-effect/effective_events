@@ -67,4 +67,24 @@ class EventNotificationsTest < ActiveSupport::TestCase
     assert_email(count: 2) { order.purchase! }
   end
 
+  test 'notify! with html content' do
+    event = build_event()
+    event.save!
+
+    event_registrant = build_event_registrant(event: event)
+    event_registrant.save!
+
+    email_template = Effective::EmailTemplate.where(template_name: :event_registrant_purchased).first!
+    email_template.save_as_html!
+
+    event_notification = build_event_notification(event: event)
+    event_notification.save!
+
+    event_notification.update!(subject: "Cool subject {{ event.name }}", body: "<p>Cool body {{ event.name }} {{ registrant.name }}</p>", content_type: 'text/html')
+
+    assert_email(subject: "Cool subject #{event.title}", body: "<p>Cool body #{event.title} #{event_registrant.name}</p>", html_layout: true) do
+      event_notification.notify!(event_registrants: [event_registrant])
+    end
+  end
+
 end

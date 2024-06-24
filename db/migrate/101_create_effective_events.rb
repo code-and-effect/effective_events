@@ -183,6 +183,10 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.string :subject
       t.text :body
 
+      t.string :cc
+      t.string :bcc
+      t.string :content_type
+
       t.datetime :started_at
       t.datetime :completed_at
 

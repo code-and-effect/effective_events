@@ -195,7 +195,8 @@ module EffectiveEventsTestBuilder
       reminder: 1.day.to_i,
       from: 'noreply@example.com',
       subject: "#{category} subject",
-      body: "#{category} body"
+      body: "#{category} body",
+      content_type: "text/plain"
     )
   end
 
