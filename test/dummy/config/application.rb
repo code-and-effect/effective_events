@@ -14,6 +14,7 @@ require 'effective_email_templates'
 require 'effective_memberships'
 require 'effective_roles'
 require 'effective_events'
+require "effective_test_bot"
 
 module Dummy
   class Application < Rails::Application
