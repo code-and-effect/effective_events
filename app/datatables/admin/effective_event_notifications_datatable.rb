@@ -12,7 +12,10 @@ class Admin::EffectiveEventNotificationsDatatable < Effective::Datatable
 
     col :event
     col :category
-    col :from
+
+    col :from, visible: false do |notification|
+      ERB::Util.html_escape_once(notification.from)
+    end
 
     # col :reminder do |poll_notification|
     #   case poll_notification.category
@@ -37,8 +40,12 @@ class Admin::EffectiveEventNotificationsDatatable < Effective::Datatable
       simple_format(notification.body)
     end
 
-    # col :started_at, visible: false
-    # col :completed_at
+    col :cc, visible: false
+    col :bcc, visible: false
+    col :content_type, visible: false
+
+    col :started_at, visible: false
+    col :completed_at
 
     actions_col
   end

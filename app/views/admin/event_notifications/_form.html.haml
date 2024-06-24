@@ -12,26 +12,7 @@
     - template = 'event_' + category.parameterize.underscore
 
     = f.show_if :category, category do
-      = render "/admin/event_notifications/form_#{template}", f: f
-
-      - if f.object.category == category && f.object.persisted?
-        = f.select :from, mailer_froms_collection(), label: 'From'
-        = f.text_field :subject
-        = f.text_area :body, rows: 10
-      - else
-        - email_template = Effective::EmailTemplate.where(template_name: template).first!
-        - from_value = email_template.from || EffectiveResources.mailer_froms.first
-
-        = f.select :from, mailer_froms_collection(), label: 'From', value: from_value
-        = f.text_field :subject, value: email_template.subject
-        = f.text_area :body, rows: 10, value: email_template.body
-
-        %p The available variables are:
-
-        %ul
-          - Effective::EventNotification::EMAIL_TEMPLATE_VARIABLES.each do |variable|
-            %li {{ #{variable} }}
-
-        %small.text-muted Please contact us to add additional variables
+      .my-3= render "/admin/event_notifications/form_#{template}", f: f
+      = email_notification_fields(f, template, variables: Effective::EventNotification::EMAIL_TEMPLATE_VARIABLES)
 
   = effective_submit(f)

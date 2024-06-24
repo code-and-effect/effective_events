@@ -2,6 +2,7 @@ module Effective
   class EventNotification < ActiveRecord::Base
     self.table_name = (EffectiveEvents.event_notifications_table_name || :event_notifications).to_s
 
+    acts_as_email_notification # effective_resources
     log_changes(to: :event) if respond_to?(:log_changes)
 
     belongs_to :event
@@ -54,6 +55,10 @@ module Effective
       subject           :string
       body              :text
 
+      cc                :string
+      bcc               :string
+      content_type      :string
+
       # Tracking background jobs email send out
       started_at        :datetime
       completed_at      :datetime
@@ -71,13 +76,6 @@ module Effective
     scope :notifiable, -> { where(started_at: nil, completed_at: nil) }
 
     validates :category, presence: true, inclusion: { in: CATEGORIES }
-
-    validates :from, presence: true, email: true
-    validates :subject, presence: true
-    validates :body, presence: true
-
-    validates :body, liquid: true
-    validates :subject, liquid: true
 
     # validates :reminder, if: -> { reminder? || upcoming_reminder? || before_event_ends? },
     #   presence: true, uniqueness: { scope: [:event_id, :category], message: 'already exists' }
@@ -147,10 +145,14 @@ module Effective
 
       update_column(:started_at, Time.zone.now)
 
-      opts = { from: from, subject: subject, body: body }
-
       event_registrants.each do |event_registrant|
-        EffectiveEvents.send_email(email_template, event_registrant, opts)
+        begin
+          EffectiveEvents.send_email(email_template, event_registrant, email_notification_params)
+        rescue => e
+          EffectiveLogger.error(e.message, associated: event_registrant) if defined?(EffectiveLogger)
+          ExceptionNotifier.notify_exception(e, data: { event_registrant_id: event_registrant.id, event_notification_id: id }) if defined?(ExceptionNotifier)
+          raise(e) if Rails.env.test? || Rails.env.development?
+        end
       end
 
       update_column(:completed_at, Time.zone.now)
