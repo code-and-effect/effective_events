@@ -88,6 +88,10 @@ module Effective
       'event_' + category.to_s.parameterize.underscore
     end
 
+    def email_template_variables
+      EMAIL_TEMPLATE_VARIABLES
+    end
+
     def registrant_purchased?
       category == 'Registrant purchased'
     end
