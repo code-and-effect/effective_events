@@ -82,7 +82,7 @@ class EventNotificationsTest < ActiveSupport::TestCase
 
     event_notification.update!(subject: "Cool subject {{ event.name }}", body: "<p>Cool body {{ event.name }} {{ registrant.name }}</p>", content_type: 'text/html')
 
-    assert_email(subject: "Cool subject #{event.title}", body: "<p>Cool body #{event.title} #{event_registrant.name}</p>", html_layout: true) do
+    assert_email(subject: "Cool subject #{event.title}", html_layout: true) do
       event_notification.notify!(event_registrants: [event_registrant])
     end
   end

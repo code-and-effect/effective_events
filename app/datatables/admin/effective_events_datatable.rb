@@ -4,7 +4,7 @@ module Admin
       scope :all
       scope :registerable
       scope :published
-      scope :unpublished
+      scope :draft
       scope :upcoming
       scope :past
     end
@@ -19,7 +19,12 @@ module Admin
       end
 
       col :slug, visible: false
-      col :draft
+
+      col :draft?, as: :boolean, visible: false
+      col :published?, as: :boolean
+      col :published_start_at
+      col :published_end_at
+
       col :start_at, label: 'Start', visible: false
       col :end_at, label: 'End', visible: false
       col :excerpt, visible: false

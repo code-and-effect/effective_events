@@ -41,10 +41,11 @@ module Effective
 
     has_one_attached :file
 
-    acts_as_slugged
-    log_changes if respond_to?(:log_changes)
-    acts_as_tagged if respond_to?(:acts_as_tagged)
     acts_as_role_restricted if respond_to?(:acts_as_role_restricted)
+    acts_as_published
+    acts_as_slugged
+    acts_as_tagged if respond_to?(:acts_as_tagged)
+    log_changes if respond_to?(:log_changes)
 
     effective_resource do
       title                  :string
@@ -52,8 +53,9 @@ module Effective
       category               :string
       slug                   :string
 
-      draft                  :boolean
-      published_at           :datetime
+      published_start_at       :datetime
+      published_end_at         :datetime
+      legacy_draft             :boolean       # No longer used. To be removed.
 
       start_at               :datetime
       end_at                 :datetime
@@ -86,9 +88,6 @@ module Effective
       base = base.includes(:pg_search_document) if defined?(PgSearch)
       base
     }
-
-    scope :published, -> { where(draft: false).where(arel_table[:published_at].lt(Time.zone.now)) }
-    scope :unpublished, -> { where(draft: true).or(where(arel_table[:published_at].gteq(Time.zone.now))) }
 
     scope :upcoming, -> { where(arel_table[:end_at].gt(Time.zone.now)) }
     scope :past, -> { where(arel_table[:end_at].lteq(Time.zone.now)) }
@@ -136,7 +135,6 @@ module Effective
     scope :delayed_payment_date_upcoming, -> { delayed.where(arel_table[:delayed_payment_date].gt(Time.zone.today)) }
 
     validates :title, presence: true, length: { maximum: 255 }
-    validates :published_at, presence: true, unless: -> { draft? }
     validates :start_at, presence: true
     validates :end_at, presence: true
     validates :external_registration_url, url: true
@@ -196,13 +194,6 @@ module Effective
       event_tickets.any? { |et| et.waitlist? }
     end
 
-    def published?
-      return false if draft?
-      return false if published_at.blank?
-
-      published_at < Time.zone.now
-    end
-
     def registerable?
       return false unless published?
       return false if closed?
@@ -247,10 +238,11 @@ module Effective
       Event.new(attributes.except('id', 'updated_at', 'created_at')).tap do |event|
         event.title = event.title + ' (Copy)'
         event.slug = event.slug + '-copy'
-        event.draft = true
 
         event.rich_text_body = rich_text_body
         event.rich_text_excerpt = rich_text_excerpt
+
+        event.assign_attributes(published_start_at: nil, published_end_at: nil)
       end
     end
 

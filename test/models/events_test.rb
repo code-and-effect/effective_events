@@ -36,4 +36,34 @@ class EventsTest < ActiveSupport::TestCase
     assert event.early_bird_past?
   end
 
+  test 'published? and draft?' do
+    event = build_event()
+    assert event.published?
+    refute event.draft?
+
+    event.update!(published_start_at: nil)
+    refute event.published?
+    assert event.draft?
+    refute Effective::Event.published.include?(event)
+    assert Effective::Event.draft.include?(event)
+
+    event.update!(published_start_at: Time.zone.now)
+    assert event.published?
+    refute event.draft?
+    assert Effective::Event.published.include?(event)
+    refute Effective::Event.draft.include?(event)
+
+    event.update!(published_end_at: Time.zone.now)
+    refute event.published?
+    assert event.draft?
+    refute Effective::Event.published.include?(event)
+    assert Effective::Event.draft.include?(event)
+
+    event.update!(published_end_at: nil)
+    assert event.published?
+    refute event.draft?
+    assert Effective::Event.published.include?(event)
+    refute Effective::Event.draft.include?(event)
+  end
+
 end
