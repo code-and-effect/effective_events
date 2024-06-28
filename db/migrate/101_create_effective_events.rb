@@ -6,8 +6,9 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.string :category
       t.string :slug
 
-      t.boolean :draft, default: false
-      t.datetime :published_at
+      t.datetime :published_start_at
+      t.datetime :published_end_at
+      t.boolean :legacy_draft, default: false
 
       t.datetime :start_at
       t.datetime :end_at

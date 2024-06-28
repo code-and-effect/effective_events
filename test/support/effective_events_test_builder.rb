@@ -3,7 +3,7 @@ module EffectiveEventsTestBuilder
   def create_event_by(name, end_at)
     Effective::Event.create!(
       title: name,
-      published_at: Date.yesterday,
+      published_start_at: Date.yesterday,
       start_at: 1.month.ago,
       end_at: end_at,
       registration_start_at: 1.month.ago - 1,
@@ -36,7 +36,7 @@ module EffectiveEventsTestBuilder
       rich_text_excerpt: '<p>This is a great event!</p>',
       rich_text_body: '<p>This is really a great event!</p>',
 
-      published_at: Time.zone.now,
+      published_start_at: Time.zone.now,
       start_at: (now + 1.week),
       end_at: (now + 1.week + 1.hour),
 

@@ -1,6 +1,16 @@
 = effective_form_with(model: [:admin, event], engine: true) do |f|
   = f.text_field :title, label: "Title"
 
+  -# acts_as_published
+  = f.hide_if(:save_as_draft, true) do
+    .row
+      .col-md-6
+        = f.datetime_field :published_start_at, hint: 'The event will be available starting on this date and time.'
+      .col-md-6
+        = f.datetime_field :published_end_at, hint: 'The event will no longer be available after this date and time. Leave blank for no end date.', date_linked: false
+
+  = f.check_box :save_as_draft, label: "Save as a draft. It will not appear on the website and can only be accessed by admin users."
+
   - if f.object.persisted? || f.object.errors.include?(:slug)
     - current_url = (effective_events.event_url(f.object) rescue nil)
     = f.text_field :slug, hint: "The slug controls this event's internet address. Be careful, changing the slug will break links that other websites may have to the old address.<br>#{('This event is currently reachable via ' + link_to(current_url.gsub(f.object.slug, '<strong>' + f.object.slug + '</strong>').html_safe, current_url)) if current_url }".html_safe
@@ -13,10 +23,6 @@
     .col
       - if event.class.respond_to?(:acts_as_tagged?)
         = render 'effective/tags/fields', f: f
-
-  = f.check_box :draft, hint: 'Save this event as a draft. It will not be accessible on the website.'
-  .row
-    .col-md-6= f.datetime_field :published_at, label: 'Publish date', hint: 'When should this be displayed on the website.'
 
   .row
     .col-md-6= f.datetime_field :start_at, label: "Event Start"
