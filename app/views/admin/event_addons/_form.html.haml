@@ -1,4 +1,10 @@
 = effective_form_with(model: [:admin, event_addon], engine: true) do |f|
+  - if inline_datatable?
+    = f.hidden_field :event_id
+  - else
+    = f.select :event_id, Effective::Event.sorted.all,
+      'data-load-ajax-url': effective_events.new_admin_event_addon_path,
+      'data-load-ajax-div': '#effective-events-event-addon-ajax'
   = f.hidden_field :event_id
 
   - if f.object.new_record?
@@ -11,11 +17,10 @@
   - else
     = f.static_field :owner
 
-  = render 'admin/event_addons/fields', f: f, event: event_addon.event
+  #effective-events-event-addon-ajax
+    - if f.object.event.present?
+      = render 'admin/event_addons/fields', f: f, event: event_addon.event
 
   = f.check_box :archived, label: "Archive this addon. It will be displayed as archived on the owner's event registration"
 
-  - if f.object.new_record?
-    = f.submit 'Save and Mark Registered'
-  - else
-    = f.submit 'Save'
+  = f.submit 'Save'

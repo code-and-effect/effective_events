@@ -1,5 +1,10 @@
 = effective_form_with(model: [:admin, event_registrant], engine: true) do |f|
-  = f.hidden_field :event_id
+  - if inline_datatable?
+    = f.hidden_field :event_id
+  - else
+    = f.select :event_id, Effective::Event.sorted.all,
+      'data-load-ajax-url': effective_events.new_admin_event_registrant_path,
+      'data-load-ajax-div': '#effective-events-event-registrant-ajax'
 
   - if f.object.new_record?
     -# User
@@ -13,11 +18,10 @@
 
   = f.datetime_field :registered_at, required: true
 
-  = render 'effective/event_registrants/fields', f: f, event: event_registrant.event, namespace: :admin
+  #effective-events-event-registrant-ajax
+    - if f.object.event.present?
+      = render 'effective/event_registrants/fields', f: f, event: event_registrant.event, namespace: :admin
 
   = f.check_box :archived, label: "Archive this registrant. It will be displayed as archived on the owner's event registration"
 
-  - if f.object.new_record?
-    = f.submit 'Save and Mark Registered'
-  - else
-    = f.submit 'Save'
+  = f.submit 'Save'
