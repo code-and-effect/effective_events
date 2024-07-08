@@ -166,10 +166,6 @@ module Effective
       errors.add(:delayed_payment, 'no delayed payment processor available') unless EffectiveOrders.try(:delayed?)
     end
 
-    validate(if: -> { delayed_payment_date && registration_end_at }) do
-      errors.add(:delayed_payment_date, 'must be after registration end date') unless registration_end_at < delayed_payment_date
-    end
-
     validate(if: -> { file.attached? }) do
       errors.add(:file, 'must be an image') unless file.image?
     end
