@@ -140,6 +140,10 @@ module Effective
       user&.is?(:member)
     end
 
+    def member_email
+      email.presence || user&.email
+    end
+
     def present_registrant?
       !blank_registrant?
     end
