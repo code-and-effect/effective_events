@@ -84,7 +84,6 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.text :notes
 
       t.boolean :blank_registrant, default: false
-      t.boolean :member_registrant, default: false
 
       t.boolean :waitlisted, default: false
       t.boolean :promoted, default: false

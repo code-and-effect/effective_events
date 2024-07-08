@@ -4,8 +4,8 @@
   - raise('expected a submitted event_registration') unless resource.submitted?
   - raise('expected a deffered event_registration submit_order') unless resource.submit_order&.deferred?
 
-  - if resource.event.delayed?
-    - raise('expected event delayed_payment_date to match order delayed_payment_date') unless resource.event.delayed_payment_date == resource.submit_order.delayed_payment_date
+  -# - if resource.event.delayed?
+  -#   - raise('expected event delayed_payment_date to match order delayed_payment_date') unless resource.event.delayed_payment_date == resource.submit_order.delayed_payment_date
 
   .mb-4
     = link_to "Return to Dashboard", return_to_dashboard_path, class: 'btn btn-lg btn-primary btn-block'

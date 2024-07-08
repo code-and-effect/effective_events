@@ -17,10 +17,6 @@
         - else
           = f.hidden_field :blank_registrant, value: false
 
-        - if ticket.member_or_non_member?
-          = f.show_if(:blank_registrant, true, nested: true) do 
-            = f.check_box :member_registrant, label: 'Yes, this ticket will be for a member'
-
         = f.show_if(:blank_registrant, false, nested: true) do
           %hr
 

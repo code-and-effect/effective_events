@@ -18,6 +18,10 @@ EffectiveEvents.setup do |config|
   # Hint text for event images attachments
   config.events_hint_text = 'Hint text that includes required image dimensions'
 
+  # Validations for Event Registrants
+  # config.event_registrant_required_fields = [:first_name, :last_name, :email, :company]
+  config.event_registrant_required_fields = [:first_name, :last_name, :email]
+
   # Mailer Settings
   # Please see config/initializers/effective_resources.rb for default effective_* gem mailer settings
   #
