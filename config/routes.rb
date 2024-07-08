@@ -44,6 +44,8 @@ EffectiveEvents::Engine.routes.draw do
     resources :event_registrants, except: [:show] do
       post :promote, on: :member
       post :unpromote, on: :member
+      post :waitlist, on: :member
+      post :unwaitlist, on: :member
 
       post :archive, on: :member
       post :unarchive, on: :member
