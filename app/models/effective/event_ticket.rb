@@ -68,7 +68,6 @@ module Effective
     validates :early_bird_price, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
 
     validates :capacity, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
-    validates :capacity, numericality: { greater_than_or_equal_to: 1, message: 'must have a non-zero capacity when using waitlist' }, if: -> { waitlist? }
 
     def to_s
       title.presence || 'New Event Ticket'

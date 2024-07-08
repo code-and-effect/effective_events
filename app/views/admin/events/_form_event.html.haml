@@ -5,7 +5,7 @@
   = f.hide_if(:save_as_draft, true) do
     .row
       .col-md-6
-        = f.datetime_field :published_start_at, hint: 'The event will be available starting on this date and time.'
+        = f.datetime_field :published_start_at, hint: 'The event will be available starting on this date and time. Leave blank to use the current date and time.'
       .col-md-6
         = f.datetime_field :published_end_at, hint: 'The event will no longer be available after this date and time. Leave blank for no end date.', date_linked: false
 
