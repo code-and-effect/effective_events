@@ -58,8 +58,6 @@ module Effective
 
     scope :sorted, -> { order(:last_name) }
     scope :deep, -> { includes(:event, :event_ticket, :owner) }
-
-    #scope :registered, -> { purchased_or_deferred.unarchived }
     scope :registered, -> { where.not(registered_at: nil) }
 
     before_validation(if: -> { event_registration.present? }) do
@@ -68,7 +66,7 @@ module Effective
     end
 
     before_validation(if: -> { blank_registrant? }) do
-      assign_attributes(user: nil, first_name: nil, last_name: nil, email: nil)
+      assign_attributes(user: nil, first_name: nil, last_name: nil, email: nil, company: nil)
     end
 
     before_validation(if: -> { user.present? }) do
@@ -88,22 +86,24 @@ module Effective
     validates :email, email: true
 
     # Member Only Ticket
-    with_options(if: -> { event_ticket&.member_only? }, unless: -> { blank_registrant? }) do
+    with_options(if: -> { event_ticket&.member_only? && present_registrant? }) do
       validates :user_id, presence: { message: 'Please select a member' }
     end
 
     # Regular Ticket
-    with_options(if: -> { event_ticket&.regular? }, unless: -> { blank_registrant? }) do
-      validates :first_name, presence: true
-      validates :last_name, presence: true
-      validates :email, presence: true
+    with_options(if: -> { event_ticket&.regular? && present_registrant? }) do
+      validates :first_name, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:first_name) }
+      validates :last_name, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:last_name) }
+      validates :email, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:email) }
+      validates :company, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:company) }
     end
 
-    with_options(if: -> { event_ticket&.member_or_non_member? && !blank_registrant? }) do
-      validates :user_id, presence: { message: 'Please select a member' }, unless: -> { first_name.present? || last_name.present? || email.present? }
-      validates :first_name, presence: true, unless: -> { user.present? }
-      validates :last_name, presence: true, unless: -> { user.present? }
-      validates :email, presence: true, unless: -> { user.present? }
+    with_options(if: -> { event_ticket&.member_or_non_member? && present_registrant? }) do
+      validates :user_id, presence: { message: 'Please select a member' }, unless: -> { first_name.present? || last_name.present? }
+      validates :first_name, presence: true, unless: -> { user.present? || EffectiveEvents.event_registrant_required_fields.exclude?(:first_name) }
+      validates :last_name, presence: true, unless: -> { user.present? || EffectiveEvents.event_registrant_required_fields.exclude?(:last_name) }
+      validates :email, presence: true, unless: -> { user.present? || EffectiveEvents.event_registrant_required_fields.exclude?(:email) }
+      validates :company, presence: true, unless: -> { user.present? || EffectiveEvents.event_registrant_required_fields.exclude?(:company) }
     end
 
     after_defer do
@@ -137,7 +137,11 @@ module Effective
     end
 
     def member_present?
-      user&.is?(:member) || (blank_registrant? && member_registrant?)
+      user&.is?(:member)
+    end
+
+    def present_registrant?
+      !blank_registrant?
     end
 
     def tax_exempt
@@ -161,6 +165,24 @@ module Effective
     # This is the Admin Save and Mark Registered action
     def mark_registered!
       registered!
+    end
+
+    def waitlist!
+      raise('expected a waitlist? event_ticket') unless event_ticket.waitlist?
+
+      update!(waitlisted: true)
+      orders.reject(&:purchased?).each { |order| order.update_purchasable_attributes! }
+
+      true
+    end
+
+    def unwaitlist!
+      raise('expected a waitlist? event_ticket') unless event_ticket.waitlist?
+
+      update!(waitlisted: false)
+      orders.reject(&:purchased?).each { |order| order.update_purchasable_attributes! }
+
+      true
     end
 
     def promote!

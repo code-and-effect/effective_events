@@ -18,9 +18,13 @@ module Admin
       col :title
       col :category, visible: false
 
-      col :early_bird_price, as: :price, visible: event.early_bird_end_at.present?
+      col :early_bird_price, as: :price, visible: event&.early_bird_end_at.present?
       col :regular_price, as: :price
       col :member_price, as: :price
+
+      col :waitlist
+      col :capacity_available, visible: false
+      col :capacity, label: 'Capacity Total', visible: false
 
       col :capacity_to_s, label: 'Capacity' do |ticket|
         if ticket.capacity.present? && ticket.waitlist?
@@ -44,9 +48,6 @@ module Admin
         event.event_registrants.purchased.unarchived.count
       end
 
-      col :capacity_available, visible: false
-      col :capacity, label: 'Capacity Total', visible: false
-      col :waitlist, visible: false
 
       col :question1, visible: false
       col :question2, visible: false
