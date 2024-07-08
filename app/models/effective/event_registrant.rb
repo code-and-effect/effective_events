@@ -32,7 +32,6 @@ module Effective
       company               :string
 
       blank_registrant      :boolean
-      member_registrant     :boolean
 
       waitlisted            :boolean
       promoted              :boolean      # An admin marked this registrant as promoted from the waitlist

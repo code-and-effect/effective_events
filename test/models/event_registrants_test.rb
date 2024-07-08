@@ -47,9 +47,9 @@ class EventRegistrantsTest < ActiveSupport::TestCase
     assert_equal 200_00, event_registrant.price
 
     event_registrant.event_ticket.update!(category: 'Member or Non-Member', member_price: 50_00)
-    event_registrant.update!(blank_registrant: true, member_registrant: true)
+    event_registrant.update!(blank_registrant: true)
 
-    assert_equal 50_00, event_registrant.price
+    assert_equal 200_00, event_registrant.price
   end
 
   test 'waitlist pricing' do
