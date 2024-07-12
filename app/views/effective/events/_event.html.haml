@@ -1,9 +1,11 @@
-.card.mb-4{class: "effective-events-#{event.category.to_s.parameterize}"}
-  .card-body
-    - if event.category.present?
-      = link_to(event.category, effective_events.events_path + '/' + event.category.parameterize, class: "badge badge-event mb-2 effective-events-#{event.category.parameterize}")
+.my-5{class: "effective-events-#{event.category.to_s.parameterize}"}
 
-    %h2.mt-1= link_to event.title, effective_events.event_path(event)
-    .effective-events-schedule= effective_events_event_schedule(event)
-    .effective-events-excerpt= event.excerpt.to_s
-    = link_to "View Event",  effective_events.event_path(event), class: 'btn btn-primary'
+  - if event.category.present?
+    = link_to(event.category, effective_events.events_path + '/' + event.category.parameterize, class: "badge badge-primary badge-event mb-2 effective-events-#{event.category.parameterize}")
+
+  %h2.effective-events-title= link_to event.title, effective_events.event_path(event)
+  .effective-events-schedule
+    = effective_events_event_schedule(event)
+
+  .effective-events-excerpt= event.excerpt.to_s
+

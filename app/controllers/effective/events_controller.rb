@@ -8,7 +8,12 @@ module Effective
     }
 
     def index
-      @page_title ||= 'Events'
+      if event_category.present?
+        @page_title = event_category
+        @event_category = event_category
+      else
+        @page_title ||= view_context.events_name_label
+      end
       EffectiveResources.authorize!(self, :index, Effective::Event)
 
       # Sometimes we just display a Datatable for the events

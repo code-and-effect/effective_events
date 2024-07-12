@@ -1,9 +1,25 @@
 module EffectiveEventsHelper
+
+  # Events
+  def events_name_label
+    et('effective_events.name')
+  end
+
+  # Event
+  def event_label
+    et(Effective::Event)
+  end
+
+  # Events
+  def events_label
+    ets(Effective::Event)
+  end
+
   def effective_events_event_schedule(event)
     if event.start_at.beginning_of_day == event.end_at.beginning_of_day
-      "#{event.start_at.strftime("%b %d, %Y %I:%M%P")} - #{event.end_at.strftime("%I:%M%P")}"
+      "#{event.start_at.strftime("%A, %B %d, %Y · %l:%M%P")} - #{event.end_at.strftime("%l:%M%P")}"
     else
-      "#{event.start_at.strftime("%b %d, %Y")} - #{event.end_at.strftime("%b %d, %Y")}"
+      "#{event.start_at.strftime("%A, %B %d, %Y")} - #{event.end_at.strftime("%A, %b %d, %Y")}"
     end
   end
 
