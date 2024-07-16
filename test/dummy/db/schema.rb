@@ -467,6 +467,7 @@ ActiveRecord::Schema.define(version: 101) do
     t.integer "event_id"
     t.string "title"
     t.integer "capacity"
+    t.boolean "display_capacity", default: false
     t.boolean "waitlist", default: false
     t.string "category"
     t.integer "regular_price"
