@@ -1,5 +1,5 @@
 = effective_form_with(model: [:admin, event], engine: true) do |f|
-  = f.file_field :file, label: 'Image attachment', hint: EffectiveEvents.events_hint_text
+  = f.file_field :file, label: 'Image preview', hint: EffectiveEvents.events_hint_text
 
   - if defined?(EffectiveArticleEditor)
     = f.article_editor :rich_text_excerpt, label: 'Excerpt', hint: 'Will be used for the events excerpt on index pages.'
