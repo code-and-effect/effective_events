@@ -24,12 +24,13 @@
             Anyone will be able to purchase this ticket. They can select a member from the dropdown list of all members to receive the member pricing or they can enter a first name and last name to receive the regular pricing.
 
       .col
-        = f.number_field :capacity, hint: "The number of registrations will be limited to capacity.<br>Leave blank for unlimited capacity."
+        = f.number_field :capacity, hint: "The number of registrations will be limited to capacity. Leave blank for unlimited capacity."
+        = f.check_box :display_capacity, label: "Yes, display the remaining ticket capacity to users during registration", hint: "Leave blank to hide the capacity."
 
         - if f.object.event&.delayed?
           = f.check_box :waitlist, 
             label: "Yes, add to waitlist once capacity is reached",
-            hint: "requires a delayed payment event. Once capacity is reached, new registrations will be added to the waitlist. Payment information is collected but not charged for waitlisted registrants."
+            hint: "requires a delayed payment event. Once capacity is reached, new registrations will be added to the waitlist. Payment information is collected but not charged for waitlisted registrants. To waitlist everyone and promote later, set the capacity to zero."
     .row
       .col-md-6
         - if f.object.event&.early_bird_end_at.present?
