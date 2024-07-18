@@ -1,6 +1,6 @@
 .row.mb-5.effective-events{class: "effective-events-#{event.category.to_s.parameterize}"}
-  .col-lg-4
-    - if event.file.present?
+  - if event.file.present?
+    .col-lg-4
       = link_to effective_events.event_path(event) do
         = image_tag url_for(event.file), class: "effective-events-image d-none d-lg-flex align-self-start", alt: event.title, width: "350", height: "220"
 
