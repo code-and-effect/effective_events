@@ -5,9 +5,9 @@
   = f.hide_if(:save_as_draft, true) do
     .row
       .col-md-6
-        = f.datetime_field :published_start_at, hint: 'The event will be available starting on this date and time. Leave blank to use the current date and time.'
+        = f.datetime_field :published_start_at, label: 'Published start', hint: 'The event will appear on the website after this date and time. Leave blank to publish immediately.'
       .col-md-6
-        = f.datetime_field :published_end_at, hint: 'The event will no longer be available after this date and time. Leave blank for no end date.', date_linked: false
+        = f.datetime_field :published_end_at, label: 'Published start', hint: 'The event will not appear on the website after this date and time. Leave blank for no end date.', date_linked: false
 
   = f.check_box :save_as_draft, label: "Save as a draft. It will not appear on the website and can only be accessed by admin users."
 
@@ -19,14 +19,14 @@
     .col
       - categories = EffectiveEvents.categories
       - if categories.present?
-        = f.select :category, categories, hint: 'optional category'
+        = f.select :category, categories
     .col
       - if event.class.respond_to?(:acts_as_tagged?)
         = render 'effective/tags/fields', f: f
 
   .row
-    .col-md-6= f.datetime_field :start_at, label: "Event Start"
-    .col-md-6= f.datetime_field :end_at, label: "Event End"
+    .col-md-6= f.datetime_field :start_at, label: "Event start"
+    .col-md-6= f.datetime_field :end_at, label: "Event end"
 
   %hr
 
@@ -34,10 +34,10 @@
     .col-md-6
       %h2 Registration
       %p The online registration and purchase for this event will be available between:
-      = f.datetime_field :registration_start_at, label: "Registration Start"
-      = f.datetime_field :registration_end_at, label: "Registration End"
-      = f.datetime_field :early_bird_end_at, label: "Early Bird End",
-        hint: 'Event tickets can be purchased for early bird pricing before this date. Afterwards regular pricing applies.'
+      = f.datetime_field :registration_start_at, label: "Registration start"
+      = f.datetime_field :registration_end_at, label: "Registration end"
+      = f.datetime_field :early_bird_end_at, label: "Early bird end",
+        hint: 'Event tickets are purchased at early bird pricing before this date. After this date, regular pricing applies.'
 
       = f.check_box :allow_blank_registrants, label: "Yes, allow blank ticket registrations", hint: "Allow event tickets to be purchased without adding a name. The purchaser may return to add names later."
 
