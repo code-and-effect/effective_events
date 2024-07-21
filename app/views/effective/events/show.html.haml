@@ -20,14 +20,10 @@
             = link_to 'Register', url, class: 'btn btn-lg btn-primary'
 
         .row
-          - if @event.file.present?
-            .col-lg-4
-              = image_tag url_for(@event.file), class: "effective-events-image d-none d-lg-flex align-self-start", alt: @event.title, width: "350", height: "220"
-
           .col
             %ul.list-unstyled
               %li.mb-3
-                %label Event Date
+                %label Date and Time
                 %br
                 = effective_events_event_schedule(@event)
 
@@ -56,6 +52,10 @@
               -#     %ul
               -#       - @event.event_tickets.each do |ticket|
               -#         %li= "#{ticket} (#{effective_events_ticket_price(@event, ticket)})"
+
+          - if @event.file.present?
+            .col-lg-4
+              = image_tag url_for(@event.file), class: "effective-events-image d-none d-lg-flex align-self-start", alt: @event.title, width: "350", height: "220"
 
         .py-3
 

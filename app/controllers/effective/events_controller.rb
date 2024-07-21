@@ -39,9 +39,8 @@ module Effective
       if EffectiveResources.authorized?(self, :admin, :effective_events)
         flash.now[:warning] = [
           'Hi Admin!',
-          ('You are viewing a hidden event.' if @event.draft?),
-          'Click here to',
-          ("<a href='#{effective_events.edit_admin_event_path(@event)}' class='alert-link'>edit event settings</a>.")
+          ('You are viewing a hidden event. ' if @event.draft?),
+          ("<a href='#{effective_events.edit_admin_event_path(@event)}' class='alert-link'>Edit this event</a>.")
         ].compact.join(' ')
       end
 

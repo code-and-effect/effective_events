@@ -1,20 +1,17 @@
 = render 'layout' do
   .row
-
     - if EffectiveEvents.categories.length > 1
       .d-none.d-lg-block.col-lg-3
         -#= render('effective/events/form', event_search: @event_search)
         = render('effective/events/sidebar')
 
     .col
-      %h1.event-title.mb-4= @page_title
+      %h1.effective-title.mb-4= @page_title
 
       - results = @event_search.results(page: params[:page])
       - if (@event_search.present? && results.length == 0) || @events.blank?
         .alert.alert-warning.mb-3
-          No
-          = events_label.downcase
-          were found. Please try another category or check back later!
+          There are no active #{events_label.downcase} for this category.
       - else
         = render(results) # This renders effective/events/event
 
