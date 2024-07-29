@@ -24,6 +24,7 @@ module Effective
       title                       :string
 
       capacity                    :integer
+      display_capacity            :boolean
       waitlist                    :boolean 
 
       category                    :string

@@ -42,6 +42,8 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
 
       t.string :title
       t.integer :capacity
+      t.boolean :display_capacity, default: false
+
       t.boolean :waitlist, default: false
       t.string :category
 

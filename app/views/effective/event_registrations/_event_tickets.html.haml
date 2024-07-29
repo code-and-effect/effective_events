@@ -20,7 +20,7 @@
           %tr
             %td
               = ticket.to_s
-              - if ticket.capacity.present?
+              - if ticket.capacity.present? && ticket.display_capacity?
                 %br
                 %small
                   #{ticket.capacity_available} remaining
