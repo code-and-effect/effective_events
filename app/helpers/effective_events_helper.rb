@@ -19,7 +19,7 @@ module EffectiveEventsHelper
     if event.start_at.beginning_of_day == event.end_at.beginning_of_day
       "#{event.start_at.strftime("%A, %B %d, %Y · %l:%M%P")} - #{event.end_at.strftime("%l:%M%P")}"
     else
-      "#{event.start_at.strftime("%A, %B %d, %Y")} - #{event.end_at.strftime("%A, %b %d, %Y")}"
+      "#{event.start_at.strftime("%A, %B %d, %Y")} - #{event.end_at.strftime("%A, %B %d, %Y")}"
     end
   end
 
