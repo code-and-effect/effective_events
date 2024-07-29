@@ -1,74 +1,66 @@
 = render 'layout' do
   .effective-event
     .row
+      - if EffectiveEvents.categories.length > 1
+        .col-lg-3
+          = render('effective/events/sidebar')
+
       .col
-        %h1.mb-4= @page_title
+        %h1.effective-event-title.mb-4= @page_title
 
-    .row
-      .col-md-3
-        - if @event.registerable?
-          .register.mb-4
-            - url = @event.external_registration_url.presence || effective_events.new_event_event_registration_path(@event)
-            = link_to 'Register', url, class: 'btn btn-primary btn-block'
-
-        %ul.list-unstyled
-          -# Not shown
-          -# %li.mb-3
-          -#   %label Published
-          -#   %br
-          -#   = @event.published_at.strftime("%B %e at %l:%M%P")
-          %li.mb-3
-            %label Event Date
-            %br
-            = effective_events_event_schedule(@event)
-
-          - if @event.registration_start_at.present?
-            %li.mb-3
-              %label Registration Opens
-              %br
-              = @event.registration_start_at.strftime("%b %d, %Y %I:%M%P")
-
-          - if @event.early_bird_end_at.present?
-            %li.mb-3
-              %label Early Bird Rate Ends
-              %br
-              = @event.early_bird_end_at.strftime("%b %d, %Y %I:%M%P")
-
-          - if @event.registration_end_at.present?
-            %li.mb-3
-              %label Registration Closes
-              %br
-              = @event.registration_end_at.strftime("%b %d, %Y %I:%M%P")
-
-        - if @event.event_tickets.present?
-          %ul.list-unstyled
-            - if @event.event_tickets.present?
-              %li
-                %label Tickets
-                %br
-                %ul
-                  - @event.event_tickets.each do |ticket|
-                    %li= "#{ticket} (#{effective_events_ticket_price(@event, ticket)})"
-
-        %hr
-
-        %label.mb-2 Upcoming Events
-        %ul.list-unstyled
-          %li.mb-3
-            - @upcoming_events.each do |event|
-              %h5= link_to event.title, effective_events.event_path(event), class: 'text-decoration-none'
-
-      .col-md-8
         - if @event.sold_out?
           .alert.alert-warning.mb-3 This event is sold out.
 
         - if @event.closed?
           .alert.alert-warning.mb-3 This event is no longer available.
 
-        - if @event.file.attached?
-          .d-flex.justify-content-center.mb-3
-            = image_tag(@event.file)
+        - if @event.registerable?
+          .register.mb-4
+            - url = @event.external_registration_url.presence || effective_events.new_event_event_registration_path(@event)
+            = link_to 'Register', url, class: 'btn btn-lg btn-primary'
+
+        .row
+          .col
+            %ul.list-unstyled
+              %li.mb-3
+                %label Date and Time
+                %br
+                = effective_events_event_schedule(@event)
+
+              - if @event.registration_start_at.present?
+                %li.mb-3
+                  %label Registration Opens
+                  %br
+                  = @event.registration_start_at.strftime("%A, %B %d, %Y · %l:%M%P")
+
+              - if @event.early_bird_end_at.present?
+                %li.mb-3
+                  %label Early Bird Rate Ends
+                  %br
+                  = @event.early_bird_end_at.strftime("%A, %B %d, %Y · %l:%M%P")
+
+              - if @event.registration_end_at.present?
+                %li.mb-3
+                  %label Registration Closes
+                  %br
+                  = @event.registration_end_at.strftime("%A, %B %d, %Y · %l:%M%P")
+
+              -# .col-md-auto
+              -#   - if @event.event_tickets.present?
+              -#     %label Tickets
+              -#     %br
+              -#     %ul
+              -#       - @event.event_tickets.each do |ticket|
+              -#         %li= "#{ticket} (#{effective_events_ticket_price(@event, ticket)})"
+
+          - if @event.file.present?
+            .col-lg-4
+              = image_tag url_for(@event.file), class: "effective-events-image d-none d-lg-flex align-self-start", alt: @event.title, width: "350", height: "220"
+
+        .py-3
 
         - if @event.body.present?
-          .content.my-5
+          .effective-event-body.mb-5
             = @event.body.to_s
+
+        = link_to("&larr; #{events_name_label}".html_safe, effective_events.events_path, class: "btn btn-secondary my-4")

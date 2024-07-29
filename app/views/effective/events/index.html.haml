@@ -1,25 +1,19 @@
 = render 'layout' do
-
-  -# render_datatable(@datatable)
-
-  .mb-4= render('effective/events/categories')
-  .mb-4= render('effective/events/form', event_search: @event_search)
-
-  - results = @event_search.results(page: params[:page])
-
-  - if @event_search.present? && results.length == 0
-    .alert.alert-info.mb-3 There are no results for your search. Please try again.
-
   .row
-    .col-md-3
-      = month_calendar(events: @events) do |date, events|
-        - if events.any? { |event| event.start_at.to_date == date }
-          = date.day
-        - else
-          &nbsp;
-    .col-md-9
-      -# This renders effective/events/event
-      = render(results)
+    - if EffectiveEvents.categories.length > 1
+      .d-none.d-lg-block.col-lg-3
+        -#= render('effective/events/form', event_search: @event_search)
+        = render('effective/events/sidebar')
 
-  %nav.d-flex.justify-content-center
-    = bootstrap_paginate(results, per_page: @event_search.per_page)
+    .col
+      %h1.effective-title.mb-4= @page_title
+
+      - results = @event_search.results(page: params[:page])
+      - if (@event_search.present? && results.length == 0) || @events.blank?
+        .alert.alert-warning.mb-3
+          There are no active #{events_label.downcase} for this category.
+      - else
+        = render(results) # This renders effective/events/event
+
+      %nav.d-flex.justify-content-center
+        = bootstrap_paginate(results, per_page: @event_search.per_page)

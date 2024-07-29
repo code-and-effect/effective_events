@@ -1,6 +1,0 @@
-.effective-event-categories
-  %ul.nav.nav-pills{role: 'navigation'}
-    = nav_link_to('All Events', effective_events.events_path, class: "nav-pill-effective-event effective-event-all")
-
-    - EffectiveEvents.categories.each do |category|
-      = nav_link_to(category, effective_events.events_path + '/' + category.parameterize, class: "nav-pill-effective-event effective-event-#{category.parameterize}")

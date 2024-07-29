@@ -8,7 +8,12 @@ module Effective
     }
 
     def index
-      @page_title ||= 'Events'
+      if event_category.present?
+        @page_title = event_category
+        @event_category = event_category
+      else
+        @page_title ||= view_context.events_name_label
+      end
       EffectiveResources.authorize!(self, :index, Effective::Event)
 
       # Sometimes we just display a Datatable for the events
@@ -34,9 +39,8 @@ module Effective
       if EffectiveResources.authorized?(self, :admin, :effective_events)
         flash.now[:warning] = [
           'Hi Admin!',
-          ('You are viewing a hidden event.' if @event.draft?),
-          'Click here to',
-          ("<a href='#{effective_events.edit_admin_event_path(@event)}' class='alert-link'>edit event settings</a>.")
+          ('You are viewing a hidden event. ' if @event.draft?),
+          ("<a href='#{effective_events.edit_admin_event_path(@event)}' class='alert-link'>Edit this event</a>.")
         ].compact.join(' ')
       end
 

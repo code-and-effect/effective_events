@@ -175,7 +175,7 @@ module Effective
     end
 
     def to_s
-      title.presence || 'New Event'
+      title.presence || model_name.human
     end
 
     def body

@@ -2,10 +2,10 @@
   - if f.object.term.present?
     = f.search_field :term, label: 'Term'
 
-  /= f.radios :category, EffectiveEvents.categories, buttons: true
+  = f.radios :category, EffectiveEvents.categories
 
   - f.object.order ||= Effective::EventSearch::ORDERS.first
-  = f.radios :order, Effective::EventSearch::ORDERS, buttons: true
+  = f.radios :order, Effective::EventSearch::ORDERS
 
-  = f.save('Search', class: 'btn btn-primary btn-search mr-3', name: nil)
+  = f.save('Apply Filters', class: 'btn btn-primary btn-search mr-3', name: nil)
   = link_to 'Reset filters', request.path

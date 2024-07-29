@@ -16,7 +16,7 @@ EffectiveEvents.setup do |config|
   config.categories = ['Events']
 
   # Hint text for event images attachments
-  config.events_hint_text = 'Hint text that includes required image dimensions'
+  config.events_hint_text = 'Optional. Shown on the events index and event pages. Dimensions are 220px tall and 350px wide.'
 
   # Validations for Event Registrants
   # config.event_registrant_required_fields = [:first_name, :last_name, :email, :company]

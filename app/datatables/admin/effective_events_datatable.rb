@@ -22,8 +22,8 @@ module Admin
 
       col :draft?, as: :boolean, visible: false
       col :published?, as: :boolean
-      col :published_start_at
-      col :published_end_at
+      col :published_start_at, as: "Published start"
+      col :published_end_at, as: "Published end"
 
       col :start_at, label: 'Start', visible: false
       col :end_at, label: 'End', visible: false
@@ -47,8 +47,7 @@ module Admin
       # col :event_registrants, search: :string
       # col :event_addons, search: :string
 
-      col :allow_blank_registrants
-
+      col :allow_blank_registrants, visible: false
       col :roles, visible: false
       col :authenticate_user, visible: false
 
