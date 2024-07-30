@@ -1,6 +1,7 @@
 en:
   effective_events:
     name: 'Events'
+    acronym: 'Events'
 
   activerecord:
     models:
