@@ -1,16 +1,28 @@
-- # Choose ANY member
-- klass = (f.object.user || current_user).class
-- ajax_url = (@select2_users_ajax_path || effective_memberships.member_users_membership_select2_ajax_index_path) unless Rails.env.test?
+- if current_user.try(:is_any?, :member, :admin)
+  = f.radios :member_or_non_member_choice, Effective::EventRegistrant::MEMBER_OR_NON_MEMBER_CHOICES, label: false, inline: true
+- else
+  = f.hidden_field :member_or_non_member_choice, value: 'Add a regular registration'
 
-= f.hidden_field :user_type, value: klass.name
-= f.select :user_id, klass.all, ajax_url: ajax_url, label: 'Member', hint: effective_events_event_registrant_user_hint()
+= f.show_if(:member_or_non_member_choice, 'Add a member registration', nested: true) do
+  = f.hidden_field :first_name, value: nil
+  = f.hidden_field :last_name, value: nil
+  = f.hidden_field :email, value: nil
+  = f.hidden_field :company, value: nil
 
-- # Choose RELATED ORGANIZATION member
--# = f.hidden_field :user_type, value: current_user.class.name
--# = f.select :user_id, effective_events_event_registrant_user_collection(f.object), hint: effective_events_event_registrant_user_hint()
+  - # Choose ANY member
+  - klass = (f.object.user || current_user).class
+  - ajax_url = (@select2_users_ajax_path || effective_memberships.member_users_membership_select2_ajax_index_path) unless Rails.env.test?
 
-= f.show_if(:user_id, '', nested: true) do
-  %p.text-center - or -
+  = f.hidden_field :user_type, value: klass.name
+  = f.select :user_id, klass.all, ajax_url: ajax_url, label: 'Member', hint: effective_events_event_registrant_user_hint()
+
+  - # Choose RELATED ORGANIZATION member
+  -# = f.hidden_field :user_type, value: current_user.class.name
+  -# = f.select :user_id, effective_events_event_registrant_user_collection(f.object), hint: effective_events_event_registrant_user_hint()
+
+= f.show_if(:member_or_non_member_choice, 'Add a regular registration', nested: true) do
+  = f.hidden_field :user_type, value: nil
+  = f.hidden_field :user_id, value: nil
 
   - # Choose non-member
   .row

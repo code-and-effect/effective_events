@@ -42,8 +42,12 @@ module Admin
       col :promoted, visible: false
 
       col :name do |er|
-        if er.first_name.present?
+        if er.user.present?
+          "#{link_to(er.user, "/admin/users/#{er.user.id}/edit", target: '_blank')}<br><small>#{mail_to(er.user.email)}</small>"
+        elsif er.first_name.present? && er.email.present?
           "#{er.first_name} #{er.last_name}<br><small>#{mail_to(er.email)}</small>"
+        elsif er.first_name.present?
+          "#{er.first_name} #{er.last_name}"
         elsif er.owner.present?
           er.owner.to_s + ' - GUEST'
         else
@@ -51,7 +55,8 @@ module Admin
         end
       end
       
-      col :user, label: 'Member'
+      col :user, label: 'Member', visible: false
+      col :member_or_non_member_choice, visible: false
 
       col :orders, visible: false
       col :price, as: :price
