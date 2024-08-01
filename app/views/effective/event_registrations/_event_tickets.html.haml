@@ -1,43 +1,50 @@
-.card.mb-4
-  .card-body
-    - tickets = resource.event.event_tickets.reject(&:archived?)
+- tickets = resource.event.event_tickets.reject(&:archived?)
+- member_column = tickets.any? { |ticket| ticket.member_only? || ticket.member_or_non_member? }
+- waitlist = tickets.any? { |ticket| ticket.waitlist? }
 
-    - member_column = tickets.any? { |ticket| ticket.member_only? || ticket.member_or_non_member? }
-    - waitlist = tickets.any? { |ticket| ticket.waitlist? }
+- all_member_only_tickets = tickets.all? { |ticket| ticket.member_only? }
+- any_member_only_tickets = tickets.any? { |ticket| ticket.member_only? }
 
-    %p This event has the following tickets available for purchase:
+= card do
+  %p This event has the following tickets available for purchase:
 
-    %table.table.table-sm.table-striped
-      %thead
+  %table.table.table-sm.table-striped
+    %thead
+      %tr
+        %th Ticket
+        - if member_column
+          %th Member Price
+        %th #{'Regular ' if member_column}Price
+
+    %tbody
+      - tickets.each do |ticket|
         %tr
-          %th Ticket
+          %td
+            = ticket.to_s
+            - if ticket.capacity.present? && ticket.display_capacity?
+              %br
+              %small
+                #{ticket.capacity_available} remaining
+                - if ticket.waitlist?
+                  before waitlist
+
           - if member_column
-            %th Member Price
-          %th #{'Regular ' if member_column}Price
-
-      %tbody
-        - tickets.each do |ticket|
-          %tr
             %td
-              = ticket.to_s
-              - if ticket.capacity.present? && ticket.display_capacity?
-                %br
-                %small
-                  #{ticket.capacity_available} remaining
-                  - if ticket.waitlist?
-                    before waitlist
-
-            - if member_column
-              %td
-                - if ticket.member_price.present?
-                  = price_to_currency(ticket.member_price)
-                - else
-                  = '-'
-            %td
-              - if ticket.regular_price.present?
-                = price_to_currency(ticket.regular_price)
+              - if ticket.member_price.present?
+                = price_to_currency(ticket.member_price)
               - else
                 = '-'
+          %td
+            - if ticket.regular_price.present?
+              = price_to_currency(ticket.regular_price)
+            - else
+              = '-'
 
-    - if waitlist
-      %p If the ticket capacity has been reached you will be added to the waitlist.
+  - if waitlist
+    %p If the ticket capacity has been reached you will be added to the waitlist.
+
+- unless current_user.try(:is?, :member)
+  - if all_member_only_tickets
+    .alert.alert-info.mb-4 You must be a member to purchase tickets.
+  - elsif any_member_only_tickets
+    .alert.alert-info.mb-4 You must be a member to purchase some of these tickets.

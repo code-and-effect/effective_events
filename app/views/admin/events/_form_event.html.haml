@@ -1,19 +1,8 @@
 = effective_form_with(model: [:admin, event], engine: true) do |f|
   = f.text_field :title, label: "Title"
 
-  -# acts_as_published
-  = f.hide_if(:save_as_draft, true) do
-    .row
-      .col-md-6
-        = f.datetime_field :published_start_at, hint: 'The event will be available starting on this date and time. Leave blank to publish immediately.'
-      .col-md-6
-        = f.datetime_field :published_end_at, label: 'Published start', hint: 'The event will not appear on the website after this date and time. Leave blank for no end date.', date_linked: false
-
-  = f.check_box :save_as_draft, label: "Save as a draft. It will not appear on the website and can only be accessed by admin users."
-
-  - if f.object.persisted? || f.object.errors.include?(:slug)
-    - current_url = (effective_events.event_url(f.object) rescue nil)
-    = f.text_field :slug, hint: "The slug controls this event's internet address. Be careful, changing the slug will break links that other websites may have to the old address.<br>#{('This event is currently reachable via ' + link_to(current_url.gsub(f.object.slug, '<strong>' + f.object.slug + '</strong>').html_safe, current_url)) if current_url }".html_safe
+  = acts_as_published_fields(f)
+  = acts_as_slugged_fields(f, url: (effective_events.event_url(f.object) rescue nil))
 
   .row
     .col
@@ -47,7 +36,7 @@
         = f.url_field :external_registration_url, hint: "The url for external event registration. Must start with http(s)://"
     
     .col-md-6
-      - if EffectiveOrders.try(:delayed?)
+      - if EffectiveEvents.delayed?
         %h2 Delayed Payments
         %p The online payment for this event will be charged as follows:
 
