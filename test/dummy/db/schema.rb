@@ -431,6 +431,7 @@ ActiveRecord::Schema.define(version: 101) do
     t.string "number"
     t.text "notes"
     t.boolean "blank_registrant", default: false
+    t.string "member_or_non_member_choice"
     t.boolean "waitlisted", default: false
     t.boolean "promoted", default: false
     t.datetime "registered_at"

@@ -34,7 +34,7 @@ module EffectiveEventsHelper
     ].compact.sort.uniq
 
     if prices.length > 1
-      "#{(prices.first == 0 ? '$0' : price_to_currency(prices.first))} to #{(prices.last == 0 ? '$0' : price_to_currency(prices.last))}"
+      "#{(prices.first == 0 ? '$0' : price_to_currency(prices.first))} or #{(prices.last == 0 ? '$0' : price_to_currency(prices.last))}"
     else
       (prices.first == 0 ? '$0' : price_to_currency(prices.first))
     end
@@ -97,7 +97,7 @@ module EffectiveEventsHelper
     
     return if url.blank?
 
-    "Can't find the person you need? <a href='#{url}' target='blank'>Click here</a> to add them to your organization."
+    "Can't find the member you need? <a href='#{url}' target='blank'>Click here</a> to add them to your #{EffectiveResources.etd(EffectiveMemberships.Organization)}."
   end
 
 end

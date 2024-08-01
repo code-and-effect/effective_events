@@ -22,10 +22,8 @@
           = render('effective/event_registrants/fields_regular', f: fr)
         - elsif ticket.member_only?
           = render('effective/event_registrants/fields_member_only', f: fr)
-        - elsif ticket.member_or_non_member? && registrant.member_registrant?
-          = render('effective/event_registrants/fields_member_only', f: fr)
-        - elsif ticket.member_or_non_member? && !registrant.member_registrant?
-          = render('effective/event_registrants/fields_regular', f: fr)
+        - elsif ticket.member_or_non_member?
+          = render('effective/event_registrants/fields_member_or_non_member', f: fr)
         - else
           - raise("Unexpected ticket category: #{ticket.category || 'nil'}")
 

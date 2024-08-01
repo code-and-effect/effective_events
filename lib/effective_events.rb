@@ -24,12 +24,17 @@ module EffectiveEvents
     mailer&.constantize || Effective::EventsMailer
   end
 
-  def categories
+  def self.categories
     Array(config[:categories]) - [nil, false, '']
   end
 
-  def event_registrant_required_fields
+  def self.event_registrant_required_fields
     (Array(config[:event_registrant_required_fields]) - [nil, false, '']).map(&:to_sym)
+  end
+
+  # If we can create delayed payment events at all
+  def self.delayed?
+    !!EffectiveOrders.try(:delayed?) 
   end
 
 end

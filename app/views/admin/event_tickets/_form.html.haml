@@ -27,17 +27,25 @@
         = f.number_field :capacity, hint: "The number of registrations will be limited to capacity. Leave blank for unlimited capacity."
         = f.check_box :display_capacity, label: "Yes, display the remaining ticket capacity to users during registration", hint: "Leave blank to hide the capacity."
 
-        - if f.object.event&.delayed?
+        - if EffectiveEvents.delayed?
+          - event_delayed = f.object.event&.delayed?
+          - f.object.waitlist = false if !event_delayed
+
           = f.check_box :waitlist, 
             label: "Yes, add to waitlist once capacity is reached",
-            hint: "requires a delayed payment event. Once capacity is reached, new registrations will be added to the waitlist. Payment information is collected but not charged for waitlisted registrants. To waitlist everyone and promote later, set the capacity to zero."
+            hint: "requires a event with delayed payment. Once capacity is reached, new registrations will be added to the waitlist. Payment information is collected but not charged for waitlisted registrants. To waitlist everyone and promote later, set the capacity to zero.",
+            disabled: !event_delayed
     .row
       .col-md-6
-        - if f.object.event&.early_bird_end_at.present?
-          = f.price_field :early_bird_price, hint: 'A price of $0 will allow a checkout for free. Leave blank for no early bird price.'
+        = f.price_field :early_bird_price, 
+          hint: 'requires an event with early bird date. A price of $0 will allow a checkout for free. Leave blank for no early bird price.',
+          disabled: !f.object.event&.early_bird_end_at.present?
 
         = f.show_if_any(:category, ['Regular', 'Member or Non-Member']) do
           = f.price_field :regular_price, hint: 'A price of $0 will allow a checkout for free.'
+
+        = f.show_if_any(:category, ['Member Only']) do
+          = f.static_field :regular_price, value: 'None'
 
         = f.show_if_any(:category, ['Member Only', 'Member or Non-Member']) do
           = f.price_field :member_price, hint: 'A price of $0 will allow a checkout for free when selecting a member.'
@@ -47,10 +55,11 @@
         .col-md-6= f.text_field :qb_item_name, label: 'QuickBooks item name'
 
     = f.check_box :tax_exempt
-    = f.check_box :archived, label: 'Archive this ticket. It will be unavailable for purchase.'
+    = f.check_box :archived, label: 'Archive this ticket. While archived, it cannot be purchased by users but registrants can only be added by an admin.'
 
   = card('Questions') do
-    %p Add upto 3 questions
+    %p
+      %small.text-muted Please add up to 3 questions to ask during registration. Each ticket will have their own unique answers. Leave a question blank to skip.
 
     = f.text_field :question1, label: 'Question 1'
     = f.text_field :question2, label: 'Question 2'

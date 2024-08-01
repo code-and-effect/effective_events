@@ -344,6 +344,10 @@ module EffectiveEventsEventRegistration
     end
 
     save!
+
+    update_submit_fees_and_order! if submit_order.present? && !submit_order.purchased?
+
+    true
   end
 
   private
