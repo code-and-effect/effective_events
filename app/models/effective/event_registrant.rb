@@ -2,6 +2,8 @@
 
 module Effective
   class EventRegistrant < ActiveRecord::Base
+    include ActionView::Helpers::TagHelper
+
     self.table_name = (EffectiveEvents.event_registrants_table_name || :event_registrants).to_s
 
     PERMITTED_BLANK_REGISTRANT_CHANGES = ["first_name", "last_name", "email", "company", "user_id", "user_type", "blank_registrant", "member_or_non_member_choice", "response1", "response2", "response3"]
@@ -140,12 +142,31 @@ module Effective
       end
     end
 
+    def purchasable_name
+      details = [
+        (content_tag(:span, 'Member', class: 'badge badge-warning') if member_ticket?),
+        (content_tag(:span, 'Waitlist', class: 'badge badge-warning') if waitlisted_not_promoted?),
+        (content_tag(:span, 'Archived', class: 'badge badge-warning') if event_ticket&.archived?)
+      ].compact.join(' ')
+
+      ["#{event_ticket} - #{name}", details.presence].compact.join('<br>').html_safe
+    end
+
     def last_first_name
       first_name.present? ? "#{last_name}, #{first_name}" : "GUEST"
     end
 
     def member_present?
       user&.is?(:member)
+    end
+
+    def member_ticket?
+      return false if event_ticket.blank?
+
+      return true if event_ticket.member_only?
+      return true if event_ticket.member_or_non_member? && member_present?
+
+      false
     end
 
     def member_or_non_member_choice

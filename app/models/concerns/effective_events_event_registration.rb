@@ -164,7 +164,10 @@ module EffectiveEventsEventRegistration
 
     def required_steps
       return self.class.test_required_steps if Rails.env.test? && self.class.test_required_steps.present?
-      event&.event_products.unarchived.present? ? wizard_step_keys : (wizard_step_keys - [:addons])
+
+      with_addons = event.event_products.any? { |event_product| event_product.archived? == false }
+
+      with_addons ? wizard_step_keys : (wizard_step_keys - [:addons])
     end
 
     def find_or_build_submit_fees

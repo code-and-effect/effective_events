@@ -18,11 +18,13 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
     col :id, visible: false
 
     col :event_ticket, search: :string, label: 'Ticket' do |er|
-      [
-        er.event_ticket.to_s,
+      details = [
+        (content_tag(:span, 'Member', class: 'badge badge-warning') if er.member_ticket?),
         (content_tag(:span, 'Waitlist', class: 'badge badge-warning') if er.waitlisted_not_promoted?),
         (content_tag(:span, 'Archived', class: 'badge badge-warning') if er.event_ticket&.archived?)
-      ].compact.join('<br>').html_safe
+      ].compact.join(' ')
+
+      [er.event_ticket.to_s, details.presence].compact.join('<br>').html_safe
     end
 
     col :user, label: 'Member', visible: false
