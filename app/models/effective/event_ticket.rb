@@ -75,29 +75,40 @@ module Effective
     end
 
     # This is supposed to be an indempotent big update the world thing
-    def update_waitlist!
-      return false unless waitlist?
+    # def update_waitlist!
+    #   return false unless waitlist?
 
-      changed_event_registrants = registered_event_registrants.each_with_index.map do |event_registrant, index|
-        next if event_registrant.purchased?
+    #   changed_event_registrants = registered_event_registrants.each_with_index.map do |event_registrant, index|
+    #     next if event_registrant.purchased?
 
-        waitlisted_was = event_registrant.waitlisted?
-        waitlisted = (waitlist? && index >= capacity)
-        next if waitlisted == waitlisted_was
+    #     waitlisted_was = event_registrant.waitlisted?
+    #     waitlisted = (waitlist? && index >= capacity)
+    #     next if waitlisted == waitlisted_was
 
-        event_registrant.update!(waitlisted: waitlisted) # Updates price
-        event_registrant
-      end.compact
+    #     event_registrant.update!(waitlisted: waitlisted) # Updates price
+    #     event_registrant
+    #   end.compact
 
-      orders = changed_event_registrants.flat_map { |event_registrant| event_registrant.deferred_orders }.compact.uniq
-      orders.each { |order| order.update_purchasable_attributes! }
+    #   orders = changed_event_registrants.flat_map { |event_registrant| event_registrant.deferred_orders }.compact.uniq
+    #   orders.each { |order| order.update_purchasable_attributes! }
 
-      true
+    #   true
+    # end
+
+    def capacity_selectable
+      return 100 if capacity.blank?
+      return 100 if waitlist?
+
+      capacity_available
     end
 
     def capacity_available
       return nil if capacity.blank?
-      [(capacity - registered_event_registrants_count), 0].max
+      [(capacity - registered_or_selected_event_registrants_count), 0].max
+    end
+
+    def registered_or_selected_event_registrants_count
+      event_registrants.count { |er| er.registered? || er.selected_not_expired? }
     end
 
     def registered_event_registrants_count

@@ -1,0 +1,32 @@
+- # Displayed on the details step
+- event = form.object.event
+
+- form.object.event_registrants.each_with_index do |event_registrant, index|
+  = card("Ticket ##{index+1}") do
+    - event_ticket = event_registrant.event_ticket
+
+    %p
+      = event_ticket
+      = ' - '
+      = price_to_currency(event_registrant.event_ticket_price)
+      = event_registrant.details
+
+    = form.fields_for :event_registrants, event_registrant do |fr|
+      - if event.allow_blank_registrants? && (fr.object.user.blank? || fr.object.blank_registrant?)
+        = fr.check_box :blank_registrant, label: "I will return and add this ticket's information later"
+      - else
+        = fr.hidden_field :blank_registrant, value: false
+
+      = fr.show_if(:blank_registrant, false) do
+        = render('effective/event_registrants/fields_user', f: fr, ticket: event_ticket)
+        = render('effective/event_registrants/fields_questions', f: fr, ticket: event_ticket)
+
+      -# - if event_ticket.regular?
+      -#   = render('effective/event_registrants/fields_regular', f: fr)
+      -# - elsif event_ticket.member_only?
+      -#   = render('effective/event_registrants/fields_member_only', f: fr)
+      -# - elsif event_ticket.member_or_non_member?
+      -#   = render('effective/event_registrants/fields_member_or_non_member', f: fr)
+      -# - else
+      -#   - raise("Unexpected ticket category: #{event_registrant.event_ticket.category || 'nil'}")
+

@@ -1,0 +1,17 @@
+.event-registrant-user-fields
+  - # Choose ANY member
+  - klass = (f.object.user || current_user).class
+  - ajax_url = (@select2_ajax_path || effective_events.users_event_registrants_select2_ajax_index_path) unless Rails.env.test?
+
+  = f.hidden_field :user_type, value: klass.name
+  = f.select :user_id, klass.all, ajax_url: ajax_url, 
+    label: "Quick Add", placeholder: "Search by name, email, or company", hint: "Can't find someone? Add their details below.",
+    input_js: { minimumInputLength: 1 }, 'data-event-registrant-user-search': true
+
+  .row
+    .col-md= f.text_field :first_name
+    .col-md= f.text_field :last_name
+
+  .row
+    .col-md= f.email_field :email
+    .col-md= f.text_field :company

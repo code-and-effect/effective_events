@@ -91,6 +91,7 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.boolean :waitlisted, default: false
       t.boolean :promoted, default: false
 
+      t.datetime :selected_at
       t.datetime :registered_at
 
       t.text :response1
@@ -167,6 +168,17 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       # Dates
       t.datetime :submitted_at
       t.datetime :completed_at
+
+      t.datetime :updated_at
+      t.datetime :created_at
+    end
+
+    create_table :event_ticket_selections do |t|
+      t.integer :event_registration_id
+      t.string :event_registration_type
+
+      t.string :event_ticket_id
+      t.integer :quantity
 
       t.datetime :updated_at
       t.datetime :created_at

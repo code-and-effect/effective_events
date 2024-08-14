@@ -97,7 +97,8 @@ module EffectiveEventsHelper
     
     return if url.blank?
 
-    "Can't find the member you need? <a href='#{url}' target='blank'>Click here</a> to add them to your #{EffectiveResources.etd(EffectiveMemberships.Organization)}."
+    #"Can't find the member you need? <a href='#{url}' target='blank'>Click here</a> to add them to your #{EffectiveResources.etd(EffectiveMemberships.Organization)}."
+    "Can't find the member you need? Please add them below"
   end
 
 end

@@ -25,5 +25,7 @@ module Effective
       return redirect_to('/dashboard')
     end
 
+    # TODO: Add better permitted params
+
   end
 end

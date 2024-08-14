@@ -8,6 +8,7 @@ module Effective
 
     PERMITTED_BLANK_REGISTRANT_CHANGES = ["first_name", "last_name", "email", "company", "user_id", "user_type", "blank_registrant", "member_or_non_member_choice", "response1", "response2", "response3"]
     MEMBER_OR_NON_MEMBER_CHOICES = ['Add a regular registration', 'Add a member registration']
+    SELECTION_WINDOW = 15.minutes
 
     acts_as_purchasable
     acts_as_archived
@@ -27,6 +28,7 @@ module Effective
 
     # Required for member-only tickets. The user attending.
     belongs_to :user, polymorphic: true, optional: true
+    accepts_nested_attributes_for :user
 
     effective_resource do
       first_name            :string
@@ -39,6 +41,8 @@ module Effective
 
       waitlisted            :boolean
       promoted              :boolean      # An admin marked this registrant as promoted from the waitlist
+
+      selected_at           :datetime     # When the event registration was selected by a user on the tickets! step
       registered_at         :datetime     # When the order is deferred or purchased
 
       # Question Responses
@@ -90,31 +94,31 @@ module Effective
     validates :email, email: true
 
     # Member Only Ticket
-    with_options(if: -> { event_ticket&.member_only? && present_registrant? }) do
-      validates :user_id, presence: { message: 'Please select a member' }
-    end
+    # with_options(if: -> { event_ticket&.member_only? && present_registrant? }) do
+    #   validates :user_id, presence: { message: 'Please select a member' }
+    # end
 
-    # Regular Ticket
-    with_options(if: -> { event_ticket&.regular? && present_registrant? }) do
-      validates :first_name, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:first_name) }
-      validates :last_name, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:last_name) }
-      validates :email, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:email) }
-      validates :company, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:company) }
-    end
+    # # Regular Ticket
+    # with_options(if: -> { event_ticket&.regular? && present_registrant? }) do
+    #   validates :first_name, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:first_name) }
+    #   validates :last_name, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:last_name) }
+    #   validates :email, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:email) }
+    #   validates :company, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:company) }
+    # end
 
-    # Member or Non-Member Ticket
-    validates :member_or_non_member_choice, presence: true, if: -> { event_ticket&.member_or_non_member? && present_registrant? }
+    # # Member or Non-Member Ticket
+    # validates :member_or_non_member_choice, presence: true, if: -> { event_ticket&.member_or_non_member? && present_registrant? }
 
-    with_options(if: -> { event_ticket&.member_or_non_member? && present_registrant? && member_or_non_member_choice == 'Add a regular registration' }) do
-      validates :first_name, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:first_name) }
-      validates :last_name, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:last_name) }
-      validates :email, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:email) }
-      validates :company, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:company) }
-    end
+    # with_options(if: -> { event_ticket&.member_or_non_member? && present_registrant? && member_or_non_member_choice == 'Add a regular registration' }) do
+    #   validates :first_name, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:first_name) }
+    #   validates :last_name, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:last_name) }
+    #   validates :email, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:email) }
+    #   validates :company, presence: true, unless: -> { EffectiveEvents.event_registrant_required_fields.exclude?(:company) }
+    # end
 
-    with_options(if: -> { event_ticket&.member_or_non_member? && present_registrant? && member_or_non_member_choice == 'Add a member registration' }) do
-      validates :user_id, presence: { message: 'Please select a member' }
-    end
+    # with_options(if: -> { event_ticket&.member_or_non_member? && present_registrant? && member_or_non_member_choice == 'Add a member registration' }) do
+    #   validates :user_id, presence: { message: 'Please select a member' }
+    # end
 
     after_defer do
       registered! if event_registration.blank? && !registered?
@@ -142,13 +146,15 @@ module Effective
       end
     end
 
-    def purchasable_name
-      details = [
+    def details
+      [
         (content_tag(:span, 'Member', class: 'badge badge-warning') if member_ticket?),
         (content_tag(:span, 'Waitlist', class: 'badge badge-warning') if waitlisted_not_promoted?),
         (content_tag(:span, 'Archived', class: 'badge badge-warning') if event_ticket&.archived?)
-      ].compact.join(' ')
+      ].compact.join(' ').html_safe
+    end
 
+    def purchasable_name
       ["#{event_ticket} - #{name}", details.presence].compact.join('<br>').html_safe
     end
 
@@ -189,8 +195,16 @@ module Effective
       event_ticket&.qb_item_name
     end
 
+    def selected?
+      selected_at.present?
+    end
+
     def registered?
       registered_at.present?
+    end
+
+    def selected_not_expired?
+      selected_at.present? && (selected_at + SELECTION_WINDOW > Time.zone.now)
     end
 
     # Called by an event_registration after_defer and after_purchase

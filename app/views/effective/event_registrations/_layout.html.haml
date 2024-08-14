@@ -1,3 +1,8 @@
 .row
-  .col-lg-3.mb-3= render_wizard_sidebar(resource)
+  .col-lg-3.mb-3
+    .mb-3= render_wizard_sidebar(resource)
+
+    = card do
+      = effective_countdown(Time.zone.now + 15.minutes)
+
   .col-lg-9.mb-3= yield

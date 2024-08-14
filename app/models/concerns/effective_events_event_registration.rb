@@ -33,6 +33,7 @@ module EffectiveEventsEventRegistration
     acts_as_wizard(
       start: 'Start',
       tickets: 'Tickets',
+      details: 'Ticket Details',
       addons: 'Add-ons',
       summary: 'Review',
       billing: 'Billing Address',
@@ -51,6 +52,9 @@ module EffectiveEventsEventRegistration
 
     # Effective Namespace
     belongs_to :event, class_name: 'Effective::Event'
+
+    has_many :event_ticket_selections, -> { order(:id) }, class_name: 'Effective::EventTicketSelection', inverse_of: :event_registration, dependent: :destroy
+    accepts_nested_attributes_for :event_ticket_selections, reject_if: :all_blank, allow_destroy: true
 
     has_many :event_registrants, -> { order(:id) }, class_name: 'Effective::EventRegistrant', inverse_of: :event_registration, dependent: :destroy
     accepts_nested_attributes_for :event_registrants, reject_if: :all_blank, allow_destroy: true
@@ -86,6 +90,7 @@ module EffectiveEventsEventRegistration
     scope :deep, -> { 
       includes(:owner)
       .includes(event: [:rich_texts, event_products: :purchased_event_addons, event_tickets: :purchased_event_registrants])
+      .includes(event_ticket_selections: [:event_ticket])
       .includes(event_registrants: [event_ticket: :purchased_event_registrants])
       .includes(event_addons: [event_product: :purchased_event_addons])
     }
@@ -106,20 +111,23 @@ module EffectiveEventsEventRegistration
 
     # All Steps
     validate(if: -> { event.present? }) do
-      self.errors.add(:base, "cannot register for an external registration event") if event.external_registration?
+      errors.add(:base, "cannot register for an external registration event") if event.external_registration?
     end
 
     # Tickets Step
     validate(if: -> { current_step == :tickets }) do
-      self.errors.add(:event_registrants, "can't be blank") unless present_event_registrants.present?
-    end
-
-    # Validate all tickets are available for registration
-    validate(if: -> { current_step == :tickets }) do
-      unavailable_event_tickets.each do |event_ticket|
-        errors.add(:base, "The requested number of #{event_ticket} tickets are not available")
+      if event_ticket_selections.all? { |selection| selection.quantity.to_i == 0 }
+        errors.add(:event_ticket_selections, "Please select one or more tickets")
+        event_ticket_selections.each { |ets| ets.errors.add(:quantity, "can't be blank") }
       end
     end
+
+    # # Validate all tickets are available for registration
+    # validate(if: -> { current_step == :tickets }) do
+    #   unavailable_event_tickets.each do |event_ticket|
+    #     errors.add(:base, "The requested number of #{event_ticket} tickets are not available")
+    #   end
+    # end
 
     # Validate all products are available for registration
     validate(if: -> { current_step == :addons }) do
@@ -131,14 +139,14 @@ module EffectiveEventsEventRegistration
     # If we're submitted. Try to move to completed.
     before_save(if: -> { submitted? }) { try_completed! }
 
-    def around_destroy_deferred_event_registration
-      raise('expecting a deferred submit order') unless submit_order&.deferred?
+    # def around_destroy_deferred_event_registration
+    #   raise('expecting a deferred submit order') unless submit_order&.deferred?
 
-      waitlisted_event_tickets_was = event_tickets().select(&:waitlist?)
-      yield
-      waitlisted_event_tickets_was.each { |event_ticket| event_ticket.update_waitlist! }
-      true
-    end
+    #   waitlisted_event_tickets_was = event_tickets().select(&:waitlist?)
+    #   yield
+    #   waitlisted_event_tickets_was.each { |event_ticket| event_ticket.update_waitlist! }
+    #   true
+    # end
 
     def delayed_payment_date_upcoming?
       event&.delayed_payment_date_upcoming?
@@ -195,9 +203,9 @@ module EffectiveEventsEventRegistration
       true
     end
 
-    def after_submit_deferred!
-      update_deferred_event_registration!
-    end
+    # def after_submit_deferred!
+    #   update_deferred_event_registration!
+    # end
 
     def after_submit_purchased!
       event_registrants.each { |event_registrant| event_registrant.registered! }
@@ -220,11 +228,60 @@ module EffectiveEventsEventRegistration
     completed?
   end
 
-  def tickets!
-    after_commit do
-      update_submit_fees_and_order! if submit_order.present?
-      update_deferred_event_registration! if submit_order&.deferred?
+  def selected_at
+    event_registrants.map(&:selected_at).compact.min
+  end
+
+  # This considers the event_ticket_selection and builds the appropriate event_registrants
+  def update_event_registrants
+    event_ticket_selections.each do |event_ticket_selection|
+      event_ticket = event_ticket_selection.event_ticket
+      quantity = event_ticket_selection.quantity.to_i
+
+      # All the registrants for this event ticket
+      registrants = event_registrants.select { |er| er.event_ticket == event_ticket }
+
+      # Delete over quantity
+      if (diff = registrants.length - quantity) > 0
+        registrants.last(diff).each { |er| er.mark_for_destruction }
+      end
+
+      # Create upto quantity
+      if (diff = quantity - registrants.length) > 0
+        diff.times { build_event_registrant(event_ticket: event_ticket) }
+      end
     end
+
+    event_registrants
+  end
+
+  # Looks at any unselected event registrants and assigns a waitlist value
+  def waitlist_event_registrants
+    present_event_registrants.select { |er| er.waitlisted.nil? }.each do |event_registrant|
+      waitlist = 'TODO'
+      event_registrant.assign_attributes(waitlisted: waitlisted)
+    end
+  end
+
+  def select_event_registrants
+    now = Time.zone.now
+
+    present_event_registrants.each do |event_registrant|
+      event_registrant.assign_attributes(selected_at: now)
+    end
+
+    event_registrants
+  end
+
+  def tickets!
+    update_event_registrants
+    waitlist_event_registrants
+    select_event_registrants
+
+    # after_commit do
+    #   update_submit_fees_and_order! if submit_order.present?
+    #   update_deferred_event_registration! if submit_order&.deferred?
+    # end
 
     save!
   end
@@ -255,11 +312,15 @@ module EffectiveEventsEventRegistration
     true
   end
 
-  # Find or build
-  def event_registrant(event_ticket:, first_name:, last_name:, email:)
-    registrant = event_registrants.find { |er| er.event_ticket == event_ticket && er.first_name == first_name && er.last_name == last_name && er.email == email }
-    registrant || event_registrants.build(event: event, event_ticket: event_ticket, owner: owner, first_name: first_name, last_name: last_name, email: email)
+  def build_event_registrant(event_ticket:)
+    event_registrants.build(event: event, event_ticket: event_ticket, owner: owner)
   end
+
+  # Find or build
+  # def event_registrant(event_ticket:, first_name:, last_name:, email:)
+  #   registrant = event_registrants.find { |er| er.event_ticket == event_ticket && er.first_name == first_name && er.last_name == last_name && er.email == email }
+  #   registrant || event_registrants.build(event: event, event_ticket: event_ticket, owner: owner, first_name: first_name, last_name: last_name, email: email)
+  # end
 
   # Find or build. But it's not gonna work with more than 1. This is for testing only really.
   def event_addon(event_product:, first_name:, last_name:, email:)
@@ -267,16 +328,27 @@ module EffectiveEventsEventRegistration
     addon || event_addons.build(event: event, event_product: event_product, owner: owner, first_name: first_name, last_name: last_name, email: email)
   end
 
-  # This builds the default event registrants used by the wizard form
-  def build_event_registrants
-    if event_registrants.blank?
-      raise('expected owner and event to be present') unless owner && event
-
-      event_registrants.build()
-    end
-
-    event_registrants
+  # Find or build
+  def event_ticket_selection(event_ticket:)
+    event_ticket_selections.find { |ets| ets.event_ticket == event_ticket } 
   end
+
+  # Find or build
+  def build_event_ticket_selection(event_ticket:)
+    selection = event_ticket_selection(event_ticket: event_ticket) 
+    selection || event_ticket_selections.build(event_ticket: event_ticket, quantity: 0)
+  end
+
+  # This builds the default event registrants used by the wizard form
+  # def build_event_registrants
+  #   if event_registrants.blank?
+  #     raise('expected owner and event to be present') unless owner && event
+
+  #     event_registrants.build()
+  #   end
+
+  #   event_registrants
+  # end
 
   # This builds the default event addons used by the wizard form
   def build_event_addons
@@ -355,17 +427,17 @@ module EffectiveEventsEventRegistration
 
   private
 
-  def update_deferred_event_registration!
-    raise('expected a deferred submit order') unless submit_order&.deferred?
+  # def update_deferred_event_registration!
+  #   raise('expected a deferred submit order') unless submit_order&.deferred?
 
-    # Mark registered anyone who hasn't been registered yet. They are now!
-    event_registrants.reject(&:registered?).each { |event_registrant| event_registrant.registered! }
+  #   # Mark registered anyone who hasn't been registered yet. They are now!
+  #   event_registrants.reject(&:registered?).each { |event_registrant| event_registrant.registered! }
 
-    # Update the waitlist for any event tickets
-    event_tickets.select(&:waitlist?).each { |event_ticket| event_ticket.update_waitlist! }
+  #   # Update the waitlist for any event tickets
+  #   event_tickets.select(&:waitlist?).each { |event_ticket| event_ticket.update_waitlist! }
 
-    true
-  end
+  #   true
+  # end
 
   def present_event_registrants
     event_registrants.reject(&:marked_for_destruction?).reject(&:archived?)
