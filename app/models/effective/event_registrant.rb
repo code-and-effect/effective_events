@@ -8,7 +8,6 @@ module Effective
 
     PERMITTED_BLANK_REGISTRANT_CHANGES = ["first_name", "last_name", "email", "company", "user_id", "user_type", "blank_registrant", "member_or_non_member_choice", "response1", "response2", "response3"]
     MEMBER_OR_NON_MEMBER_CHOICES = ['Add a regular registration', 'Add a member registration']
-    SELECTION_WINDOW = 15.minutes
 
     acts_as_purchasable
     acts_as_archived
@@ -204,7 +203,9 @@ module Effective
     end
 
     def selected_not_expired?
-      selected_at.present? && (selected_at + SELECTION_WINDOW > Time.zone.now)
+      return false unless EffectiveEvents.EventRegistration.selection_window.present?
+
+      selected_at.present? && (selected_at + EffectiveEvents.EventRegistration.selection_window > Time.zone.now)
     end
 
     # Called by an event_registration after_defer and after_purchase

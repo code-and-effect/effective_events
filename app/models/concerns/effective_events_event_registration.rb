@@ -15,6 +15,11 @@ module EffectiveEventsEventRegistration
 
   module ClassMethods
     def effective_events_event_registration?; true; end
+
+    def selection_window
+      20.minutes
+    end
+
   end
 
   included do
@@ -213,6 +218,7 @@ module EffectiveEventsEventRegistration
       notifications = event.event_notifications.select(&:registrant_purchased?)
       notifications.each { |notification| notification.notify!(event_registrants: event_registrants) }
     end
+
   end
 
   # Instance Methods
@@ -228,8 +234,20 @@ module EffectiveEventsEventRegistration
     completed?
   end
 
+  def display_countdown?
+    return false unless draft?
+    return false unless selected_at.present?
+    return false unless current_step.present?
+
+    [:start, :tickets, :submitted, :complete].exclude?(current_step)
+  end
+
   def selected_at
-    event_registrants.map(&:selected_at).compact.min
+    event_registrants.map(&:selected_at).compact.max
+  end
+
+  def selected_expires_at
+    selected_at + EffectiveEvents.EventRegistration.selection_window
   end
 
   # This considers the event_ticket_selection and builds the appropriate event_registrants
@@ -275,8 +293,8 @@ module EffectiveEventsEventRegistration
 
   def tickets!
     update_event_registrants
-    waitlist_event_registrants
     select_event_registrants
+    waitlist_event_registrants
 
     # after_commit do
     #   update_submit_fees_and_order! if submit_order.present?
