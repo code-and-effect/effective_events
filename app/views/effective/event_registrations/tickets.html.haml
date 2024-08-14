@@ -1,8 +1,8 @@
 = render 'layout' do
 
-  = render 'effective/event_registrations/event_tickets', resource: resource
-
   = render 'effective/event_registrations/content', resource: resource
+
+  = render 'effective/event_registrations/event_tickets', resource: resource
 
   = effective_form_with(model: resource, url: wizard_path(step), method: :put) do |f|
     = f.hidden_field :id
