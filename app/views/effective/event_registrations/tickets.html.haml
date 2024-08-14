@@ -1,8 +1,17 @@
 = render 'layout' do
 
+  - all_steps_content = resource.event&.rich_text_all_steps_content
+  - step_content = resource.event&.send("rich_text_#{step}_content")
+
+  - if all_steps_content.present?
+    .card.mb-4
+      .card-body= all_steps_content.to_s
+
   = render 'effective/event_registrations/event_tickets', resource: resource
 
-  = render 'effective/event_registrations/content', resource: resource
+  - if step_content.present?
+    .card.mb-4
+      .card-body= step_content.to_s
 
   = effective_form_with(model: resource, url: wizard_path(step), method: :put) do |f|
     = f.hidden_field :id

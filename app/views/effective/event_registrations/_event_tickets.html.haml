@@ -6,6 +6,11 @@
 - any_member_only_tickets = tickets.any? { |ticket| ticket.member_only? }
 
 = card do
+  - if resource.event.early_bird?
+    .alert.alert-warning.mb-3
+      Early Bird rates end on
+      = resource.event.early_bird_end_at.strftime("%A, %B %d, %Y at %l:%M%P.")
+
   %table.table.table-sm.table-striped
     %thead
       %tr
@@ -30,7 +35,7 @@
                 %li
                   - if ticket.regular_price.present? && ticket.regular_price != 0
                     %div
-                      %s.mr-2.text-muted
+                      %s.text-muted
                         = price_to_currency(ticket.regular_price)
 
                   - if ticket.member_price.present? && ticket.member_price != 0
