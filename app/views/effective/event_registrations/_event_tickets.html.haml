@@ -6,15 +6,11 @@
 - any_member_only_tickets = tickets.any? { |ticket| ticket.member_only? }
 
 = card do
-  %p This event has the following tickets available for purchase:
-
   %table.table.table-sm.table-striped
     %thead
       %tr
         %th Ticket
-        - if member_column
-          %th Member Price
-        %th #{'Regular ' if member_column}Price
+        %th Price
 
     %tbody
       - tickets.each do |ticket|
@@ -28,17 +24,34 @@
                 - if ticket.waitlist?
                   before waitlist
 
-          - if member_column
-            %td
-              - if ticket.member_price.present?
-                = price_to_currency(ticket.member_price)
-              - else
-                = '-'
           %td
-            - if ticket.regular_price.present?
-              = price_to_currency(ticket.regular_price)
-            - else
-              = '-'
+            %ul.list-unstyled.mb-0
+              - if resource.event.early_bird? && ticket.early_bird_price.present? && ticket.early_bird_price != 0 && ticket.early_bird_price != ticket.member_price && ticket.early_bird_price != ticket.regular_price
+                %li
+                  - if ticket.regular_price.present? && ticket.regular_price != 0
+                    %div
+                      %s.mr-2.text-muted
+                        = price_to_currency(ticket.regular_price)
+
+                  - if ticket.member_price.present? && ticket.member_price != 0
+                    %div
+                      %s.text-muted
+                        = price_to_currency(ticket.member_price)
+                      .badge.badge-secondary.mr-2 Members
+
+                  %div
+                    = price_to_currency(ticket.early_bird_price)
+                    .badge.badge-warning Early Bird
+
+              - else
+                - if ticket.regular_price.present?
+                  %li
+                    = price_to_currency(ticket.regular_price)
+
+                - if ticket.member_price.present?
+                  %li
+                    = price_to_currency(ticket.member_price)
+                    .badge.badge-secondary Members
 
   - if waitlist
     %p If the ticket capacity has been reached you will be added to the waitlist.
