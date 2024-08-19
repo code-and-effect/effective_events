@@ -204,7 +204,6 @@ module Effective
 
     def selected_not_expired?
       return false unless EffectiveEvents.EventRegistration.selection_window.present?
-
       selected_at.present? && (selected_at + EffectiveEvents.EventRegistration.selection_window > Time.zone.now)
     end
 

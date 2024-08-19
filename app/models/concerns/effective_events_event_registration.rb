@@ -92,7 +92,7 @@ module EffectiveEventsEventRegistration
       timestamps
     end
 
-    scope :deep, -> { 
+    scope :deep, -> {
       includes(:owner)
       .includes(event: [:rich_texts, event_products: :purchased_event_addons, event_tickets: :purchased_event_registrants])
       .includes(event_ticket_selections: [:event_ticket])
@@ -127,12 +127,12 @@ module EffectiveEventsEventRegistration
       end
     end
 
-    # # Validate all tickets are available for registration
-    # validate(if: -> { current_step == :tickets }) do
-    #   unavailable_event_tickets.each do |event_ticket|
-    #     errors.add(:base, "The requested number of #{event_ticket} tickets are not available")
-    #   end
-    # end
+    # Validate all tickets are available for registration
+    validate(if: -> { current_step == :tickets }) do
+      unavailable_event_tickets.each do |event_ticket|
+        errors.add(:base, "The requested number of #{event_ticket} tickets are not available")
+      end
+    end
 
     # Validate all products are available for registration
     validate(if: -> { current_step == :addons }) do
@@ -275,7 +275,7 @@ module EffectiveEventsEventRegistration
 
   # Looks at any unselected event registrants and assigns a waitlist value
   def waitlist_event_registrants
-    present_event_registrants.select { |er| er.waitlisted.nil? }.each do |event_registrant|
+    present_event_registrants.select { |er| er.selected_at.blank? }.each do |event_registrant|
       waitlist = 'TODO'
       event_registrant.assign_attributes(waitlisted: waitlisted)
     end
@@ -294,7 +294,7 @@ module EffectiveEventsEventRegistration
   def tickets!
     update_event_registrants
     select_event_registrants
-    waitlist_event_registrants
+    #waitlist_event_registrants
 
     # after_commit do
     #   update_submit_fees_and_order! if submit_order.present?
