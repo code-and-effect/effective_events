@@ -27,7 +27,7 @@
           - if ticket.capacity.present? && ticket.display_capacity?
             %br
             %small
-              #{ticket.capacity_available(except: form.object)} remaining
+              #{event.capacity_available(event_ticket: ticket, event_registration: form.object)} remaining
               - if ticket.waitlist?
                 before waitlist
         %td

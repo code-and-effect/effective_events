@@ -63,7 +63,7 @@ module Effective
       timestamps
     end
 
-    scope :sorted, -> { order(:last_name) }
+    scope :sorted, -> { order(:event_ticket_id, :id) }
     scope :deep, -> { includes(:event, :event_ticket, :owner) }
     scope :registered, -> { where.not(registered_at: nil) }
 

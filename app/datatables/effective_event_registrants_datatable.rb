@@ -52,7 +52,7 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
     end
 
     if event_registration.present?
-      scope = scope.where(event_registration_id: event_registration)
+      scope = scope.where(event_registration_id: event_registration).sorted
     end
 
     scope

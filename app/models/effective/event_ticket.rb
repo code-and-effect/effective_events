@@ -69,37 +69,17 @@ module Effective
     validates :early_bird_price, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
 
     validates :capacity, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
+    validates :capacity, presence: { message: 'must be present when using the waitlist'}, if: -> { waitlist? }
 
     def to_s
       title.presence || 'New Event Ticket'
     end
 
-    # This is supposed to be an indempotent big update the world thing
-    # def update_waitlist!
-    #   return false unless waitlist?
-
-    #   changed_event_registrants = registered_event_registrants.each_with_index.map do |event_registrant, index|
-    #     next if event_registrant.purchased?
-
-    #     waitlisted_was = event_registrant.waitlisted?
-    #     waitlisted = (waitlist? && index >= capacity)
-    #     next if waitlisted == waitlisted_was
-
-    #     event_registrant.update!(waitlisted: waitlisted) # Updates price
-    #     event_registrant
-    #   end.compact
-
-    #   orders = changed_event_registrants.flat_map { |event_registrant| event_registrant.deferred_orders }.compact.uniq
-    #   orders.each { |order| order.update_purchasable_attributes! }
-
-    #   true
-    # end
-
-    def capacity_selectable(event_registration:)
+    def capacity_selectable(except: nil)
       return nil if capacity.blank?
       return nil if waitlist?
 
-      capacity_available(except: event_registration)
+      capacity_available(except: except)
     end
 
     def capacity_available(except: nil)
@@ -108,7 +88,7 @@ module Effective
     end
 
     def capacity_taken(except: nil)
-      registered_or_selected_event_registrants(except: except).count
+      registered_or_selected_event_registrants(except: except).reject(&:waitlisted?).length
     end
 
     def registered_or_selected_event_registrants(except: nil)

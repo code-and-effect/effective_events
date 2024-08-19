@@ -15,7 +15,7 @@ module Effective
     has_many :event_products, -> { EventProduct.sorted }, inverse_of: :event, dependent: :destroy
     accepts_nested_attributes_for :event_products, allow_destroy: true
 
-    has_many :event_registrants, -> { order(:event_ticket_id).order(:id) }, inverse_of: :event
+    has_many :event_registrants, -> { order(:event_ticket_id, :id) }, inverse_of: :event
     accepts_nested_attributes_for :event_registrants, allow_destroy: true
 
     has_many :event_addons, -> { order(:event_product_id).order(:id) }, inverse_of: :event
@@ -251,17 +251,23 @@ module Effective
     end
 
     # The amount of tickets that can be purchased except ones from an event registration
-    def capacity_selectable(event_ticket:, event_registration:)
+    def capacity_selectable(event_ticket:, event_registration: nil)
       return 0 if event_ticket.archived?
+
       return 100 if event_ticket.capacity.blank?
       return 100 if event_ticket.waitlist?
 
-      event_ticket.capacity_selectable(event_registration: event_registration)
+      event_ticket.capacity_selectable(except: event_registration)
     end
 
     # The amount of tickets that can be purchased except ones from an event registration
-    def capacity_available(event_ticket:, event_registration:)
+    def capacity_available(event_ticket:, event_registration: nil)
       event_ticket.capacity_available(except: event_registration)
+    end
+
+    # Just used in tests so far
+    def capacity_taken(event_ticket:, event_registration: nil)
+      event_ticket.capacity_taken(except: event_registration)
     end
 
     # Can I register/purchase this many new event tickets?

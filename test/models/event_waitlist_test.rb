@@ -23,100 +23,57 @@ class EventWaitlistTest < ActiveSupport::TestCase
     assert_equal 0, event_registration2.event_addons.length
   end
 
-  test 'event registration waitlist on two registrations' do
+  test 'assigning waitlist' do
+    selection_window = EffectiveEvents.EventRegistration.selection_window
+
     event = build_waitlist_event()
-    event_ticket = event.event_tickets.first
 
-    event_registration = build_event_registration(event: event, event_registrants: false, event_addons: false)
+    ticket = event.event_tickets.first!
+    assert ticket.waitlist?
+    assert_equal 5, ticket.capacity
 
-    6.times do |index|
-      event_registration.build_event_registrant(event_ticket: event_ticket)
+    reg1 = build_event_registration(event: event, event_registrants: false)
+    reg2 = build_event_registration(event: event, event_registrants: false)
+
+    assert event.event_ticket_available?(ticket, quantity: 5)
+    assert_equal 5, event.capacity_available(event_ticket: ticket, event_registration: reg1)
+    assert_equal 0, event.capacity_taken(event_ticket: ticket, event_registration: reg1)
+
+    # Select tickets in reg1
+    reg1.event_ticket_selection(event_ticket: ticket, quantity: 4)
+    reg1.tickets!
+    ticket.reload
+
+    assert_equal 4, reg1.event_registrants.count { |et| !et.waitlisted? }
+    assert_equal 0, reg1.event_registrants.count { |et| et.waitlisted? }
+
+    assert_equal 5, event.capacity_available(event_ticket: ticket, event_registration: reg1)
+    assert_equal 4, event.capacity_taken(event_ticket: ticket)
+
+    # Select tickets in reg2
+    reg2.event_ticket_selection(event_ticket: ticket, quantity: 4)
+    reg2.tickets!
+    ticket.reload
+
+    assert_equal 1, reg2.event_registrants.count { |et| !et.waitlisted? }
+    assert_equal 3, reg2.event_registrants.count { |et| et.waitlisted? }
+
+    assert_equal 1, event.capacity_available(event_ticket: ticket, event_registration: reg2)
+    assert_equal 4, event.capacity_taken(event_ticket: ticket, event_registration: reg2)
+    assert_equal 0, event.capacity_available(event_ticket: ticket)
+
+    # Now go 20 minutes in the future
+    with_time_travel(Time.zone.now + selection_window) do
+      reg2.event_ticket_selection(event_ticket: ticket, quantity: 4)
+      reg2.tickets!
+      ticket.reload
+
+      assert_equal 4, reg2.event_registrants.count { |et| !et.waitlisted? }
+      assert_equal 0, reg2.event_registrants.count { |et| et.waitlisted? }
+
+      assert_equal 1, event.capacity_available(event_ticket: ticket)
+      assert_equal 4, event.capacity_taken(event_ticket: ticket)
     end
-
-    event_registration.ready!
-    assert event_registration.draft?
-
-    assert_equal 6, event_registration.event_registrants.length
-    assert_equal 0, event_registration.event_registrants.count { |er| er.waitlisted? }
-    assert_equal 600_00, event_registration.submit_order.subtotal
-
-    event_registration.submit_order.delay!(payment: {}, payment_intent: 'asdf', provider: 'deluxe_delayed', card: 'Visa')
-
-    event_registration.reload
-    assert event_registration.submitted?
-
-    assert_equal 5, event_registration.event_registrants.count { |er| !er.waitlisted? }
-    assert_equal 1, event_registration.event_registrants.count { |er| er.waitlisted? }
-    assert_equal 500_00, event_registration.submit_order.subtotal
-
-    # Now build another registration should be waitlisted
-    event_registration2 = build_event_registration(event: event, event_registrants: false, event_addons: false)
-
-    1.times do |index|
-      event_registration2.build_event_registrant(event_ticket: event_ticket)
-    end
-
-    event_registration2.ready!
-    assert_equal 1, event_registration2.event_registrants.length
-    assert_equal 0, event_registration2.event_registrants.count { |er| er.waitlisted? }
-    assert_equal 100_00, event_registration2.submit_order.subtotal
-
-    event_registration2.submit_order.delay!(payment: {}, payment_intent: 'asdf', provider: 'deluxe_delayed', card: 'Visa')
-
-    event_registration2.reload
-    assert event_registration2.submitted?
-
-    assert_equal 1, event_registration2.event_registrants.count { |er| er.waitlisted? }
-    assert_equal 0, event_registration2.submit_order.subtotal
-
-    # Now remove some tickets from the first one. It should update the waitlist.
-    event_registration.event_registrants.first.mark_for_destruction
-    event_registration.event_registrants.second.mark_for_destruction
-    event_registration.tickets!
-
-    event_registration.reload
-    assert_equal 4, event_registration.event_registrants.length
-    assert_equal 4, event_registration.event_registrants.count { |er| !er.waitlisted? }
-    assert_equal 4, event_registration.submit_order.order_items.length
-    assert_equal 400_00, event_registration.submit_order.subtotal
-
-    event_registration2.reload
-    assert_equal 1, event_registration2.event_registrants.count { |er| !er.waitlisted? }
-    assert_equal 100_00, event_registration2.submit_order.subtotal
-  end
-
-  test 'event registration waitlist with destroyed registration' do
-    event = build_waitlist_event()
-    event_ticket = event.event_tickets.first
-
-    event_registration = build_event_registration(event: event, event_registrants: false, event_addons: false)
-
-    6.times do |index|
-      event_registration.build_event_registrant(event_ticket: event_ticket)
-    end
-
-    event_registration.ready!
-    event_registration.submit_order.delay!(payment: {}, payment_intent: 'asdf', provider: 'deluxe_delayed', card: 'Visa')
-
-    # Now build another registration should be waitlisted
-    event_registration2 = build_event_registration(event: event, event_registrants: false, event_addons: false)
-
-    1.times do |index|
-      event_registration2.build_event_registrant(event_ticket: event_ticket)
-    end
-
-    event_registration2.ready!
-    event_registration2.submit_order.delay!(payment: {}, payment_intent: 'asdf', provider: 'deluxe_delayed', card: 'Visa')
-
-    event_registration2.reload
-    assert_equal 1, event_registration2.event_registrants.count { |er| er.waitlisted? }
-
-    # Destroying the first event registration will move the waitlisted registrant to the main list
-    event_registration.destroy!
-
-    event_registration2.reload
-    assert_equal 1, event_registration2.event_registrants.count { |er| !er.waitlisted? }
-    assert_equal 100_00, event_registration2.submit_order.subtotal
   end
 
 end
