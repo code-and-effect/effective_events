@@ -250,19 +250,32 @@ module Effective
       start_at
     end
 
+    # The amount of tickets that can be purchased except ones from an event registration
+    def capacity_selectable(event_ticket:, event_registration:)
+      return 0 if event_ticket.archived?
+      return 100 if event_ticket.capacity.blank?
+      return 100 if event_ticket.waitlist?
+
+      event_ticket.capacity_selectable(event_registration: event_registration)
+    end
+
+    # The amount of tickets that can be purchased except ones from an event registration
+    def capacity_available(event_ticket:, event_registration:)
+      event_ticket.capacity_available(except: event_registration)
+    end
+
     # Can I register/purchase this many new event tickets?
-    def event_ticket_available?(event_ticket, quantity:)
+    def event_ticket_available?(event_ticket, except: nil, quantity: 0)
       raise('expected an EventTicket') unless event_ticket.kind_of?(Effective::EventTicket)
       raise('expected quantity to be greater than 0') unless quantity.to_i > 0
 
       return false if event_ticket.archived?
-      return true if event_ticket.capacity.blank?   # No capacity enforced for this ticket
 
-      # Total number already sold
-      registered = registered_event_registrants.count { |r| r.event_ticket_id == event_ticket.id }
+      return true if event_ticket.capacity.blank? # No capacity enforced
+      return true if event_ticket.waitlist?       # Always available for waitlist
 
-      # If there's capacity for this many more
-      (registered + quantity) <= event_ticket.capacity
+      # Do we have any tickets available left?
+      event_ticket.capacity_available(except: except) >= quantity.to_i
     end
 
     # Can I register/purchase this many new event products?

@@ -30,12 +30,7 @@ class EventWaitlistTest < ActiveSupport::TestCase
     event_registration = build_event_registration(event: event, event_registrants: false, event_addons: false)
 
     6.times do |index|
-      event_registration.event_registrant(
-        event_ticket: event_ticket,
-        first_name: "First #{index+1}",
-        last_name: "Last #{index+1}",
-        email: "registrant#{index+1}@effective_events.test"
-      )
+      event_registration.build_event_registrant(event_ticket: event_ticket)
     end
 
     event_registration.ready!
@@ -58,12 +53,7 @@ class EventWaitlistTest < ActiveSupport::TestCase
     event_registration2 = build_event_registration(event: event, event_registrants: false, event_addons: false)
 
     1.times do |index|
-      event_registration2.event_registrant(
-        event_ticket: event_ticket,
-        first_name: "First #{index+1}",
-        last_name: "Last #{index+1}",
-        email: "registrant#{index+1}@effective_events.test"
-      )
+      event_registration2.build_event_registrant(event_ticket: event_ticket)
     end
 
     event_registration2.ready!
@@ -102,12 +92,7 @@ class EventWaitlistTest < ActiveSupport::TestCase
     event_registration = build_event_registration(event: event, event_registrants: false, event_addons: false)
 
     6.times do |index|
-      event_registration.event_registrant(
-        event_ticket: event_ticket,
-        first_name: "First #{index+1}",
-        last_name: "Last #{index+1}",
-        email: "registrant#{index+1}@effective_events.test"
-      )
+      event_registration.build_event_registrant(event_ticket: event_ticket)
     end
 
     event_registration.ready!
@@ -117,12 +102,7 @@ class EventWaitlistTest < ActiveSupport::TestCase
     event_registration2 = build_event_registration(event: event, event_registrants: false, event_addons: false)
 
     1.times do |index|
-      event_registration2.event_registrant(
-        event_ticket: event_ticket,
-        first_name: "First #{index+1}",
-        last_name: "Last #{index+1}",
-        email: "registrant#{index+1}@effective_events.test"
-      )
+      event_registration2.build_event_registrant(event_ticket: event_ticket)
     end
 
     event_registration2.ready!

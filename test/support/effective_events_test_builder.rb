@@ -103,10 +103,11 @@ module EffectiveEventsTestBuilder
 
     if event_registrants
       event_registration.event.event_tickets.each_with_index do |event_ticket, index|
-        event_registration.event_registrant(
-          event_ticket: event_ticket,
-          first_name: "First",
-          last_name: "Last #{index+1}",
+        registrant = event_registration.build_event_registrant(event_ticket: event_ticket)
+
+        registrant.assign_attributes(
+          first_name: "First", 
+          last_name: "Last #{index+1}", 
           email: "registrant#{index+1}@effective_events.test"
         )
       end

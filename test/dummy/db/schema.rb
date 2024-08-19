@@ -25,8 +25,8 @@ ActiveRecord::Schema.define(version: 101) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
-    t.bigint "record_id", null: false
-    t.bigint "blob_id", null: false
+    t.integer "record_id", null: false
+    t.integer "blob_id", null: false
     t.datetime "created_at", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
@@ -45,7 +45,7 @@ ActiveRecord::Schema.define(version: 101) do
   end
 
   create_table "active_storage_variant_records", force: :cascade do |t|
-    t.bigint "blob_id", null: false
+    t.integer "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
@@ -434,6 +434,7 @@ ActiveRecord::Schema.define(version: 101) do
     t.string "member_or_non_member_choice"
     t.boolean "waitlisted", default: false
     t.boolean "promoted", default: false
+    t.datetime "selected_at"
     t.datetime "registered_at"
     t.text "response1"
     t.text "response2"
@@ -462,6 +463,15 @@ ActiveRecord::Schema.define(version: 101) do
     t.index ["owner_id", "owner_type"], name: "index_event_registrations_on_owner_id_and_owner_type"
     t.index ["status"], name: "index_event_registrations_on_status"
     t.index ["token"], name: "index_event_registrations_on_token"
+  end
+
+  create_table "event_ticket_selections", force: :cascade do |t|
+    t.integer "event_registration_id"
+    t.string "event_registration_type"
+    t.string "event_ticket_id"
+    t.integer "quantity"
+    t.datetime "updated_at"
+    t.datetime "created_at"
   end
 
   create_table "event_tickets", force: :cascade do |t|

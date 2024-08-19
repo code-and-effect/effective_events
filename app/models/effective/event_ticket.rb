@@ -95,20 +95,32 @@ module Effective
     #   true
     # end
 
-    def capacity_selectable
-      return 100 if capacity.blank?
-      return 100 if waitlist?
+    def capacity_selectable(event_registration:)
+      return nil if capacity.blank?
+      return nil if waitlist?
 
-      capacity_available
+      capacity_available(except: event_registration)
     end
 
-    def capacity_available
+    def capacity_available(except: nil)
       return nil if capacity.blank?
-      [(capacity - registered_or_selected_event_registrants_count), 0].max
+      [(capacity - capacity_taken(except: except)), 0].max
+    end
+
+    def capacity_taken(except: nil)
+      registered_or_selected_event_registrants(except: except).count
+    end
+
+    def registered_or_selected_event_registrants(except: nil)
+      raise('expected except to be an EventRegistration') if except && !except.class.try(:effective_events_event_registration?)
+
+      event_registrants.select do |er| 
+        (er.registered? || er.selected_not_expired?) && (except.blank? || er.event_registration_id != except.id)
+      end
     end
 
     def registered_or_selected_event_registrants_count
-      event_registrants.count { |er| er.registered? || er.selected_not_expired? }
+      registered_or_selected_event_registrants.count
     end
 
     def registered_event_registrants_count
