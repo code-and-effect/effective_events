@@ -37,8 +37,7 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
       end.join.html_safe
     end
 
-    # This is the non-waitlisted full price
-    col :event_ticket_price, as: :price, label: 'Price'
+    col :price, as: :price
     col :archived, visible: false
 
     # no actions_col

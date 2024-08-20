@@ -1,29 +1,19 @@
-// $(document).on('change', '[data-event-registrant-user-search]', function(event) {
-//   let $select = $(event.target);
-//   let value = $select.val() || ''
-
-//   console.log("I am here");
-//   console.log(event);
-// });
-
+// For the Ticket Details screen
 $(document).on('select2:select', '[data-event-registrant-user-search]', function(event) {
   var data = event.params.data['data'];
-  var $form = $(event.target).closest('.event-registrant-user-fields')
+  var $form = $(event.currentTarget).closest('.event-registrant-user-fields')
 
-  if(data.first_name) {
-    $form.find('[name$="[first_name]"]').val(data.first_name);
-  }
+  $form.find('[name$="[first_name]"]').val(data.first_name || '').prop('readonly', true)
+  $form.find('[name$="[last_name]"]').val(data.last_name || '').prop('readonly', true)
+  $form.find('[name$="[email]"]').val(data.email || '').prop('readonly', true)
+  $form.find('[name$="[company]"]').val(data.company || '').prop('readonly', true)
+});
 
-  if(data.last_name) {
-    $form.find('[name$="[last_name]"]').val(data.last_name);
-  }
+$(document).on('select2:unselect', '[data-event-registrant-user-search]', function(event) {
+  var $form = $(event.currentTarget).closest('.event-registrant-user-fields')
 
-  if(data.email) {
-    $form.find('[name$="[email]"]').val(data.email);
-  }
-
-  if(data.company) {
-    $form.find('[name$="[company]"]').val(data.company);
-  }
-
+  $form.find('[name$="[first_name]"]').val('').prop('readonly', false)
+  $form.find('[name$="[last_name]"]').val('').prop('readonly', false)
+  $form.find('[name$="[email]"]').val('').prop('readonly', false)
+  $form.find('[name$="[company]"]').val('').prop('readonly', false)
 });

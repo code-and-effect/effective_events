@@ -8,10 +8,12 @@
     label: "Quick Add", placeholder: "Search by name, email, or company", hint: "Can't find someone? Add their details below.",
     input_js: { minimumInputLength: 1 }, 'data-event-registrant-user-search': true
 
-  .row
-    .col-md= f.text_field :first_name
-    .col-md= f.text_field :last_name
+  - readonly = (f.object.user.present? && f.object.user.persisted? && f.object.user.errors.blank?)
 
   .row
-    .col-md= f.email_field :email
-    .col-md= f.text_field :company
+    .col-md= f.text_field :first_name, input_html: { readonly: readonly, plaintext: false }
+    .col-md= f.text_field :last_name, input_html: { readonly: readonly, plaintext: false }
+
+  .row
+    .col-md= f.email_field :email, input_html: { readonly: readonly, plaintext: false }
+    .col-md= f.text_field :company, input_html: { readonly: readonly, plaintext: false }

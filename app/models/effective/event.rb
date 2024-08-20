@@ -253,7 +253,6 @@ module Effective
     # The amount of tickets that can be purchased except ones from an event registration
     def capacity_selectable(event_ticket:, event_registration: nil)
       return 0 if event_ticket.archived?
-
       return 100 if event_ticket.capacity.blank?
       return 100 if event_ticket.waitlist?
 
@@ -276,7 +275,6 @@ module Effective
       raise('expected quantity to be greater than 0') unless quantity.to_i > 0
 
       return false if event_ticket.archived?
-
       return true if event_ticket.capacity.blank? # No capacity enforced
       return true if event_ticket.waitlist?       # Always available for waitlist
 

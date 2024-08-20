@@ -80,6 +80,10 @@ module Effective
       assign_attributes(first_name: user.first_name, last_name: user.last_name, email: user.email)
     end
 
+    before_validation(if: -> { user.blank? && first_name.present? && last_name.present? && email.present? }) do
+      assign_user()
+    end
+
     before_validation(if: -> { event_ticket.present? }, unless: -> { purchased? }) do
       assign_price()
     end
@@ -88,9 +92,46 @@ module Effective
       errors.add(:waitlisted, 'is not permitted for a non-waitlist event ticket') if waitlisted? && !event_ticket.waitlist?
     end
 
-    validates :user_id, uniqueness: { scope: [:event_id], allow_blank: true, message: 'is already registered for this event' }
     validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
     validates :email, email: true
+
+    # This works for persisted and adding a new one. But not adding two at same time in a registration
+    validates :user_id, uniqueness: { scope: [:event_id], allow_blank: true, message: 'is already registered for this event' }
+
+    # Copy any user errors from assign_user() into the registrant
+    validate(if: -> { user && user.new_record? && user.errors.present? }) do
+      errors.add(:first_name, user.errors[:first_name].join(', ')) if user.errors[:first_name].present?
+      errors.add(:last_name, user.errors[:last_name].join(', ')) if user.errors[:last_name].present?
+      errors.add(:email, user.errors[:email].join(', ')) if user.errors[:email].present?
+
+      others = user.errors
+        .reject { |error| [:first_name, :last_name, :email].include?(error.attribute) }
+        .map { |error| error.full_message }
+
+      errors.add(:base, others.join(', ')) if others.present?
+    end
+
+    # When should we do these validations?
+    def registrant_validations_enabled?
+      return false if blank_registrant? # They want to come back later
+      return false if event_ticket.blank? # Invalid anyway
+      return true if event_registration.blank? # If we're creating in an Admin area
+
+      [:details, :summary].include?(event_registration.current_step) # Full validations on the details step
+    end
+
+    # First name, last name and email are always required fields on details
+    with_options(if: -> { registrant_validations_enabled? }) do
+      validates :first_name, presence: true
+      validates :last_name, presence: true
+      validates :email, presence: true
+    end
+
+    # Regular Ticket
+    with_options(if: -> { registrant_validations_enabled? && event_ticket.regular? }) do
+      validates :user_id, presence: true, unless: -> { user&.new_record? }
+      validates :company, presence: true
+    end
 
     # Member Only Ticket
     # with_options(if: -> { event_ticket&.member_only? && present_registrant? }) do
@@ -280,6 +321,21 @@ module Effective
     end
 
     private
+
+    def assign_user
+      raise('is already purchased') if purchased?
+
+      raise('expected no user') unless user.blank?
+      raise('expected a first_name') unless first_name.present?
+      raise('expected a last_name') unless last_name.present?
+      raise('expected an email') unless email.present?
+      raise('expected a user_type') unless user_type.present?
+
+      if(user_klass = user_type.safe_constantize).present?
+        user = user_klass.new(first_name: first_name.strip, last_name: last_name.strip, email: email.strip.downcase, password: SecureRandom.alphanumeric(12))
+        assign_attributes(user: user)
+      end
+    end
 
     def assign_price
       raise('is already purchased') if purchased?

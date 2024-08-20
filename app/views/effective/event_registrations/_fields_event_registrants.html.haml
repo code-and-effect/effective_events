@@ -8,9 +8,8 @@
     %p
       = event_ticket
       = ' - '
-      = price_to_currency(event_registrant.event_ticket_price)
+      = price_to_currency(event_registrant.price)
       = event_registrant.details
-      = event_registrant.selected_at.to_i
 
     = form.fields_for :event_registrants, event_registrant do |fr|
       - if event.allow_blank_registrants? && (fr.object.user.blank? || fr.object.blank_registrant?)
