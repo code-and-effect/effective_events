@@ -1,19 +1,37 @@
 .event-registrant-user-fields
   - # Choose ANY member
-  - klass = (f.object.user || current_user).class
-  - ajax_url = (@select2_ajax_path || effective_events.users_event_registrants_select2_ajax_index_path) unless Rails.env.test?
+  - user_klass = (f.object.user || current_user).class
+  - users_ajax_url = (@select2_user_ajax_path || effective_events.users_event_registrants_select2_ajax_index_path) unless Rails.env.test?
+  - organizations_ajax_url = (@select2_organization_ajax_path || effective_events.organizations_event_registrants_select2_ajax_index_path) unless Rails.env.test?
 
-  = f.hidden_field :user_type, value: klass.name
-  = f.select :user_id, klass.all, ajax_url: ajax_url, 
-    label: "Quick Add", placeholder: "Search by name, email, or company", hint: "Can't find someone? Add their details below.",
+  = f.hidden_field :user_type, value: user_klass.name
+
+  = f.select :user_id, user_klass.all, ajax_url: users_ajax_url, label: "Quick add", placeholder: "Search by name, email, or company",
+    hint: "Can't find someone? Add their details below.",
     input_js: { minimumInputLength: 1 }, 'data-event-registrant-user-search': true
 
-  - readonly = (f.object.user.present? && f.object.user.persisted? && f.object.user.errors.blank?)
+  - disabled = (f.object.user.present? && f.object.user.persisted? && f.object.user.errors.blank?)
 
   .row
-    .col-md= f.text_field :first_name, input_html: { readonly: readonly, plaintext: false }
-    .col-md= f.text_field :last_name, input_html: { readonly: readonly, plaintext: false }
+    .col-md= f.text_field :first_name, input_html: { disabled: disabled }
+    .col-md= f.text_field :last_name, input_html: { disabled: disabled }
 
   .row
-    .col-md= f.email_field :email, input_html: { readonly: readonly, plaintext: false }
-    .col-md= f.text_field :company, input_html: { readonly: readonly, plaintext: false }
+    .col-md= f.email_field :email, input_html: { disabled: disabled }
+    .col-md
+      - # These are populated by the user selected javascript
+      = f.hidden_field :organization_type, value: EffectiveMemberships.Organization.name
+      = f.hidden_field :organization_id
+
+      - if EffectiveEvents.organization_enabled? == false
+        = f.text_field :company, input_html: { disabled: disabled }
+      
+      - if EffectiveEvents.organization_enabled?
+        - # This is just used to display when we have a user selected.
+        /= f.text_field :organization_name, label: organization_label, value: f.object.company, input_html: { disabled: true }, wrapper: { class: 'effective-static-control', style: ('display: none;' if f.object.user.blank?) }
+
+        - # This creates a select field organization_id and a text field company
+        = f.select_or_text :organization_id, :company, EffectiveMemberships.Organization.sorted.all, name: organization_label.downcase,
+          input_html: { disabled: disabled },
+          text: { label: "#{organization_label} name", placeholder: "New #{organization_label.downcase} name" },
+          select: { label: organization_label, placeholder: 'Search by name', organizations_ajax_url: organizations_ajax_url, input_js: { minimumInputLength: 1} }

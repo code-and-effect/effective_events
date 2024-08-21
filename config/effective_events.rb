@@ -12,15 +12,14 @@ EffectiveEvents.setup do |config|
   # Events can be restricted by role
   config.use_effective_roles = true
 
+  # Create effective_memberships organizations from the Ticket Details screen.
+  config.organization_enabled = false
+
   # Categories
   config.categories = ['Events']
 
   # Hint text for event images attachments
   config.events_hint_text = 'Optional. Shown on the events index and event pages. Dimensions are 220px tall and 350px wide.'
-
-  # Validations for Event Registrants
-  # config.event_registrant_required_fields = [:first_name, :last_name, :email, :company]
-  config.event_registrant_required_fields = [:first_name, :last_name, :email]
 
   # Mailer Settings
   # Please see config/initializers/effective_resources.rb for default effective_* gem mailer settings

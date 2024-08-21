@@ -13,7 +13,9 @@ module Effective
         data = { first_name: user.first_name, last_name: user.last_name, email: user.email }
 
         if user.class.try(:effective_memberships_organization_user?)
-          data[:company] = user.organizations.map(&:to_s).join(', ')
+          data[:company] = user.organizations.first.to_s
+          data[:organization_name] = user.organizations.first.to_s
+          data[:organization_id] = user.organizations.first.try(:id)
         end
 
         { 
@@ -21,6 +23,20 @@ module Effective
           text: to_select2(user),
           data: data
         }
+      end
+    end
+
+    def organizations
+      klass = EffectiveMemberships.Organization
+      raise('an EffectiveMemberships.Organization is required') unless klass.try(:effective_memberships_organization?)
+
+      collection = klass.all
+
+      # Authorize
+      EffectiveResources.authorize!(self, :member_organizations, collection.klass)
+
+      respond_with_select2_ajax(collection, skip_authorize: true) do |organization|
+        { id: organization.to_param, text: organization.to_s }
       end
     end
 

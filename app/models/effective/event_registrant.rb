@@ -6,8 +6,9 @@ module Effective
 
     self.table_name = (EffectiveEvents.event_registrants_table_name || :event_registrants).to_s
 
+    attr_accessor :organization_name # Not used. Just for the form.
+
     PERMITTED_BLANK_REGISTRANT_CHANGES = ["first_name", "last_name", "email", "company", "user_id", "user_type", "blank_registrant", "member_or_non_member_choice", "response1", "response2", "response3"]
-    MEMBER_OR_NON_MEMBER_CHOICES = ['Add a regular registration', 'Add a member registration']
 
     acts_as_purchasable
     acts_as_archived
@@ -25,18 +26,21 @@ module Effective
     # This fee when checked out through the event registration
     belongs_to :event_registration, polymorphic: true, optional: true
 
-    # Required for member-only tickets. The user attending.
+    # The user for this registrant
     belongs_to :user, polymorphic: true, optional: true
     accepts_nested_attributes_for :user
+
+    # The organization for this registrant
+    belongs_to :organization, polymorphic: true, optional: true
+    accepts_nested_attributes_for :organization
 
     effective_resource do
       first_name            :string
       last_name             :string
       email                 :string
-      company               :string
+      company               :string   # Organization name
 
-      blank_registrant             :boolean
-      member_or_non_member_choice  :string       # Used by Member or Non-Member tickets to indicate a member or non-member
+      blank_registrant      :boolean  # Leave details and come backlater
 
       waitlisted            :boolean
       promoted              :boolean      # An admin marked this registrant as promoted from the waitlist
@@ -73,15 +77,27 @@ module Effective
     end
 
     before_validation(if: -> { blank_registrant? }) do
-      assign_attributes(user: nil, first_name: nil, last_name: nil, email: nil, company: nil)
+      assign_attributes(user: nil, organization: nil, first_name: nil, last_name: nil, email: nil, company: nil)
     end
 
     before_validation(if: -> { user.present? }) do
       assign_attributes(first_name: user.first_name, last_name: user.last_name, email: user.email)
     end
 
+    before_validation(if: -> { organization.present? }) do
+      assign_attributes(company: organization.to_s)
+    end
+
     before_validation(if: -> { user.blank? && first_name.present? && last_name.present? && email.present? }) do
       assign_user()
+    end
+
+    before_validation(if: -> { user.present? && organization.blank? && company.present? }) do
+      assign_organization()
+    end
+
+    before_validation(if: -> { user.present? && organization.present? && company.blank? }) do
+      assign_representative()
     end
 
     before_validation(if: -> { event_ticket.present? }, unless: -> { purchased? }) do
@@ -328,13 +344,35 @@ module Effective
       raise('expected no user') unless user.blank?
       raise('expected a first_name') unless first_name.present?
       raise('expected a last_name') unless last_name.present?
-      raise('expected an email') unless email.present?
+      raise('expected a email') unless email.present?
       raise('expected a user_type') unless user_type.present?
+
+      binding.pry
 
       if(user_klass = user_type.safe_constantize).present?
         user = user_klass.new(first_name: first_name.strip, last_name: last_name.strip, email: email.strip.downcase, password: SecureRandom.alphanumeric(12))
         assign_attributes(user: user)
       end
+    end
+
+    def assign_organization
+      raise('is already purchased') if purchased?
+
+      raise('expected no organization') unless organization.blank?
+      raise('expected a user') unless user.present?
+      raise('expected a email') unless company.present?
+      raise('expected a company') unless company.present?
+      raise('expected a organization_type') unless organization_type.present?
+
+      organization_klass = organization_type.constantize
+
+      binding.pry
+    end
+
+    def assign_representative
+      raise('is already purchased') if purchased?
+
+      binding.pry
     end
 
     def assign_price

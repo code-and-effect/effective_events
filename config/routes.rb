@@ -27,6 +27,7 @@ EffectiveEvents::Engine.routes.draw do
 
     resources :event_registrants_select2_ajax, only: [] do
       get :users, on: :collection
+      get :organizations, on: :collection
     end
   end
 

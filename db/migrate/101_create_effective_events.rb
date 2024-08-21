@@ -77,11 +77,14 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.integer :user_id
       t.string :user_type
 
+      t.integer :organization_id
+      t.string :organization_type
+
       t.string :first_name
       t.string :last_name
       t.string :email
-
       t.string :company
+
       t.string :number
       t.text :notes
 
