@@ -52,6 +52,8 @@ module EffectiveEventsHelper
 
     tickets.map do |ticket|
       title = ticket.to_s
+      title = "#{title} (archived)" if ticket.archived?
+
       price = effective_events_ticket_price(event, ticket)
 
       label = [title, price].compact.join(' - ')

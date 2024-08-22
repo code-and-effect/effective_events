@@ -9,10 +9,10 @@
   - if f.object.new_record?
     -# User
     - klass = (f.object.owner || current_user).class
-    - ajax_url = (@select2_users_ajax_path || effective_resources.users_admin_select2_ajax_index_path) unless Rails.env.test?
+    - ajax_url = (effective_resources.users_admin_select2_ajax_index_path unless Rails.env.test?)
 
     = f.hidden_field :owner_type, value: klass.name
-    = f.select :owner_id, klass.all, ajax_url: ajax_url, label: 'User'
+    = f.select :owner_id, klass.all, ajax_url: ajax_url, label: 'Registration User'
   - else
     = f.static_field :owner
 
@@ -20,7 +20,20 @@
 
   #effective-events-event-registrant-ajax
     - if f.object.event.present?
-      = render 'effective/event_registrants/fields', f: f, event: event_registrant.event, namespace: :admin
+      .card
+        .card-body
+          - if f.object.purchased?
+            = f.static_field :event_ticket, label: 'Purchased ticket'
+
+          = f.select :event_ticket_id, effective_events_event_tickets_collection(f.object.event, namespace), required: true
+
+          - if f.object.event.allow_blank_registrants? && (f.object.new_record? || f.object.blank_registrant?)
+            = f.check_box :blank_registrant, label: "I will return and add this ticket's information later"
+          - else
+            = f.hidden_field :blank_registrant, value: false
+
+          = f.show_if(:blank_registrant, false) do
+            = render('effective/event_registrants/fields', f: f)
 
   = f.check_box :archived, label: "Archive this registrant. It will be displayed as archived on the owner's event registration"
 

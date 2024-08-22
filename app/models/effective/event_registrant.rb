@@ -117,7 +117,7 @@ module Effective
 
     # Member ticket: company name is locked in. you can only add to your own company
     validate(if: -> { registrant_validations_enabled? && event_ticket&.member_only? }) do
-      if building_user_and_organization && owner.organizations.exclude?(organization)
+      if building_user_and_organization && owner.present? && owner.organizations.exclude?(organization)
         errors.add(:organization_id, "must be your own #{EffectiveResources.etd(organization)} for member-only tickets") 
       end
 

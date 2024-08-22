@@ -18,5 +18,4 @@
         = fr.hidden_field :blank_registrant, value: false
 
       = fr.show_if(:blank_registrant, false) do
-        = render('effective/event_registrants/fields_registrant', f: fr)
-        = render('effective/event_registrants/fields_questions', f: fr)
+        = render('effective/event_registrants/fields', f: fr)

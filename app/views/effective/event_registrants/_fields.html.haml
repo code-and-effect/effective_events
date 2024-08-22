@@ -1,24 +1,51 @@
-.card.mb-4
-  .card-body
-    - if f.object.purchased?
-      = f.static_field :event_ticket, label: 'Purchased ticket'
-    - else
-      = f.select :event_ticket_id, effective_events_event_tickets_collection(event, namespace), label: 'Ticket'
+.event-registrant-user-fields
+  - user_klass = (f.object.user || current_user).class
+  - ajax_url = (effective_events.users_event_registrants_select2_ajax_index_path unless Rails.env.test?)
+  - disabled = (f.object.user.present? && f.object.user.persisted? && f.object.user.errors.blank?)
+  - event_ticket = f.object.event_ticket
 
-    - if f.object.purchased? && namespace == :admin
-      = f.select :event_ticket_id, effective_events_event_tickets_collection(event, namespace), label: 'Change Ticket', hint: 'Admin only. Change the purchased ticket. This will not create charges, alter the original order, or consider ticket capacity.'
+  = f.hidden_field :user_type, value: user_klass.name
 
-    - event.event_tickets.each do |ticket|
-      - next if ticket.member_only? && !current_user&.is?(:member)
+  = f.select :user_id, user_klass.all, ajax_url: ajax_url, label: "Quick add", placeholder: "Search by name, email, or company",
+    hint: "Can't find someone? Add their details below.", input_js: { minimumInputLength: 1 }, 'data-event-registrant-user-search': true
 
-      = f.show_if(:event_ticket_id, ticket.id) do
-        - if event.allow_blank_registrants? && (f.object.new_record? || f.object.blank_registrant?)
-          = f.check_box :blank_registrant, label: "I will return and add this ticket's information later"
+  .row
+    .col-md= f.text_field :first_name, input_html: { disabled: disabled }
+    .col-md= f.text_field :last_name, input_html: { disabled: disabled }
+
+  .row
+    .col-md= f.email_field :email, input_html: { disabled: disabled }
+    .col-md
+      - if EffectiveEvents.organization_enabled? == false
+        = f.text_field :company, input_html: { disabled: disabled }
+      
+      - if EffectiveEvents.organization_enabled?
+        - organizations = EffectiveMemberships.Organization.sorted.all
+
+        - # These are populated by the user selected javascript
+        = f.hidden_field :organization_type, value: EffectiveMemberships.Organization.name
+        = f.hidden_field :organization_id
+
+        - if event_ticket&.member_only?
+          - organization_id = (f.object.event_registration&.owner || current_user).try(:organizations).try(:first).try(:id)
+
+          = f.select :organization_id, organizations, label: organization_label, placeholder: 'Search by name', input_html: { disabled: disabled },
+            input_js: { minimumInputLength: 1 },
+            hint: "You can only add new members to your own #{organization_label.downcase}",
+            value: (organization_id if organization_id && f.object.organization_id.blank?)
         - else
-          = f.hidden_field :blank_registrant, value: false
+          - # This creates a select field organization_id and a text field company
+          = f.select_or_text :organization_id, :company, organizations, name: organization_label.downcase, input_html: { disabled: disabled },
+            text: { label: "#{organization_label} name", placeholder: "New #{organization_label.downcase} name" },
+            select: { label: organization_label, placeholder: 'Search by name', input_js: { minimumInputLength: 1 } }
 
-        = f.show_if(:blank_registrant, false, nested: true) do
-          %hr
-          = render('effective/event_registrants/fields_registrant', f: f)
-          = render('effective/event_registrants/fields_questions', f: f)
+  - if event_ticket.present?
+    - if event_ticket.question1.present?
+      = f.text_field :response1, label: event_ticket.question1
+
+    - if event_ticket.question2.present?
+      = f.text_field :response2, label: event_ticket.question2
+
+    - if event_ticket.question3.present?
+      = f.text_field :response3, label: event_ticket.question3
 
