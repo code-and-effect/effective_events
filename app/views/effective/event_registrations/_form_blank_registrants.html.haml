@@ -18,7 +18,6 @@
       = fr.check_box :blank_registrant, label: "I will return and add this ticket's information later"
 
       = fr.show_if(:blank_registrant, false) do
-        = render('effective/event_registrants/fields_registrant', f: fr)
-        = render('effective/event_registrants/fields_questions', f: fr)
+        = render('effective/event_registrants/fields', f: fr)
 
   = f.submit 'Save Ticket Information', center: true
