@@ -305,44 +305,48 @@ module Effective
       raise('expected a last_name') unless last_name.present?
       raise('expected a email') unless email.present?
 
-      raise('expected a user_type') unless user_type.present?
-      raise('expected a organization_type') unless organization_type.present?
-
       # Helps the member-only ticket validations
       assign_attributes(building_user_and_organization: true)
 
-      user_klass = user_type.constantize
-      organization_klass = organization_type.constantize
+      # Add User
+      if user_type.present?
+        user_klass = user_type.constantize
 
-      # First we lookup the user by email. If they actually exist we ignore all other fields
-      existing_user = user_klass.find_by_any_email(email.strip.downcase)
+        # First we lookup the user by email. If they actually exist we ignore all other fields
+        existing_user = user_klass.find_by_any_email(email.strip.downcase)
 
-      if existing_user.present?
-        assign_attributes(user: existing_user)
-        assign_attributes(organization: existing_user.organizations.first) if existing_user.organizations.first.present?
-      else
-        # Otherwise create a new user
-        new_user = user_klass.create(
-          first_name: first_name.strip, 
-          last_name: last_name.strip, 
-          email: email.strip.downcase, 
-          password: SecureRandom.base64(12) + '!@#123abcABC-'
-        )
+        if existing_user.present?
+          assign_attributes(user: existing_user)
+          assign_attributes(organization: existing_user.organizations.first) if existing_user.organizations.first.present?
+        else
+          # Otherwise create a new user
+          new_user = user_klass.create(
+            first_name: first_name.strip, 
+            last_name: last_name.strip, 
+            email: email.strip.downcase, 
+            password: SecureRandom.base64(12) + '!@#123abcABC-'
+          )
 
-        assign_attributes(user: new_user)
+          assign_attributes(user: new_user)
+        end
+
+        return false unless user.valid?
       end
 
-      return false unless user.valid?
+      # Add Organization and representative
+      if organization_type.present?
+        organization_klass = organization_type.constantize
 
-      # Find or create the organization
-      if organization.present?
-        user.build_representative(organization: organization)
-      else
-        new_organization = organization_klass.where(title: company.strip).first
-        new_organization ||= organization_klass.create(title: company.strip, email: email.strip.downcase)
+        # Find or create the organization
+        if organization.present?
+          user.build_representative(organization: organization)
+        else
+          new_organization = organization_klass.where(title: company.strip).first
+          new_organization ||= organization_klass.create(title: company.strip, email: email.strip.downcase)
 
-        user.build_representative(organization: new_organization)
-        assign_attributes(organization: new_organization)
+          user.build_representative(organization: new_organization)
+          assign_attributes(organization: new_organization)
+        end
       end
 
       true

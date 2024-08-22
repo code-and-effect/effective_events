@@ -106,6 +106,7 @@ module EffectiveEventsTestBuilder
         registrant = event_registration.build_event_registrant(event_ticket: event_ticket)
 
         registrant.assign_attributes(
+          user_type: 'User',
           first_name: "First", 
           last_name: "Last #{index+1}", 
           email: "registrant#{index+1}@effective_events.test"
@@ -158,15 +159,17 @@ module EffectiveEventsTestBuilder
     event ||= build_event()
     event_ticket ||= build_event_ticket()
 
+    @event_registrant_count ||= 0
+    @event_registrant_count += 1
+
     Effective::EventRegistrant.new(
       owner: owner,
       event: event,
       event_ticket: event_ticket,
-      first_name: "Joe",
-      last_name: "Dirt",
-      email: "joe@dirt.com",
+      first_name: "Joe #{@event_registrant_count}",
+      last_name: "Dirt #{@event_registrant_count}",
+      email: "joe-#{@event_registrant_count}@dirt.com",
       company: "JD Inc.",
-      number: "648593"
     )
   end
 
