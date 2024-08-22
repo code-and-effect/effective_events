@@ -7,14 +7,16 @@ module Effective
     def users
       authorize! :users, Effective::EventRegistrant
 
+      with_organizations = current_user.class.try(:effective_memberships_organization_user?)
+
       collection = current_user.class.all
+      collection = collection.includes(:organizations) if with_organizations
 
       respond_with_select2_ajax(collection, skip_authorize: true) do |user|
         data = { first_name: user.first_name, last_name: user.last_name, email: user.email }
 
-        if user.class.try(:effective_memberships_organization_user?)
-          data[:company] = user.organizations.first.to_s
-          data[:organization_name] = user.organizations.first.to_s
+        if with_organizations
+          data[:company] = user.organizations.first.try(:to_s)
           data[:organization_id] = user.organizations.first.try(:id)
         end
 

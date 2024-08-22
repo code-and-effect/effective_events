@@ -134,7 +134,7 @@ module EffectiveEventsEventRegistration
     # Validate the same registrant user isn't being registered twice
     validate(if: -> { current_step == :details }) do
       present_event_registrants.group_by { |er| er.user }.each do |user, event_registrants|
-        if event_registrants.length > 1
+        if user.present? && event_registrants.length > 1
           errors.add(:base, "Unable to register #{user} more than once")
           event_registrants.each { |er| er.errors.add(:user_id, "cannot be registered more than once") }
         end
@@ -150,10 +150,6 @@ module EffectiveEventsEventRegistration
 
     # If we're submitted. Try to move to completed.
     before_save(if: -> { submitted? }) { try_completed! }
-
-    def delayed_payment_date_upcoming?
-      event&.delayed_payment_date_upcoming?
-    end
 
     def can_visit_step?(step)
       return false if step == :complete && !completed?
@@ -181,12 +177,16 @@ module EffectiveEventsEventRegistration
       with_addons ? wizard_step_keys : (wizard_step_keys - [:addons])
     end
 
-    def find_or_build_submit_fees
-      with_outstanding_coupon_fees(submit_fees)
-    end
-
     def delayed_payment_attributes
       { delayed_payment: event&.delayed_payment, delayed_payment_date: event&.delayed_payment_date }
+    end
+
+    def delayed_payment_date_upcoming?
+      event&.delayed_payment_date_upcoming?
+    end
+
+    def find_or_build_submit_fees
+      with_outstanding_coupon_fees(submit_fees)
     end
 
     # All Fees and Orders
@@ -267,7 +267,7 @@ module EffectiveEventsEventRegistration
 
     event_registrants.each { |er| er.assign_attributes(selected_at: nil) }
     event_ticket_selections.each { |ets| ets.assign_attributes(quantity: 0) }
-    assign_attributes(wizard_steps: {}) # Reset all steps
+    assign_attributes(current_step: nil, wizard_steps: {}) # Reset all steps
 
     save!
   end
@@ -295,6 +295,12 @@ module EffectiveEventsEventRegistration
     event_registrants
   end
 
+  # Assigns the selected at time to start the reservation window
+  def select_event_registrants
+    now = Time.zone.now
+    present_event_registrants.each { |er| er.assign_attributes(selected_at: now) }
+  end
+
   # Looks at any unselected event registrants and assigns a waitlist value
   def waitlist_event_registrants
     present_event_registrants.group_by { |er| er.event_ticket }.each do |event_ticket, event_registrants|
@@ -305,11 +311,6 @@ module EffectiveEventsEventRegistration
         event_registrants.each { |er| er.assign_attributes(waitlisted: false) }
       end
     end
-  end
-
-  def select_event_registrants
-    now = Time.zone.now
-    present_event_registrants.each { |er| er.assign_attributes(selected_at: now) }
   end
 
   def tickets!
@@ -412,13 +413,6 @@ module EffectiveEventsEventRegistration
     end
 
     unavailable
-  end
-
-  def event_ticket_member_users
-    raise("expected owner to be a user") if owner.class.try(:effective_memberships_organization?)
-    users = [owner] + (owner.try(:organizations).try(:flat_map, &:users) || [])
-
-    users.select { |user| user.is_any?(:member) }.uniq
   end
 
   def update_blank_registrants!

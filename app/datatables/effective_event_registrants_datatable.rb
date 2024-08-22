@@ -6,8 +6,11 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
 
     col :name do |er|
       if er.first_name.present?
-        email = (er.user.present? ? masked_email(er.user) : er.email)
-        "#{er.first_name} #{er.last_name}<br><small>#{email}</small>"
+        [
+          "#{er.first_name} #{er.last_name}",
+          ("<small>#{er.organization || er.company}</small>" if er.organization || er.company.present?),
+          ("<small>#{er.email}</small>" if er.email.present?)
+        ].join('<br>').html_safe
       elsif er.owner.present?
         er.owner.to_s + ' - GUEST'
       else
@@ -22,6 +25,8 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
     end
 
     col :user, label: 'Member', visible: false
+    col :organization, visible: false
+
     col :first_name, visible: false
     col :last_name, visible: false
     col :email, visible: false

@@ -18,15 +18,5 @@
         = fr.hidden_field :blank_registrant, value: false
 
       = fr.show_if(:blank_registrant, false) do
-        = render('effective/event_registrants/fields_user', f: fr, ticket: event_ticket)
-        = render('effective/event_registrants/fields_questions', f: fr, ticket: event_ticket)
-
-      -# - if event_ticket.regular?
-      -#   = render('effective/event_registrants/fields_regular', f: fr)
-      -# - elsif event_ticket.member_only?
-      -#   = render('effective/event_registrants/fields_member_only', f: fr)
-      -# - elsif event_ticket.member_or_non_member?
-      -#   = render('effective/event_registrants/fields_member_or_non_member', f: fr)
-      -# - else
-      -#   - raise("Unexpected ticket category: #{event_registrant.event_ticket.category || 'nil'}")
-
+        = render('effective/event_registrants/fields_registrant', f: fr)
+        = render('effective/event_registrants/fields_questions', f: fr)

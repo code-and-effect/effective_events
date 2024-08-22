@@ -8,7 +8,7 @@ module Effective
       raise('expected an Effective::EventRegistrant') unless resource.kind_of?(Effective::EventRegistrant)
 
       @assigns = assigns_for(resource)
-      mail(to: resource.member_email, **headers_for(resource, opts))
+      mail(to: resource.email, **headers_for(resource, opts))
     end
 
     protected

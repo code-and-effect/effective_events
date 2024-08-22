@@ -19,15 +19,6 @@
 
         = f.show_if(:blank_registrant, false, nested: true) do
           %hr
-
-          - if ticket.regular?
-            = render('effective/event_registrants/fields_regular', f: f)
-          - elsif ticket.member_only?
-            = render('effective/event_registrants/fields_member_only', f: f)
-          - elsif ticket.member_or_non_member?
-            = render('effective/event_registrants/fields_member_or_non_member', f: f)
-          - else
-            - raise("Unexpected ticket category: #{ticket.category || 'nil'}")
-
-          = render('effective/event_registrants/fields_questions', f: f, ticket: ticket)
+          = render('effective/event_registrants/fields_registrant', f: f)
+          = render('effective/event_registrants/fields_questions', f: f)
 
