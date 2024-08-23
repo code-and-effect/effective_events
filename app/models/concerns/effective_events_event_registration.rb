@@ -435,6 +435,7 @@ module EffectiveEventsEventRegistration
       raise('unable to make changes to event addons while updating blank registrants')
     end
 
+    assign_attributes(current_step: :details) if current_step.blank? # Enables validations
     save!
 
     update_submit_fees_and_order! if submit_order.present? && !submit_order.purchased?

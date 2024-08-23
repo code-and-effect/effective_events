@@ -5,6 +5,7 @@ $(document).on('select2:select', '[data-event-registrant-user-search]', function
 
   // Set the organization_id
   $form.find('input[type="hidden"][name$="[organization_id]"]').val(data.organization_id || '')
+  $form.find('input[type="hidden"][name$="[organization_type]"]').val(data.organization_type || '')
 
   // Disable everything else
   $form.find('input[name$="[first_name]"]').val(data.first_name || '').prop('disabled', true)
@@ -20,6 +21,7 @@ $(document).on('select2:unselect', '[data-event-registrant-user-search]', functi
 
   // Unset the organization_id
   $form.find('input[type="hidden"][name$="[organization_id]"]').val('')
+  $form.find('input[type="hidden"][name$="[organization_type]"]').val('')
 
   // Enable everything else
   $form.find('input[name$="[first_name]"]').val('').prop('disabled', false)

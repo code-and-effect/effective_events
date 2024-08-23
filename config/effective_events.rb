@@ -12,8 +12,16 @@ EffectiveEvents.setup do |config|
   # Events can be restricted by role
   config.use_effective_roles = true
 
-  # Create effective_memberships organizations from the Ticket Details screen.
+  # Display effective_memberships organizations on the Ticket Details screen instead of a company field
+  # Create representatives when there is a user and an organization
   config.organization_enabled = false
+
+  # Create users when you fill out new user information from the Ticket Details screen. 
+  # Otherwise no users will be created. If true a User will be required for all event_registrants.
+  config.create_users = false
+
+  # Turn on the validation. You must have a company or organization when filling out Ticket Details screen.
+  config.company_or_organization_required = false
 
   # Categories
   config.categories = ['Events']

@@ -18,17 +18,20 @@ module Effective
         if with_organizations
           data[:company] = user.organizations.first.try(:to_s)
           data[:organization_id] = user.organizations.first.try(:id)
+          data[:organization_type] = user.organizations.first.try(:class).try(:name)
         end
 
         { 
           id: user.to_param, 
-          text: to_select2(user),
+          text: to_select2(user, with_organizations),
           data: data
         }
       end
     end
 
     def organizations
+      raise('expected EffectiveEvents.organization_enabled?') unless EffectiveEvents.organization_enabled?
+
       klass = EffectiveMemberships.Organization
       raise('an EffectiveMemberships.Organization is required') unless klass.try(:effective_memberships_organization?)
 
@@ -44,8 +47,8 @@ module Effective
 
     private
 
-    def to_select2(resource)
-      organizations = Array(resource.try(:organizations)).join(', ')
+    def to_select2(resource, with_organizations)
+      organizations = Array(resource.try(:organizations)).join(', ') if with_organizations
 
       [
         "<span>#{resource}</span>",

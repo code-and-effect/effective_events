@@ -16,15 +16,16 @@
   .row
     .col-md= f.email_field :email, input_html: { disabled: disabled }
     .col-md
+      = f.hidden_field :organization_type
+      = f.hidden_field :organization_id
+
       - if EffectiveEvents.organization_enabled? == false
         = f.text_field :company, input_html: { disabled: disabled }
       
       - if EffectiveEvents.organization_enabled?
-        - organizations = EffectiveMemberships.Organization.sorted.all
-
-        - # These are populated by the user selected javascript
         = f.hidden_field :organization_type, value: EffectiveMemberships.Organization.name
-        = f.hidden_field :organization_id
+
+        - organizations = EffectiveMemberships.Organization.sorted.all
 
         - if event_ticket&.member_only?
           - organization_id = (f.object.event_registration&.owner || current_user).try(:organizations).try(:first).try(:id)

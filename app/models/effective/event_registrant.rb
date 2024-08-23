@@ -81,12 +81,21 @@ module Effective
         assign_attributes(user: nil, organization: nil, first_name: nil, last_name: nil, email: nil, company: nil)
       end
 
+      before_validation(if: -> { user.blank? }) do
+        assign_attributes(building_user_and_organization: true) # For member-only ticket validations
+      end
+
       before_validation(if: -> { user.blank? && first_name.present? && last_name.present? && email.present? }) do
-        build_user_and_organization()
+        build_user() if EffectiveEvents.create_users
+        build_organization_and_representative() if EffectiveEvents.organization_enabled?
       end
 
       before_validation(if: -> { user.present? }) do
         assign_attributes(first_name: user.first_name, last_name: user.last_name, email: user.email)
+      end
+
+      before_validation(if: -> { organization.blank? && user.present? && user.class.try(:effective_memberships_organization_user?) }) do
+        assign_attributes(company: user.organizations.first.to_s.presence) if company.blank?
       end
 
       before_validation(if: -> { organization.present? }) do
@@ -109,16 +118,19 @@ module Effective
     validates :user_id, uniqueness: { scope: [:event_id], allow_blank: true, message: 'is already registered for this event' }
 
     # First name, last name and email are always required fields on details
-    with_options(if: -> { registrant_validations_enabled? }) do
-      validates :first_name, presence: true
-      validates :last_name, presence: true
-      validates :email, presence: true
-    end
+    validates :first_name, presence: true, if: -> { registrant_validations_enabled? }
+    validates :last_name, presence: true, if: -> { registrant_validations_enabled? }
+    validates :email, presence: true, if: -> { registrant_validations_enabled? }
+
+    # User, company and organization conditionall required
+    validates :user, presence: true, if: -> { registrant_validations_enabled? && EffectiveEvents.create_users }
+    validates :company, presence: true, if: -> { registrant_validations_enabled? && EffectiveEvents.company_or_organization_required }
+    validates :organization, presence: true, if: -> { registrant_validations_enabled? && EffectiveEvents.company_or_organization_required && EffectiveEvents.organization_enabled? }
 
     # Member ticket: company name is locked in. you can only add to your own company
     validate(if: -> { registrant_validations_enabled? && event_ticket&.member_only? }) do
-      if building_user_and_organization && owner.present? && owner.organizations.exclude?(organization)
-        errors.add(:organization_id, "must be your own #{EffectiveResources.etd(organization)} for member-only tickets") 
+      if building_user_and_organization && owner.present? && Array(owner.try(:organizations)).exclude?(organization)
+        errors.add(:organization_id, "must be your own for member-only tickets") 
       end
 
       errors.add(:user_id, 'must be a member to register for member-only tickets') unless member_present?
@@ -187,7 +199,7 @@ module Effective
       return false if event_ticket.blank? # Invalid anyway
       return true if event_registration.blank? # If we're creating in an Admin area
 
-      event_registration.current_step != :tickets
+      event_registration.current_step == :details
     end
 
     def member_present?
@@ -297,56 +309,63 @@ module Effective
 
     private
 
-    def build_user_and_organization
+    def build_user
       raise('is already purchased') if purchased?
-
       raise('expected no user') unless user.blank?
       raise('expected a first_name') unless first_name.present?
       raise('expected a last_name') unless last_name.present?
       raise('expected a email') unless email.present?
 
-      # Helps the member-only ticket validations
-      assign_attributes(building_user_and_organization: true)
+      return if user_type.blank?
 
       # Add User
-      if user_type.present?
-        user_klass = user_type.constantize
+      user_klass = user_type.constantize
 
-        # First we lookup the user by email. If they actually exist we ignore all other fields
-        existing_user = user_klass.find_by_any_email(email.strip.downcase)
+      # First we lookup the user by email. If they actually exist we ignore all other fields
+      existing_user = user_klass.find_by_any_email(email.strip.downcase)
 
-        if existing_user.present?
-          assign_attributes(user: existing_user)
-          assign_attributes(organization: existing_user.organizations.first) if existing_user.organizations.first.present?
-        else
-          # Otherwise create a new user
-          new_user = user_klass.create(
-            first_name: first_name.strip, 
-            last_name: last_name.strip, 
-            email: email.strip.downcase, 
-            password: SecureRandom.base64(12) + '!@#123abcABC-'
-          )
+      if existing_user.present?
+        assign_attributes(user: existing_user)
 
-          assign_attributes(user: new_user)
+        if EffectiveEvents.organization_enabled? && user_klass.try(:effective_memberships_organization_user?)
+          assign_attributes(organization: existing_user.organizations.first) if existing_user.organizations.present?
         end
+      else
+        # Otherwise create a new user
+        new_user = user_klass.create(
+          first_name: first_name.strip, 
+          last_name: last_name.strip, 
+          email: email.strip.downcase, 
+          password: SecureRandom.base64(12) + '!@#123abcABC-'
+        )
 
-        return false unless user.valid?
+        assign_attributes(user: new_user)
       end
 
+      user.valid?
+    end
+
+    # The organization might already be set here
+    def build_organization_and_representative
+      raise('is already purchased') if purchased?
+
+      return if organization_type.blank?
+
+      # We previously created an invalid user
+      return if user.present? && user.errors.present?
+
       # Add Organization and representative
-      if organization_type.present?
-        organization_klass = organization_type.constantize
+      organization_klass = organization_type.constantize
 
-        # Find or create the organization
-        if organization.present?
-          user.build_representative(organization: organization)
-        else
-          new_organization = organization_klass.where(title: company.strip).first
-          new_organization ||= organization_klass.create(title: company.strip, email: email.strip.downcase)
+      # Find or create the organization
+      if organization.present?
+        user.build_representative(organization: organization) if user.present?
+      elsif company.present?
+        new_organization = organization_klass.where(title: company.strip).first
+        new_organization ||= organization_klass.create(title: company.strip, email: email.strip.downcase)
+        assign_attributes(organization: new_organization)
 
-          user.build_representative(organization: new_organization)
-          assign_attributes(organization: new_organization)
-        end
+        user.build_representative(organization: new_organization) if user.present?
       end
 
       true
