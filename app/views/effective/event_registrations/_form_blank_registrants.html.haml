@@ -1,18 +1,25 @@
 = effective_form_with(model: resource, url: effective_events.update_blank_registrants_event_event_registration_path(event_registration.event, event_registration), method: :put) do |f|
   = f.hidden_field :id
 
+  - event = f.object.event
   - event_registrants = f.object.event_registrants.select(&:blank_registrant?)
 
   %p Please update the information for the following #{pluralize(event_registrants.count, 'incomplete ticket')}:
 
   = f.fields_for :event_registrants, event_registrants do |fr|
     - event_registrant = fr.object
+    - event_ticket = event_registrant.event_ticket
 
     = card do
       %p
-        = event_registrant.event_ticket
+        = event_ticket
         = ' - '
-        = price_to_currency(event_registrant.price)
+
+        - if event_ticket.member_or_non_member? && event_registrant.first_name.blank? && !event.early_bird?
+          = effective_events_ticket_price(event, event_ticket)
+        - else
+          = price_to_currency(event_registrant.price)
+
         = event_registrant.details
 
       = fr.check_box :blank_registrant, label: "I will return and add this ticket's information later"

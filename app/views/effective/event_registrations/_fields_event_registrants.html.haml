@@ -8,7 +8,12 @@
     %p
       = event_ticket
       = ' - '
-      = price_to_currency(event_registrant.price)
+
+      - if event_ticket.member_or_non_member? && event_registrant.first_name.blank? && !event.early_bird?
+        = effective_events_ticket_price(event, event_ticket)
+      - else
+        = price_to_currency(event_registrant.price)
+
       = event_registrant.details
 
     = form.fields_for :event_registrants, event_registrant do |fr|

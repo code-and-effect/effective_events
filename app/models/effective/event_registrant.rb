@@ -164,7 +164,7 @@ module Effective
     end
 
     def title
-      [event_ticket.to_s, name, ('WAITLIST' if waitlisted_not_promoted?)].compact.join(' - ')
+      ["#{event_ticket} - #{name}", details.presence].compact.join(' ').html_safe
     end
 
     def name

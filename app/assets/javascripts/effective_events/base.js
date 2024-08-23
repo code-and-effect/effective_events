@@ -21,7 +21,6 @@ $(document).on('select2:unselect', '[data-event-registrant-user-search]', functi
 
   // Unset the organization_id
   $form.find('input[type="hidden"][name$="[organization_id]"]').val('')
-  $form.find('input[type="hidden"][name$="[organization_type]"]').val('')
 
   // Enable everything else
   $form.find('input[name$="[first_name]"]').val('').prop('disabled', false)
