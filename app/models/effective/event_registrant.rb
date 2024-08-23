@@ -196,8 +196,9 @@ module Effective
     # We create registrants on the tickets step. But don't enforce validations until the details step.
     def registrant_validations_enabled?
       return false if blank_registrant? # They want to come back later
-      return false if event_ticket.blank? # Invalid anyway
+
       return true if event_registration.blank? # If we're creating in an Admin area
+      return false if event_ticket.blank? # Invalid anyway
 
       event_registration.current_step == :details
     end
