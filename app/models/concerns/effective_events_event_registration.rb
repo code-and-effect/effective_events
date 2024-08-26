@@ -17,7 +17,7 @@ module EffectiveEventsEventRegistration
     def effective_events_event_registration?; true; end
 
     def selection_window
-      20.minutes
+      30.minutes
     end
   end
 
