@@ -19,7 +19,7 @@
             - url = @event.external_registration_url.presence || effective_events.new_event_event_registration_path(@event)
             = link_to 'Register', url, class: 'btn btn-lg btn-primary'
 
-        - if @event.file.present?
+        - if @event.file.attached?
           = image_tag url_for(@event.file), class: "effective-events-image d-none d-lg-block float-right", alt: @event.title, width: "350", height: "220"
 
         %ul.list-unstyled.mb-0
