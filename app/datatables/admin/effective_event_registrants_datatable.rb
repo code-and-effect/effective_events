@@ -2,6 +2,7 @@ module Admin
   class EffectiveEventRegistrantsDatatable < Effective::Datatable
     filters do
       scope :unarchived, label: "All"
+      scope :registered
       scope :purchased
       scope :deferred
       scope :not_purchased
@@ -56,7 +57,7 @@ module Admin
       end
       
       col :user, label: 'Member', visible: false
-      col :member_or_non_member_choice, visible: false
+      col :organization, visible: false
 
       col :orders, visible: false
       col :price, as: :price
