@@ -52,7 +52,7 @@ module Effective
 
       [
         "<span>#{resource}</span>",
-        "<small>&lt;#{resource.email}&gt;</small>",
+        "<small>&lt;#{resource.try(:public_email).presence || resource.email}&gt;</small>",
         ("<small>#{organizations}</small>" if organizations.present?)
       ].compact.join(' ')
     end

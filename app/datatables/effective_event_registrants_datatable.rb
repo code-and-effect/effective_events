@@ -10,7 +10,7 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
           "#{er.first_name} #{er.last_name}",
           ("<small>#{er.organization || er.company}</small>" if er.organization || er.company.present?),
           ("<small>#{er.email}</small>" if er.email.present?)
-        ].join('<br>').html_safe
+        ].compact.join('<br>').html_safe
       elsif er.owner.present?
         er.owner.to_s + ' - GUEST'
       else

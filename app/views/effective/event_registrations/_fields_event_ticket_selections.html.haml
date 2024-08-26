@@ -33,7 +33,7 @@
         %td
           %ul.list-unstyled.mb-0
             - # Early Bird
-            - if event.early_bird? && early_bird_price.to_i > 0 && [ticket.member_price, ticket.regular_price].exclude?(ticket.early_bird_price)
+            - if event.early_bird? && ticket.early_bird_price.to_i > 0 && [ticket.member_price, ticket.regular_price].exclude?(ticket.early_bird_price)
               %li
                 - if ticket.regular_price.to_i > 0
                   %div

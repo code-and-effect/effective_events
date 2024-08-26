@@ -190,11 +190,10 @@ module Effective
       event_tickets.any? { |et| et.waitlist? }
     end
 
+    # No longer includes sold_out? we check that separately
     def registerable?
       return false unless published?
       return false if closed?
-      return false if sold_out?
-
       (external_registration? && external_registration_url.present?) || event_tickets.present?
     end
 
@@ -203,10 +202,13 @@ module Effective
       registration_end_at < Time.zone.now
     end
 
-    def sold_out?
+    def sold_out?(except: nil)
+      raise('expected except to be an EventRegistration') if except && !except.class.try(:effective_events_event_registration?)
+
       return false unless event_tickets.present?
       return false if any_waitlist?
-      event_tickets.none? { |event_ticket| event_ticket_available?(event_ticket, quantity: 1) }
+
+      event_tickets.none? { |event_ticket| event_ticket_available?(event_ticket, except: except, quantity: 1) }
     end
 
     def early_bird?
@@ -272,6 +274,7 @@ module Effective
     # Can I register/purchase this many new event tickets?
     def event_ticket_available?(event_ticket, except: nil, quantity: 0)
       raise('expected an EventTicket') unless event_ticket.kind_of?(Effective::EventTicket)
+      raise('expected except to be an EventRegistration') if except && !except.class.try(:effective_events_event_registration?)
       raise('expected quantity to be greater than 0') unless quantity.to_i > 0
 
       return false if event_ticket.archived?

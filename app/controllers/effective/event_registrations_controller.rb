@@ -19,8 +19,8 @@ module Effective
       return if resource.blank?
       return if resource.was_submitted?
       return if resource.event.blank?
-      return if resource.event.registerable?
       return if resource.submit_order&.deferred?
+      return if resource.event.registerable? && !resource.event.sold_out?(except: resource)
 
       flash[:danger] = "Your selected event is no longer available for registration. This event registration is no longer available."
       return redirect_to('/dashboard')

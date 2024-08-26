@@ -76,7 +76,7 @@ module Effective
       self.owner ||= event_registration.owner
     end
 
-    with_options(unless: -> { purchased? }) do
+    with_options(unless: -> { purchased? && !blank_registrant_was }) do
       before_validation(if: -> { blank_registrant? }) do
         assign_attributes(user: nil, organization: nil, first_name: nil, last_name: nil, email: nil, company: nil)
       end
@@ -91,7 +91,7 @@ module Effective
       end
 
       before_validation(if: -> { user.present? }) do
-        assign_attributes(first_name: user.first_name, last_name: user.last_name, email: user.email)
+        assign_attributes(first_name: user.first_name, last_name: user.last_name, email: (user.try(:public_email).presence || user.email))
       end
 
       before_validation(if: -> { organization.blank? && user.present? && user.class.try(:effective_memberships_organization_user?) }) do
@@ -101,10 +101,10 @@ module Effective
       before_validation(if: -> { organization.present? }) do
         assign_attributes(company: organization.to_s)
       end
+    end
 
-      before_validation(if: -> { event_ticket.present? }) do
-        assign_price()
-      end
+    before_validation(if: -> { event_ticket.present? }, unless: -> { purchased? }) do
+      assign_price()
     end
 
     validate(if: -> { event_ticket.present? }, unless: -> { purchased? }) do
