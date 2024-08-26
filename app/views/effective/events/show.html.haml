@@ -19,48 +19,48 @@
             - url = @event.external_registration_url.presence || effective_events.new_event_event_registration_path(@event)
             = link_to 'Register', url, class: 'btn btn-lg btn-primary'
 
-        .row
-          .col
-            %ul.list-unstyled
-              %li.mb-3
-                %label Date and Time
-                %br
-                = effective_events_event_schedule(@event)
+        - if @event.file.present?
+          = image_tag url_for(@event.file), class: "effective-events-image d-none d-lg-block float-right", alt: @event.title, width: "350", height: "220"
 
-              - if @event.registration_start_at.present?
-                %li.mb-3
-                  %label Registration Opens
-                  %br
-                  = @event.registration_start_at.strftime("%A, %B %d, %Y · %l:%M%P")
+        %ul.list-unstyled.mb-0
+          %li.mb-3
+            %label Date and Time
+            %br
+            = effective_events_event_schedule(@event)
 
-              - if @event.early_bird_end_at.present?
-                %li.mb-3
-                  %label Early Bird Rate Ends
-                  %br
-                  = @event.early_bird_end_at.strftime("%A, %B %d, %Y · %l:%M%P")
+          - if @event.registration_start_at.present? && @event.registration_start_at > Time.zone.now
+            %li.mb-3
+              %label Registration Opens
+              %br
+              = @event.registration_start_at.strftime("%A, %B %d, %Y · %l:%M%P")
 
-              - if @event.registration_end_at.present?
-                %li.mb-3
-                  %label Registration Closes
-                  %br
-                  = @event.registration_end_at.strftime("%A, %B %d, %Y · %l:%M%P")
+          - if @event.early_bird_end_at.present?
+            %li.mb-3
+              %label Early Bird Rate Ends
+              %br
+              = @event.early_bird_end_at.strftime("%A, %B %d, %Y · %l:%M%P")
 
-              -# .col-md-auto
-              -#   - if @event.event_tickets.present?
-              -#     %label Tickets
-              -#     %br
-              -#     %ul
-              -#       - @event.event_tickets.each do |ticket|
-              -#         %li= "#{ticket} (#{effective_events_ticket_price(@event, ticket)})"
+          - if @event.registration_end_at.present?
+            %li.mb-3
+              %label Registration Closes
+              %br
+              = @event.registration_end_at.strftime("%A, %B %d, %Y · %l:%M%P")
 
-          - if @event.file.present?
-            .col-lg-4
-              = image_tag url_for(@event.file), class: "effective-events-image d-none d-lg-flex align-self-start", alt: @event.title, width: "350", height: "220"
-
-        .py-3
+          -# .col-md-auto
+          -#   - if @event.event_tickets.present?
+          -#     %label Tickets
+          -#     %br
+          -#     %ul
+          -#       - @event.event_tickets.each do |ticket|
+          -#         %li= "#{ticket} (#{effective_events_ticket_price(@event, ticket)})"
 
         - if @event.body.present?
           .effective-event-body.mb-5
             = @event.body.to_s
+
+        - if @event.registerable?
+          .register.mb-4
+            - url = @event.external_registration_url.presence || effective_events.new_event_event_registration_path(@event)
+            = link_to 'Register', url, class: 'btn btn-lg btn-primary'
 
         = link_to("&larr; #{events_name_label}".html_safe, effective_events.events_path, class: "btn btn-secondary my-4")
