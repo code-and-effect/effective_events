@@ -424,6 +424,8 @@ ActiveRecord::Schema.define(version: 101) do
     t.string "event_registration_type"
     t.integer "user_id"
     t.string "user_type"
+    t.integer "organization_id"
+    t.string "organization_type"
     t.string "first_name"
     t.string "last_name"
     t.string "email"
@@ -434,6 +436,7 @@ ActiveRecord::Schema.define(version: 101) do
     t.string "member_or_non_member_choice"
     t.boolean "waitlisted", default: false
     t.boolean "promoted", default: false
+    t.datetime "selected_at"
     t.datetime "registered_at"
     t.text "response1"
     t.text "response2"
@@ -462,6 +465,15 @@ ActiveRecord::Schema.define(version: 101) do
     t.index ["owner_id", "owner_type"], name: "index_event_registrations_on_owner_id_and_owner_type"
     t.index ["status"], name: "index_event_registrations_on_status"
     t.index ["token"], name: "index_event_registrations_on_token"
+  end
+
+  create_table "event_ticket_selections", force: :cascade do |t|
+    t.integer "event_registration_id"
+    t.string "event_registration_type"
+    t.string "event_ticket_id"
+    t.integer "quantity"
+    t.datetime "updated_at"
+    t.datetime "created_at"
   end
 
   create_table "event_tickets", force: :cascade do |t|

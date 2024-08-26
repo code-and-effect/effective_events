@@ -15,7 +15,7 @@ module Effective
     has_many :event_products, -> { EventProduct.sorted }, inverse_of: :event, dependent: :destroy
     accepts_nested_attributes_for :event_products, allow_destroy: true
 
-    has_many :event_registrants, -> { order(:event_ticket_id).order(:id) }, inverse_of: :event
+    has_many :event_registrants, -> { order(:event_ticket_id, :id) }, inverse_of: :event
     accepts_nested_attributes_for :event_registrants, allow_destroy: true
 
     has_many :event_addons, -> { order(:event_product_id).order(:id) }, inverse_of: :event
@@ -190,11 +190,10 @@ module Effective
       event_tickets.any? { |et| et.waitlist? }
     end
 
+    # No longer includes sold_out? we check that separately
     def registerable?
       return false unless published?
       return false if closed?
-      return false if sold_out?
-
       (external_registration? && external_registration_url.present?) || event_tickets.present?
     end
 
@@ -203,10 +202,13 @@ module Effective
       registration_end_at < Time.zone.now
     end
 
-    def sold_out?
+    def sold_out?(except: nil)
+      raise('expected except to be an EventRegistration') if except && !except.class.try(:effective_events_event_registration?)
+
       return false unless event_tickets.present?
       return false if any_waitlist?
-      event_tickets.none? { |event_ticket| event_ticket_available?(event_ticket, quantity: 1) }
+
+      event_tickets.none? { |event_ticket| event_ticket_available?(event_ticket, except: except, quantity: 1) }
     end
 
     def early_bird?
@@ -250,19 +252,37 @@ module Effective
       start_at
     end
 
+    # The amount of tickets that can be purchased except ones from an event registration
+    def capacity_selectable(event_ticket:, event_registration: nil)
+      return 0 if event_ticket.archived?
+      return 100 if event_ticket.capacity.blank?
+      return 100 if event_ticket.waitlist?
+
+      event_ticket.capacity_selectable(except: event_registration)
+    end
+
+    # The amount of tickets that can be purchased except ones from an event registration
+    def capacity_available(event_ticket:, event_registration: nil)
+      event_ticket.capacity_available(except: event_registration)
+    end
+
+    # Just used in tests so far
+    def capacity_taken(event_ticket:, event_registration: nil)
+      event_ticket.capacity_taken(except: event_registration)
+    end
+
     # Can I register/purchase this many new event tickets?
-    def event_ticket_available?(event_ticket, quantity:)
+    def event_ticket_available?(event_ticket, except: nil, quantity: 0)
       raise('expected an EventTicket') unless event_ticket.kind_of?(Effective::EventTicket)
+      raise('expected except to be an EventRegistration') if except && !except.class.try(:effective_events_event_registration?)
       raise('expected quantity to be greater than 0') unless quantity.to_i > 0
 
       return false if event_ticket.archived?
-      return true if event_ticket.capacity.blank?   # No capacity enforced for this ticket
+      return true if event_ticket.capacity.blank? # No capacity enforced
+      return true if event_ticket.waitlist?       # Always available for waitlist
 
-      # Total number already sold
-      registered = registered_event_registrants.count { |r| r.event_ticket_id == event_ticket.id }
-
-      # If there's capacity for this many more
-      (registered + quantity) <= event_ticket.capacity
+      # Do we have any tickets available left?
+      event_ticket.capacity_available(except: except) >= quantity.to_i
     end
 
     # Can I register/purchase this many new event products?

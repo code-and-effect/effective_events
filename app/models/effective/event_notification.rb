@@ -150,7 +150,7 @@ module Effective
       update_column(:started_at, Time.zone.now)
 
       event_registrants.each do |event_registrant|
-        next if event_registrant.member_email.blank?
+        next if event_registrant.email.blank?
 
         begin
           EffectiveEvents.send_email(email_template, event_registrant, email_notification_params)

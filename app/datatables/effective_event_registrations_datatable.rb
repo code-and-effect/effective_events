@@ -17,6 +17,7 @@ class EffectiveEventRegistrationsDatatable < Effective::Datatable
     col :owner, visible: false, search: :string
     col :status, visible: false
     col :event_registrants, label: 'Registrants', search: :string
+
     col :event_addons, label: 'Add-ons', search: :string
     col :orders, action: :show, visible: false, search: :string
 
@@ -31,7 +32,7 @@ class EffectiveEventRegistrationsDatatable < Effective::Datatable
         end
 
         # Register Again
-        if er.event.registerable?
+        if er.event.registerable? && !er.event.sold_out?
           url = er.event.external_registration_url.presence || effective_events.new_event_event_registration_path(er.event)
           dropdown_link_to('Register Again', url)
         end

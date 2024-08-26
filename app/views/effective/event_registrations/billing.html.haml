@@ -3,7 +3,7 @@
 
   - raise('expected owner to respond to billing_address') unless resource.owner.respond_to?(:billing_address)
 
-  = card('Billing Address') do
+  = card do
     %p Please enter your billing address
 
     = effective_form_with(model: resource, url: wizard_path(step), method: :put) do |f|

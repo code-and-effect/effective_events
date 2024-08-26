@@ -6,8 +6,11 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
 
     col :name do |er|
       if er.first_name.present?
-        email = (er.user.present? ? masked_email(er.user) : er.email)
-        "#{er.first_name} #{er.last_name}<br><small>#{email}</small>"
+        [
+          "#{er.first_name} #{er.last_name}",
+          ("<small>#{er.organization || er.company}</small>" if er.organization || er.company.present?),
+          ("<small>#{er.email}</small>" if er.email.present?)
+        ].compact.join('<br>').html_safe
       elsif er.owner.present?
         er.owner.to_s + ' - GUEST'
       else
@@ -18,14 +21,12 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
     col :id, visible: false
 
     col :event_ticket, search: :string, label: 'Ticket' do |er|
-      [
-        er.event_ticket.to_s,
-        (content_tag(:span, 'Waitlist', class: 'badge badge-warning') if er.waitlisted_not_promoted?),
-        (content_tag(:span, 'Archived', class: 'badge badge-warning') if er.event_ticket&.archived?)
-      ].compact.join('<br>').html_safe
+      [er.event_ticket.to_s, er.details.presence].compact.join('<br>').html_safe
     end
 
     col :user, label: 'Member', visible: false
+    col :organization, visible: false
+
     col :first_name, visible: false
     col :last_name, visible: false
     col :email, visible: false
@@ -35,14 +36,13 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
     col :response2, visible: false
     col :response3, visible: false
 
-    col :details do |registrant|
+    col :responses, label: 'Details' do |registrant|
       [registrant.response1.presence, registrant.response2.presence, registrant.response3.presence].compact.map do |response|
         content_tag(:div, response)
       end.join.html_safe
     end
 
-    # This is the non-waitlisted full price
-    col :event_ticket_price, as: :price, label: 'Price'
+    col :price, as: :price
     col :archived, visible: false
 
     # no actions_col
@@ -56,7 +56,7 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
     end
 
     if event_registration.present?
-      scope = scope.where(event_registration_id: event_registration)
+      scope = scope.where(event_registration_id: event_registration).sorted
     end
 
     scope

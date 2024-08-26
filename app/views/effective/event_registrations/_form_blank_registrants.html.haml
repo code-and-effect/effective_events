@@ -1,32 +1,30 @@
 = effective_form_with(model: resource, url: effective_events.update_blank_registrants_event_event_registration_path(event_registration.event, event_registration), method: :put) do |f|
   = f.hidden_field :id
 
+  - event = f.object.event
   - event_registrants = f.object.event_registrants.select(&:blank_registrant?)
 
   %p Please update the information for the following #{pluralize(event_registrants.count, 'incomplete ticket')}:
 
   = f.fields_for :event_registrants, event_registrants do |fr|
-    - registrant = fr.object
-    - ticket = registrant.event_ticket
+    - event_registrant = fr.object
+    - event_ticket = event_registrant.event_ticket
 
     = card do
       %p
-        = ticket
+        = event_ticket
         = ' - '
-        = price_to_currency(registrant.event_ticket_price)
+
+        - if event_ticket.member_or_non_member? && event_registrant.first_name.blank? && !event.early_bird?
+          = effective_events_ticket_price(event, event_ticket)
+        - else
+          = price_to_currency(event_registrant.price)
+
+        = event_registrant.details
 
       = fr.check_box :blank_registrant, label: "I will return and add this ticket's information later"
 
       = fr.show_if(:blank_registrant, false) do
-        - if ticket.regular?
-          = render('effective/event_registrants/fields_regular', f: fr)
-        - elsif ticket.member_only?
-          = render('effective/event_registrants/fields_member_only', f: fr)
-        - elsif ticket.member_or_non_member?
-          = render('effective/event_registrants/fields_member_or_non_member', f: fr)
-        - else
-          - raise("Unexpected ticket category: #{ticket.category || 'nil'}")
-
-        = render('effective/event_registrants/fields_questions', f: fr, ticket: ticket)
+        = render('effective/event_registrants/fields', f: fr)
 
   = f.submit 'Save Ticket Information', center: true

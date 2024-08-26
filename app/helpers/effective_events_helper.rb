@@ -52,6 +52,8 @@ module EffectiveEventsHelper
 
     tickets.map do |ticket|
       title = ticket.to_s
+      title = "#{title} (archived)" if ticket.archived?
+
       price = effective_events_ticket_price(event, ticket)
 
       label = [title, price].compact.join(' - ')
@@ -79,25 +81,6 @@ module EffectiveEventsHelper
 
       [label, product.to_param, disabled].compact
     end
-  end
-
-  def effective_events_event_registrant_user_collection(event_registrant)
-    raise("expected an Effective::EventRegistrant") unless event_registrant.kind_of?(Effective::EventRegistrant)
-
-    Array(event_registrant.event_registration&.event_ticket_member_users).map do |user|
-      ["<span>#{user}</span> <small>#{user.email}</small>", user.to_param]
-    end
-  end
-
-  def effective_events_event_registrant_user_hint
-    url = if current_user.class.try(:effective_memberships_organization_user?)
-      organization = current_user.membership_organizations.first || current_user.organizations.first
-      effective_memberships.edit_organization_path(organization, anchor: 'tab-representatives') if organization
-    end
-    
-    return if url.blank?
-
-    "Can't find the member you need? <a href='#{url}' target='blank'>Click here</a> to add them to your #{EffectiveResources.etd(EffectiveMemberships.Organization)}."
   end
 
 end

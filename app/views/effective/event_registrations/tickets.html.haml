@@ -1,20 +1,10 @@
 = render 'layout' do
-
-  = render 'effective/event_registrations/content', resource: resource
-
-  = render 'effective/event_registrations/event_tickets', resource: resource
+  = render('effective/event_registrations/content', resource: resource)
 
   = effective_form_with(model: resource, url: wizard_path(step), method: :put) do |f|
     = f.hidden_field :id
 
-    %p Please select one or more tickets to register for this event:
+    = card do
+      = render('effective/event_registrations/fields_event_ticket_selections', form: f)
 
-    = f.has_many :event_registrants, f.object.build_event_registrants, reorder: false do |fr|
-      = render('effective/event_registrants/fields', f: fr, event: f.object.event, namespace: :events)
-
-    - if resource.delayed_payment_date_upcoming? && resource.submit_order&.delayed? && resource.submit_order&.deferred?
-      .alert.alert-info If the price of your registration changes, your order will be automatically updated.
-
-    %hr
-    .mb-4
       = f.save 'Save and Continue'

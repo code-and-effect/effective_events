@@ -1,0 +1,85 @@
+-# Displayed on the tickets step
+- event = form.object.event
+- tickets = event.event_tickets.reject(&:archived?)
+- waitlist = tickets.any? { |ticket| ticket.waitlist? }
+
+- all_member_only_tickets = tickets.all? { |ticket| ticket.member_only? }
+- any_member_only_tickets = tickets.any? { |ticket| ticket.member_only? }
+- is_member = current_user.try(:is?, :member) 
+
+- if event.early_bird?
+  .alert.alert-warning.mb-3
+    Early Bird rates end on
+    = event.early_bird_end_at.strftime("%A, %B %d, %Y at %l:%M%P.")
+
+%table.table.table-sm.table-striped
+  %thead
+    %tr
+      %th Ticket
+      %th Price
+      %th Quantity
+
+  %tbody
+    - tickets.each do |ticket|
+      %tr
+        %td
+          = ticket.to_s
+          - if ticket.capacity.present? && ticket.display_capacity?
+            %br
+            %small
+              #{event.capacity_available(event_ticket: ticket, event_registration: form.object)} remaining
+              - if ticket.waitlist?
+                before waitlist
+        %td
+          %ul.list-unstyled.mb-0
+            - # Early Bird
+            - if event.early_bird? && ticket.early_bird_price.to_i > 0 && [ticket.member_price, ticket.regular_price].exclude?(ticket.early_bird_price)
+              %li
+                - if ticket.regular_price.to_i > 0
+                  %div
+                    %s.text-muted
+                      = price_to_currency(ticket.regular_price)
+
+                - if ticket.member_price.to_i > 0
+                  %div
+                    %s.text-muted
+                      = price_to_currency(ticket.member_price)
+                    .badge.badge-secondary.mr-2 Members
+
+                %div
+                  = price_to_currency(ticket.early_bird_price)
+                  .badge.badge-warning Early Bird
+            - else
+              - if ticket.regular_price.present?
+                %li
+                  = price_to_currency(ticket.regular_price)
+
+              - if ticket.member_price.present?
+                %li
+                  = price_to_currency(ticket.member_price)
+                  .badge.badge-secondary Members
+
+        %td
+          - event_ticket_selection = form.object.event_ticket_selection(event_ticket: ticket)
+
+          = form.fields_for :event_ticket_selections, event_ticket_selection do |f|
+            = f.hidden_field :event_ticket_id
+            = f.hidden_field :quantity, value: 0
+
+            - capacity = event.capacity_selectable(event_ticket: ticket, event_registration: form.object)
+            - disabled = (ticket.member_only? && !is_member)
+
+            - if form.object.selected_expired? && !f.object.errors.present?
+              - f.object.assign_attributes(quantity: 0)
+
+            = f.select :quantity, (0..capacity), label: false, disabled: disabled, 
+              include_blank: false, input_js: { minimumResultsForSearch: 'Infinity' }
+
+- if waitlist
+  %p If the ticket capacity has been reached you will be added to the waitlist.
+
+- unless is_member
+  - if all_member_only_tickets
+    .alert.alert-info.mb-4 You must be a member to purchase tickets.
+  - elsif any_member_only_tickets
+    .alert.alert-info.mb-4 You must be a member to purchase some of these tickets.

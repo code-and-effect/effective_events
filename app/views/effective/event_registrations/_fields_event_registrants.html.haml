@@ -1,0 +1,26 @@
+- # Displayed on the details step
+- event = form.object.event
+
+- form.object.event_registrants.each_with_index do |event_registrant, index|
+  = card("Ticket ##{index+1}") do
+    - event_ticket = event_registrant.event_ticket
+
+    %p
+      = event_ticket
+      = ' - '
+
+      - if event_ticket.member_or_non_member? && event_registrant.first_name.blank? && !event.early_bird?
+        = effective_events_ticket_price(event, event_ticket)
+      - else
+        = price_to_currency(event_registrant.price)
+
+      = event_registrant.details
+
+    = form.fields_for :event_registrants, event_registrant do |fr|
+      - if event.allow_blank_registrants? && (fr.object.user.blank? || fr.object.blank_registrant?)
+        = fr.check_box :blank_registrant, label: "I will return and add this ticket's information later"
+      - else
+        = fr.hidden_field :blank_registrant, value: false
+
+      = fr.show_if(:blank_registrant, false) do
+        = render('effective/event_registrants/fields', f: fr)
