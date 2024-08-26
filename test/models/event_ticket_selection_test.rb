@@ -23,7 +23,7 @@ class EventTicketSelectionTest < ActiveSupport::TestCase
 
   test 'event selection window with 3 capacity' do
     selection_window = EffectiveEvents.EventRegistration.selection_window
-    assert_equal 20.minutes, selection_window
+    assert_equal 30.minutes, selection_window
 
     ticket = build_event_ticket()
     event = ticket.event
