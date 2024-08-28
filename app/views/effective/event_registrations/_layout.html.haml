@@ -5,7 +5,7 @@
     - if resource.display_countdown?
       .mt-4
     
-      = card do
-        %p Your tickets are reserved until #{resource.selected_expires_at.strftime("%I:%M%P %Z")}
+      .alert.alert-warning
+        Your tickets are reserved until #{resource.selected_expires_at.strftime("%I:%M%P %Z")}
 
   .col-lg-9.mb-3= yield
