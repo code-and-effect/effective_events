@@ -133,10 +133,10 @@ module EffectiveEventsEventRegistration
 
     # Validate the same registrant user isn't being registered twice
     validate(if: -> { current_step == :details }) do
-      present_event_registrants.group_by { |er| er.user }.each do |user, event_registrants|
+      present_event_registrants.group_by { |er| [er.user, er.event_ticket] }.each do |(user, event_ticket), event_registrants|
         if user.present? && event_registrants.length > 1
-          errors.add(:base, "Unable to register #{user} more than once")
-          event_registrants.each { |er| er.errors.add(:user_id, "cannot be registered more than once") }
+          errors.add(:base, "Unable to register #{user} for #{event_ticket} more than once")
+          event_registrants.each { |er| er.errors.add(:user_id, "cannot be registered for #{event_ticket} more than once") }
         end
       end
     end
@@ -315,6 +315,8 @@ module EffectiveEventsEventRegistration
 
   def tickets!
     assign_attributes(current_step: :tickets) # Ensure the unavailable tickets validations are run
+
+    reset_all_wizard_steps_after(:tickets) unless was_submitted?
 
     update_event_registrants
     select_event_registrants
