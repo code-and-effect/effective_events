@@ -94,8 +94,10 @@ module Effective
 
       save!
 
-      order = Effective::Order.new(items: self, user: owner)
-      order.purchase!(skip_buyer_validations: true, email: false)
+      unless registered?
+        order = Effective::Order.new(items: self, user: owner)
+        order.purchase!(skip_buyer_validations: true, email: false)
+      end
 
       true
     end
