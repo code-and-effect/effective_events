@@ -69,4 +69,18 @@ class EventRegistrantsTest < ActiveSupport::TestCase
     assert_equal 100_00, event_registrant.price
   end
 
+  test 'archived pricing' do
+    event = build_waitlist_event()
+    event_registration = build_event_registration(event: event)
+
+    event_registrant = event_registration.event_registrants.first
+    assert_equal 100_00, event_registrant.price
+
+    event_registrant.archive!
+    assert_equal 0, event_registrant.price
+
+    event_registrant.unarchive!
+    assert_equal 100_00, event_registrant.price
+  end
+
 end

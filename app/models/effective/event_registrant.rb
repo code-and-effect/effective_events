@@ -181,7 +181,7 @@ module Effective
       [
         (content_tag(:span, 'Member', class: 'badge badge-warning') if member_ticket?),
         (content_tag(:span, 'Waitlist', class: 'badge badge-warning') if waitlisted_not_promoted?),
-        (content_tag(:span, 'Archived', class: 'badge badge-warning') if event_ticket&.archived?)
+        (content_tag(:span, 'Archived', class: 'badge badge-warning') if archived?)
       ].compact.join(' ').html_safe
     end
 
@@ -287,6 +287,18 @@ module Effective
       true
     end
 
+    def archive!
+      super()
+      orders.reject(&:purchased?).each { |order| order.update_purchasable_attributes! }
+      true
+    end
+
+    def unarchive!
+      super()
+      orders.reject(&:purchased?).each { |order| order.update_purchasable_attributes! }
+      true
+    end
+
     def event_ticket_price
       raise('expected an event') if event.blank?
       raise('expected an event ticket') if event_ticket.blank?
@@ -375,7 +387,7 @@ module Effective
     def assign_price
       raise('is already purchased') if purchased?
 
-      price = waitlisted_not_promoted? ? 0 : event_ticket_price
+      price = (waitlisted_not_promoted? || archived?) ? 0 : event_ticket_price
 
       assign_attributes(price: price)
     end

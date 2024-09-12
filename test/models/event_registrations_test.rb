@@ -132,4 +132,43 @@ class EventRegistrationsTest < ActiveSupport::TestCase
     assert_equal 2, event_registration.event_addons.count { |ed| ed.registered? }
   end
 
+  test 'archiving registrants updates the order' do
+    event_registration = build_event_registration()
+    event_registration.ready!
+
+    order = event_registration.submit_order
+    assert_equal 5, order.order_items.length
+    assert_equal 800_00, order.subtotal
+
+    event_registrant = event_registration.event_registrants.first
+    assert_equal 100_00, event_registrant.price
+
+    order_item = order.order_items.find { |oi| oi.purchasable == event_registrant }
+    assert_equal 100_00, order_item.price
+    refute order_item.to_s.include?('Archived')
+
+    # Archive it
+    event_registrant.archive!
+    assert_equal 0, event_registrant.price
+
+    order.reload
+    assert_equal 700_00, order.subtotal
+
+    order_item = order.order_items.find { |oi| oi.purchasable == event_registrant }
+    assert_equal 0, order_item.price
+    assert order_item.to_s.include?('Archived')
+    event_registrant.reload
+
+    # Unarchive it
+    event_registrant.unarchive!
+    assert_equal 100_00, event_registrant.price
+
+    order.reload
+    assert_equal 800_00, order.subtotal
+
+    order_item = order.order_items.find { |oi| oi.purchasable == event_registrant }
+    assert_equal 100_00, order_item.price
+    refute order_item.to_s.include?('Archived')
+  end
+
 end
