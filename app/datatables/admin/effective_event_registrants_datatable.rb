@@ -21,7 +21,7 @@ module Admin
 
       col :event
 
-      col :owner, visible: false
+      col :owner
       col :event_registration, visible: false
 
       if attributes[:event_id]
@@ -56,7 +56,7 @@ module Admin
         end
       end
       
-      col :user, label: 'Member', visible: false
+      col :user, visible: false
       col :organization, visible: false
 
       col :orders, visible: false
@@ -79,6 +79,10 @@ module Admin
 
       if attributes[:event_id].present?
         scope = scope.where(event: event)
+      end
+
+      if (user_id = attributes[:for_id]).present? && (user_type = attributes[:for_type]).present?
+        scope = scope.where(user_id: user_id, user_type: user_type).or(scope.where(owner_id: user_id, owner_type: user_type))
       end
 
       scope
