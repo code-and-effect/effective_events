@@ -45,7 +45,7 @@ module EffectiveEventsHelper
 
     # Allow an admin to assign archived tickets
     authorized = (namespace == :admin)
-    member = current_user.try(:is_any?, :member)
+    member = current_user.try(:membership_present?)
 
     tickets = (authorized ? event.event_tickets : event.event_tickets.reject(&:archived?))
     tickets = tickets.reject { |ticket| ticket.member_only? } unless (authorized || member)

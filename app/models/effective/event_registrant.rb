@@ -204,7 +204,7 @@ module Effective
     end
 
     def member_present?
-      user.try(:is?, :member) || organization.try(:is?, :member)
+      user.try(:membership_present?) || organization.try(:membership_present?)
     end
 
     def member_ticket?

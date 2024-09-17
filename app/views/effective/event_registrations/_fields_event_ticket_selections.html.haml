@@ -5,7 +5,7 @@
 
 - all_member_only_tickets = tickets.all? { |ticket| ticket.member_only? }
 - any_member_only_tickets = tickets.any? { |ticket| ticket.member_only? }
-- is_member = current_user.try(:is?, :member) 
+- is_member = current_user.try(:membership_present?)
 
 - if event.early_bird?
   .alert.alert-warning.mb-3
