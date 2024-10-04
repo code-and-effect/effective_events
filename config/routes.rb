@@ -24,11 +24,6 @@ EffectiveEvents::Engine.routes.draw do
         put :update_blank_registrants, on: :member
       end
     end
-
-    resources :event_registrants_select2_ajax, only: [] do
-      get :users, on: :collection
-      get :organizations, on: :collection
-    end
   end
 
   namespace :admin do

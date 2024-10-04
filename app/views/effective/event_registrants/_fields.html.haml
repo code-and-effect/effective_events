@@ -1,6 +1,6 @@
 .event-registrant-user-fields
   - user_klass = (f.object.user || current_user).class
-  - ajax_url = (effective_events.users_event_registrants_select2_ajax_index_path unless Rails.env.test?)
+  - ajax_url = (effective_resources.users_effective_ajax_index_path unless Rails.env.test?)
   - disabled = (f.object.user.present? && f.object.user.persisted? && f.object.user.errors.blank?)
   - event_ticket = f.object.event_ticket
 

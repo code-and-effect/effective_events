@@ -10,7 +10,7 @@
   - if f.object.new_record?
     -# User
     - klass = (f.object.owner || current_user).class
-    - ajax_url = (@select2_users_ajax_path || effective_resources.users_admin_select2_ajax_index_path) unless Rails.env.test?
+    - ajax_url = (effective_resources.users_effective_ajax_index_path unless Rails.env.test?)
 
     = f.hidden_field :owner_type, value: klass.name
     = f.select :owner_id, klass.all, ajax_url: ajax_url, label: 'User'
