@@ -40,11 +40,11 @@
               %br
               = @event.early_bird_end_at.strftime("%A, %B %d, %Y · %l:%M%P")
 
-          - if @event.registration_end_at.present?
-            %li.mb-3
-              %label Registration Closes
-              %br
-              = @event.registration_end_at.strftime("%A, %B %d, %Y · %l:%M%P")
+          -#- if @event.registration_end_at.present?
+          -#  %li.mb-3
+          -#    %label Registration Closes
+          -#    %br
+          -#    = @event.registration_end_at.strftime("%A, %B %d, %Y · %l:%M%P")
 
           -# .col-md-auto
           -#   - if @event.event_tickets.present?
