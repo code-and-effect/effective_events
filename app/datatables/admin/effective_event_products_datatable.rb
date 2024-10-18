@@ -32,13 +32,13 @@ module Admin
 
       col :registered_event_addons, label: 'Registered Names' do |product|
         product.registered_event_addons.reject(&:archived?).sort_by(&:to_s).map do |addon|
-          content_tag(:div, addon.owner.to_s, class: 'col-resource_item')
+          content_tag(:div, addon.name.to_s, class: 'col-resource_item')
         end.join.html_safe
       end
 
       col :purchased_event_addons, label: 'Purchased Names', visible: false do |product|
         product.purchased_event_addons.reject(&:archived?).sort_by(&:to_s).map do |addon|
-          content_tag(:div, addon.owner.to_s, class: 'col-resource_item')
+          content_tag(:div, addon.name.to_s, class: 'col-resource_item')
         end.join.html_safe
       end
 
