@@ -10,7 +10,7 @@ EffectiveEvents::Engine.routes.draw do
 
     # Event Category routes
     match 'events/:category', to: 'events#index', via: :get, constraints: lambda { |req|
-      EffectiveEvents.categories.map(&:parameterize).include?(req.params['category'])
+      (EffectiveEvents.categories.map(&:parameterize) + ['past']).include?(req.params['category'])
     }
 
     match "events/:category/:id", to: 'events#show', via: :get, constraints: lambda { |req|

@@ -16,7 +16,7 @@ module Effective
 
     # Base collection to search.
     def collection
-      Event.events(user: current_user, unpublished: unpublished).upcoming
+      Event.events(user: current_user, unpublished: unpublished)
     end
 
     def per_page
@@ -55,13 +55,16 @@ module Effective
       events = collection()
       raise('expected an ActiveRecord collection') unless events.kind_of?(ActiveRecord::Relation)
 
+      # Filter by upcoming or past
+      events = (category == 'past') ? events.past : events.upcoming
+
       # Filter by term
       if term.present?
         events = Effective::Resource.new(events).search_any(term)
       end
 
       # Filter by category
-      if category.present?
+      if category.present? && category != 'past'
         events = events.where(category: category)
       end
 

@@ -1,6 +1,7 @@
 .effective-event-sidebar
   %ul.nav.flex-column{role: 'navigation'}
-    = nav_link_to('All Events', effective_events.events_path, class: "effective-event-all")
+    = nav_link_to('Upcoming Events', effective_events.events_path, class: "effective-event-all")
+    = nav_link_to('Past Events', effective_events.events_path + '/past', class: "effective-event-past")
 
     - EffectiveEvents.categories.each do |category|
       = nav_link_to(category, effective_events.events_path + '/' + category.parameterize, class: "effective-event-#{category.parameterize}")

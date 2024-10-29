@@ -147,6 +147,7 @@ module Effective
     validates :delayed_payment, inclusion: { in: [false], message: "cannot be used for external registration events" }, if: -> { external_registration? }
     validates :delayed_payment_date, presence: true, if: -> { delayed_payment? }
     validates :delayed_payment_date, absence: true, unless: -> { delayed_payment? }
+    validates :slug, exclusion: { in: Array(EffectiveEvents.categories) + ['past'], message: "must not match a category name or past" }
 
     validate(if: -> { start_at && end_at }) do
       errors.add(:end_at, 'must be after start date') unless start_at < end_at
