@@ -83,6 +83,8 @@ module Effective
 
     scope :sorted, -> { order(start_at: :desc) }
 
+    scope :for_sitemap, -> { published }
+
     scope :deep, -> { 
       base = includes(:event_registrants, :event_tickets, :rich_texts) 
       base = base.includes(:pg_search_document) if defined?(PgSearch)
