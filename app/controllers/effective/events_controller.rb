@@ -8,13 +8,19 @@ module Effective
     }
 
     def index
-      if event_category.present?
+      EffectiveResources.authorize!(self, :index, Effective::Event)
+
+      # Page Title
+      if event_category.blank?
+        @page_title = "Upcoming #{EffectiveResources.ets(Effective::Event)}"
+      elsif event_category == 'past'
+        @page_title = "Past #{EffectiveResources.ets(Effective::Event)}"
+      elsif event_category.present?
         @page_title = event_category
         @event_category = event_category
       else
-        @page_title ||= view_context.events_name_label
+        @page_title = view_context.events_name_label
       end
-      EffectiveResources.authorize!(self, :index, Effective::Event)
 
       # Sometimes we just display a Datatable for the events
       @datatable = EffectiveResources.best('EffectiveEventsDatatable').new
@@ -57,7 +63,7 @@ module Effective
 
     def event_category
       return nil unless params[:category].present?
-      EffectiveEvents.categories.find { |category| category.parameterize == params[:category] }
+      (Array(EffectiveEvents.categories) + ['past']).find { |category| category.parameterize == params[:category] }
     end
 
     def search_params
