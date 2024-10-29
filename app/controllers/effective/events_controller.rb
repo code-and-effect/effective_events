@@ -63,7 +63,7 @@ module Effective
 
     def event_category
       return nil unless params[:category].present?
-      (EffectiveEvents.categories + ['past']).find { |category| category.parameterize == params[:category] }
+      (Array(EffectiveEvents.categories) + ['past']).find { |category| category.parameterize == params[:category] }
     end
 
     def search_params
