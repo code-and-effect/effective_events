@@ -75,7 +75,7 @@ module Admin
     end
 
     collection do
-      scope = Effective::EventRegistrant.deep.registered
+      scope = Effective::EventRegistrant.deep.all
 
       if attributes[:event_id].present?
         scope = scope.where(event: event)
