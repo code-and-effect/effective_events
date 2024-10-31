@@ -141,6 +141,18 @@ module EffectiveEventsEventRegistration
       end
     end
 
+    # Validate the same registrant user isn't registered on another registration
+    validate(if: -> { current_step == :details }) do
+      present_event_registrants.select { |er| er.user.present? }.each do |er|
+        existing = Effective::EventRegistrant.unarchived.registered.where(event_ticket: er.event_ticket, user: er.user).where.not(id: er)
+
+        if existing.present?
+          errors.add(:base, "Unable to register #{er.user} for #{er.event_ticket}. They've already been registered")
+          er.errors.add(:user_id, "Unable to register #{er.user} for #{er.event_ticket}. They've already been registered")
+        end
+      end
+    end
+
     # Validate all products are available for registration
     validate(if: -> { current_step == :addons }) do
       unavailable_event_products.each do |event_product|

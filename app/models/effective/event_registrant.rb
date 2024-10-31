@@ -114,9 +114,6 @@ module Effective
     validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
     validates :email, email: true
 
-    # This works for persisted and adding a new one. But not adding two at same time in a registration
-    validates :user_id, uniqueness: { scope: [:event_ticket_id], allow_blank: true, message: 'is already registered for this event ticket' }
-
     # First name, last name and email are always required fields on details
     validates :first_name, presence: true, if: -> { registrant_validations_enabled? }
     validates :last_name, presence: true, if: -> { registrant_validations_enabled? }
