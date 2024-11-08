@@ -1,12 +1,12 @@
 module Admin
   class EffectiveEventRegistrantsDatatable < Effective::Datatable
     filters do
-      scope :unarchived, label: "All"
       scope :registered
-      scope :purchased
+      scope :purchased_or_created_by_admin, label: 'Purchased'
       scope :deferred
       scope :not_purchased
       scope :archived
+      scope :all
     end
 
     datatable do
@@ -60,7 +60,15 @@ module Admin
       col :organization, visible: false
 
       col :orders, visible: false
-      col :price, as: :price
+
+      col(:price, as: :price) do |registrant|
+        [
+          (badge('ADMIN') if registrant.created_by_admin?),
+          price_to_currency(registrant.price)
+        ].compact.join(' ').html_safe
+      end
+
+      col :created_by_admin, visible: false
 
       col :first_name, visible: false
       col :last_name, visible: false

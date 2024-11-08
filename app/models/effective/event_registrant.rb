@@ -55,6 +55,8 @@ module Effective
 
       archived              :boolean
 
+      created_by_admin      :boolean
+
       # Acts as Purchasable
       price                 :integer
       qb_item_name          :string
@@ -69,7 +71,8 @@ module Effective
 
     scope :sorted, -> { order(:event_ticket_id, :id) }
     scope :deep, -> { includes(:event, :event_ticket, :owner) }
-    scope :registered, -> { where.not(registered_at: nil) }
+    scope :registered, -> { unarchived.where.not(registered_at: nil) }
+    scope :purchased_or_created_by_admin, -> { purchased.or(unarchived.where(created_by_admin: true)) }
 
     before_validation(if: -> { event_registration.present? }) do
       self.event ||= event_registration.event

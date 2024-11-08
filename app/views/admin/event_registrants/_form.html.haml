@@ -37,4 +37,7 @@
 
   = f.check_box :archived, label: "Archive this registrant. It will be displayed as archived on the owner's event registration"
 
+  - if f.object.new_record?
+    = f.hidden_field :created_by_admin, value: true
+
   = f.submit 'Save'

@@ -24,6 +24,9 @@
   = f.check_box :archived, label: "Archive this addon. It will be displayed as archived on the owner's event registration"
 
   - if f.object.new_record?
+    = f.hidden_field :created_by_admin, value: true
+
+  - if f.object.new_record?
     = f.submit 'Save and Mark Registered'
   - else
     = f.submit 'Save'

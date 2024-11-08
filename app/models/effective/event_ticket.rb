@@ -95,7 +95,7 @@ module Effective
       raise('expected except to be an EventRegistration') if except && !except.class.try(:effective_events_event_registration?)
 
       event_registrants.select do |er| 
-        (er.registered? || er.selected_not_expired?) && (except.blank? || er.event_registration_id != except.id)
+        (er.registered? || er.selected_not_expired?) && (except.blank? || er.event_registration_id != except.id) && !er.archived?
       end
     end
 

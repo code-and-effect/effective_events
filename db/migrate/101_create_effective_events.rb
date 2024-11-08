@@ -105,6 +105,7 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.integer :price
 
       t.boolean :archived, default: false
+      t.boolean :created_by_admin, default: false
 
       t.timestamps
     end
@@ -146,6 +147,7 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.integer :price
 
       t.boolean :archived, default: false
+      t.boolean :created_by_admin, default: false
 
       t.timestamps
     end

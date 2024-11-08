@@ -381,6 +381,7 @@ ActiveRecord::Schema.define(version: 101) do
     t.integer "purchased_order_id"
     t.integer "price"
     t.boolean "archived", default: false
+    t.boolean "created_by_admin", default: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -444,6 +445,7 @@ ActiveRecord::Schema.define(version: 101) do
     t.integer "purchased_order_id"
     t.integer "price"
     t.boolean "archived", default: false
+    t.boolean "created_by_admin", default: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
