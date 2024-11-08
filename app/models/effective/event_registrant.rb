@@ -73,6 +73,7 @@ module Effective
     scope :deep, -> { includes(:event, :event_ticket, :owner) }
     scope :registered, -> { unarchived.where.not(registered_at: nil) }
     scope :purchased_or_created_by_admin, -> { purchased.or(unarchived.where(created_by_admin: true)) }
+    scope :not_purchased_not_created_by_admin, -> { not_purchased.where(created_by_admin: false) }
 
     before_validation(if: -> { event_registration.present? }) do
       self.event ||= event_registration.event
