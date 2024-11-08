@@ -37,15 +37,15 @@ module Admin
       col :category, visible: false
 
       col :registered_event_registrants_count, label: 'Registered' do |event|
-        event.event_registrants.registered.unarchived.count
+        event.event_registrants.registered.count
       end
 
       col :purchased_event_registrants_count, label: 'Deferred', visible: false do |event|
-        event.event_registrants.deferred.unarchived.count
+        event.event_registrants.deferred.count
       end
 
       col :purchased_event_registrants_count, label: 'Purchased', visible: false do |event|
-        event.event_registrants.purchased.unarchived.count
+        event.event_registrants.purchased.count
       end
 
 

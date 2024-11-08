@@ -1,11 +1,12 @@
 module Admin
   class EffectiveEventAddonsDatatable < Effective::Datatable
     filters do
-      scope :unarchived, label: "All"
-      scope :purchased
+      scope :registered
+      scope :purchased_or_created_by_admin, label: 'Purchased'
       scope :deferred
-      scope :not_purchased
+      scope :not_purchased_not_created_by_admin, label: 'Not Purchased'
       scope :archived
+      scope :all
     end
 
     datatable do
@@ -36,7 +37,7 @@ module Admin
     end
 
     collection do
-      scope = Effective::EventAddon.deep.registered.includes(:purchased_order, :owner)
+      scope = Effective::EventAddon.deep.includes(:purchased_order, :owner)
 
       if attributes[:event_id].present?
         scope = scope.where(event: event)
