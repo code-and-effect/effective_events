@@ -1,4 +1,4 @@
-.effective-event-sidebar
+.effective-event-sidebar.font-weight-bold.text-center.text-lg-left
   %ul.nav.flex-column{role: 'navigation'}
     = nav_link_to("Upcoming #{ets(Effective::Event)}", effective_events.events_path, class: "effective-event-all")
     = nav_link_to("Past #{ets(Effective::Event)}", effective_events.events_path + '/past', class: "effective-event-past")

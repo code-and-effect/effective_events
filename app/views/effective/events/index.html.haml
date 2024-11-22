@@ -1,11 +1,11 @@
 = render 'layout' do
   .row
     - if EffectiveEvents.categories.length > 1
-      .d-none.d-lg-block.col-lg-3
+      .d-lg-block.col-lg-3.order-2.order-lg-1
         -#= render('effective/events/form', event_search: @event_search)
         = render('effective/events/sidebar')
 
-    .col
+    .col.order-1.order-lg-2
       %h1.effective-title.mb-4= @page_title
 
       - results = @event_search.results(page: params[:page])
@@ -15,5 +15,5 @@
       - else
         = render(results) # This renders effective/events/event
 
-      %nav.d-flex.justify-content-center
+      %nav.d-flex.justify-content-center.mb-4
         = bootstrap_paginate(results, per_page: @event_search.per_page)

@@ -77,6 +77,8 @@ module Effective
         events.reorder(published_start_at: :asc)
       when 'Sort by Event Date'
         events.reorder(start_at: :asc)
+      else
+        events
       end
 
       events

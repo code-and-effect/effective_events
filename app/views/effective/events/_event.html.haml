@@ -1,12 +1,12 @@
 .row.mb-5.effective-events{class: "effective-events-#{event.category.to_s.parameterize}"}
   - # Do not show banners for past events
-  - if event.file.present? && (event.start_at > Time.zone.now)
+  - if event.file.attached? && event.upcoming?
     .col-lg-4
       = link_to effective_events.event_path(event) do
         = image_tag url_for(event.file), class: "effective-events-image d-none d-lg-flex align-self-start", alt: event.title, width: "350", height: "220"
 
   .col
-    - if event.start_at < Time.zone.now
+    - if event.past?
       .badge.badge-primary.badge-event.mb-2 Past Event
 
     - if event.category.present? && EffectiveEvents.categories.length > 1
