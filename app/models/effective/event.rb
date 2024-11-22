@@ -214,6 +214,14 @@ module Effective
       event_tickets.none? { |event_ticket| event_ticket_available?(event_ticket, except: except, quantity: 1) }
     end
 
+    def upcoming?
+      end_at > Time.zone.now
+    end
+
+    def past?
+      end_at < Time.zone.now
+    end
+
     def early_bird?
       return false if early_bird_end_at.blank?
       early_bird_end_at > Time.zone.now

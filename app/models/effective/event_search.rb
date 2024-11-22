@@ -55,27 +55,30 @@ module Effective
       events = collection()
       raise('expected an ActiveRecord collection') unless events.kind_of?(ActiveRecord::Relation)
 
-      # Filter by upcoming or past
-      events = (category == 'past') ? events.past : events.upcoming
-
       # Filter by term
       if term.present?
         events = Effective::Resource.new(events).search_any(term)
       end
 
-      # Filter by category
-      if category.present? && category != 'past'
-        events = events.where(category: category)
+      # Filter by upcoming or past and then apply default sorting
+      if category.present?
+        if category == 'past'
+          events = events.past.sorted
+        else
+          events = events.where(category: category).sorted
+        end
+      else
+        events = events.upcoming.reorder(start_at: :asc)
       end
 
-      # Apply Sorting
+      # Apply sorting from the search form
       events = case order.to_s
       when 'Sort by Published Date'
         events.reorder(published_start_at: :asc)
       when 'Sort by Event Date'
         events.reorder(start_at: :asc)
       else
-        events.reorder(start_at: :asc) # Default Sort by Event Date
+        events
       end
 
       events
