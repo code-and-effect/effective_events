@@ -36,10 +36,6 @@ module Effective
       @event = resource_scope.find(params[:id])
       @upcoming_events = resource_scope.upcoming.where.not(id: @event.id)
 
-      if @event.respond_to?(:roles_permit?)
-        raise Effective::AccessDenied.new('Access Denied', :show, @event) unless @event.roles_permit?(current_user)
-      end
-
       EffectiveResources.authorize!(self, :show, @event)
 
       if EffectiveResources.authorized?(self, :admin, :effective_events)
