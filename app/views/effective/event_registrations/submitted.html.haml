@@ -2,7 +2,7 @@
   = render 'effective/event_registrations/content', resource: resource
 
   - raise('expected a submitted event_registration') unless resource.submitted?
-  - raise('expected a deffered event_registration submit_order') unless resource.submit_order&.deferred?
+  - raise('expected a deffered event_registration submit_order') unless resource.submit_order&.was_deferred?
 
   -# - if resource.event.delayed?
   -#   - raise('expected event delayed_payment_date to match order delayed_payment_date') unless resource.event.delayed_payment_date == resource.submit_order.delayed_payment_date
