@@ -14,7 +14,7 @@
 
     %p
       Please
-      = link_to("Continue registration for #{registration.event}", effective_events.event_event_registration_build_path(registration.event, registration, registration.next_step), 'data-turbolinks' => false, class: 'btn btn-primary')
+      = link_to("Continue registration", effective_events.event_event_registration_build_path(registration.event, registration, registration.next_step), 'data-turbolinks' => false, class: 'btn btn-primary')
       or you can
       = link_to('Abandon registration', effective_events.event_event_registration_path(registration.event, registration), 'data-confirm': "Really delete registration for #{registration.event}?", 'data-method': :delete, class: 'btn btn-danger')
       to register for another event.
