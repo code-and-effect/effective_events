@@ -113,13 +113,10 @@ module Effective
     scope :events, -> (user: nil, category: nil, unpublished: false) {
       scope = all.deep
 
-      if defined?(EffectiveRoles) && EffectiveEvents.use_effective_roles
-        scope = scope.for_role(user&.roles)
-      end
-
-      if user.blank?
-        scope = scope.where(authenticate_user: false)
-      end
+      # We include member only events for all users
+      # if defined?(EffectiveRoles) && EffectiveEvents.use_effective_roles
+      #   scope = scope.for_role(user&.roles)
+      # end
 
       if category.present?
         scope = scope.where(category: category)

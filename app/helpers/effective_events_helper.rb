@@ -15,6 +15,24 @@ module EffectiveEventsHelper
     ets(Effective::Event)
   end
 
+  def event_status_badge(event)
+    event.roles.map do |role|
+      content_tag(:span, "#{role.to_s.upcase} ONLY", class: 'badge badge-secondary')
+    end.join(' ').html_safe
+  end
+
+  def admin_event_status_badge(event)
+    return nil unless EffectiveResources.authorized?(self, :admin, :effective_events)
+
+    if event.try(:archived?)
+      content_tag(:span, 'ARCHIVED', class: 'badge badge-secondary')
+    elsif event.draft?
+      content_tag(:span, 'NOT PUBLISHED', class: 'badge badge-danger')
+    elsif event.published? == false
+      content_tag(:span, "TO BE PUBLISHED AT #{event.published_start_at&.strftime('%F %H:%M') || 'LATER'}", class: 'badge badge-danger')
+    end
+  end
+
   def effective_events_event_schedule(event)
     if event.start_at.beginning_of_day == event.end_at.beginning_of_day
       "#{event.start_at.strftime("%A, %B %d, %Y · %l:%M%P")} - #{event.end_at.strftime("%l:%M%P")}"
