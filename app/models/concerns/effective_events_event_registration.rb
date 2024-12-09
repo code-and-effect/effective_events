@@ -342,6 +342,14 @@ module EffectiveEventsEventRegistration
     save!
   end
 
+  def details!
+    after_commit do
+      update_submit_fees_and_order! if submit_order.present?
+    end
+
+    save!
+  end
+
   def addons!
     after_commit do
       update_submit_fees_and_order! if submit_order.present?
