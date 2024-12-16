@@ -321,6 +321,11 @@ module Effective
       (waitlisted? && !promoted?)
     end
 
+    # Manual admin action only
+    def send_confirmation_email!
+      EffectiveEvents.send_email(:event_registrant_confirmation, self)
+    end
+
     private
 
     def build_user

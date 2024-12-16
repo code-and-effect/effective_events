@@ -1,0 +1,10 @@
+%p Event Confirmation
+
+- if @event.rich_text_confirmation_email.present?
+  = @event.rich_text_confirmation_email.to_s.html_safe
+
+%p= @event.to_s
+%p= pluralize(@event_registrants.length, 'registrant') + ' registered'
+%p= pluralize(@event_addons.length, 'addon') + ' added'
+
+%p= link_to('View your registration', effective_events.event_event_registration_url(@event, @event_registration))

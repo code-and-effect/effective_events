@@ -4,11 +4,44 @@ module Effective
     include EffectiveMailer
     include EffectiveEmailTemplatesMailer
 
+    # For the notifications. No longer used.
     def event_registrant_purchased(resource, opts = {})
       raise('expected an Effective::EventRegistrant') unless resource.kind_of?(Effective::EventRegistrant)
 
       @assigns = assigns_for(resource)
       mail(to: resource.email, **headers_for(resource, opts))
+    end
+
+    # Sent on registration purchase
+    # Sent on delayed payment date registration submitted
+    # Sent on delayed payment date registration update 
+    # Sent on update blank registrants
+    def event_registration_confirmation(resource, opts = {})
+      raise('expected an event registration') unless resource.class.try(:effective_events_event_registration?)
+
+      @event_registration = resource
+      @event = resource.event
+      @event_registrants = resource.event_registrants
+      @event_addons = resource.event_addons
+
+      subject = subject_for(__method__, "Event Confirmation - #{@event}", resource, opts)
+      headers = headers_for(resource, opts)
+
+      mail(to: resource.owner.email, subject: subject, **headers)
+    end
+
+    # Sent manually by an admin to one registrant
+    def event_registrant_confirmation(resource, opts = {})
+      raise('expected an event registrant') unless resource.kind_of?(Effective::EventRegistrant)
+
+      @event_registrant = resource
+      @event = resource.event
+      @event_registration = resource.event_registration # Optional
+
+      subject = subject_for(__method__, "Event Registrant Confirmation - #{@event}", resource, opts)
+      headers = headers_for(resource, opts)
+
+      mail(to: resource.email, subject: subject, **headers)
     end
 
     protected

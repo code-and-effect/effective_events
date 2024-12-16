@@ -41,6 +41,9 @@ module Admin
         end
       end
 
+      col :delayed_payment, visible: false
+      col :delayed_payment_date, visible: false
+
       # These show too much information to be useful to admins, rely on the edit screen
       # col :event_tickets, search: :string
       # col :event_products, search: :string

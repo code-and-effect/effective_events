@@ -1,0 +1,10 @@
+%p Event Registrant Confirmation
+
+- if @event.rich_text_confirmation_email.present?
+  = @event.rich_text_confirmation_email.to_s.html_safe
+
+%p= @event.to_s
+%p= @event_registrant.to_s
+
+- if @event_registration.present? && @event_registrant.user == @event_registration.owner
+  %p= link_to('View your registration', effective_events.event_event_registration_url(@event, @event_registration))
