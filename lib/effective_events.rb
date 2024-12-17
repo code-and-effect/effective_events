@@ -9,7 +9,7 @@ module EffectiveEvents
       :events_table_name, :event_registrants_table_name, :event_tickets_table_name, :event_ticket_selections_table_name,
       :event_registrations_table_name, :event_products_table_name, :event_addons_table_name, :event_notifications_table_name,
       :mailer, :parent_mailer, :deliver_method, :mailer_layout, :mailer_sender, :mailer_admin, :mailer_subject,
-      :layout, :per_page, :use_effective_roles, :categories, :events_hint_text,
+      :layout, :per_page, :use_effective_roles, :categories, :events_hint_text, :send_confirmation_email,
       :organization_enabled, :create_users, :company_or_organization_required,
       :event_registration_class_name
     ]
@@ -37,6 +37,10 @@ module EffectiveEvents
   # If we can create delayed payment events at all
   def self.delayed?
     !!EffectiveOrders.try(:delayed?) 
+  end
+
+  def self.send_confirmation_email?
+    send_confirmation_email == true
   end
 
 end

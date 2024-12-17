@@ -488,6 +488,8 @@ module EffectiveEventsEventRegistration
   # Sent on delayed payment date registration update 
   # Sent on update blank registrants
   def send_event_registration_confirmation!
+    return false unless EffectiveEvents.send_confirmation_email?
+
     EffectiveEvents.send_email(:event_registration_confirmation, self)
   end
 
