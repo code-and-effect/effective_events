@@ -29,6 +29,9 @@ EffectiveEvents.setup do |config|
   # Hint text for event images attachments
   config.events_hint_text = 'Optional. Shown on the events index and event pages. Dimensions are 220px tall and 350px wide.'
 
+  # Send confirmation emails
+  config.send_confirmation_email = false
+
   # Mailer Settings
   # Please see config/initializers/effective_resources.rb for default effective_* gem mailer settings
   #
