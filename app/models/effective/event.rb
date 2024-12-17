@@ -33,6 +33,7 @@ module Effective
 
     # rich_text_body
     # rich_text_excerpt
+    # rich_text_confirmation_email
 
     # rich_text_all_steps_content
     # rich_text_start_content

@@ -1,0 +1,22 @@
+%h2 Event Registrant Confirmation
+
+%p Event: #{@event.title}
+%p Date: #{effective_events_event_schedule(@event)}
+%p Ticket: #{@event_registrant.purchasable_name.gsub('<br>', ' - ').html_safe} - #{price_to_currency(@event_registrant.price)}
+
+- if @event_registrant.responses.present?
+  %p= @event_registrant.responses
+
+- if @event_registration.present? && @event_registrant.user == @event_registration.owner
+  %p= link_to('View your registration', effective_events.event_event_registration_url(@event, @event_registration))
+
+- if @event.rich_text_confirmation_email.present?
+  %hr
+  = @event.rich_text_confirmation_email.to_s.html_safe
+
+- if @event.delayed_payment?
+  %strong Please note:
+  %ul
+    %li Credit card payment will be processed on #{@event.delayed_payment_date.strftime("%A, %B %d, %Y")} 
+    %li Changes and cancellations must be made before this date.
+    %li A receipt will be sent to you after the transaction is completed.

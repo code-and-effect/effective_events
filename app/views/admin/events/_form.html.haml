@@ -31,11 +31,11 @@
     = tab 'Wizard' do
       = render '/admin/events/form_event_registration_content', event: event
 
-    = tab 'Email' do
-      %p Click New to add one or more emails.
+    -# = tab 'Email' do
+    -#   %p Click New to add one or more emails.
 
-      - datatable = Admin::EffectiveEventNotificationsDatatable.new(event_id: event.id)
-      = render_datatable(datatable, inline: true, simple: true)
+    -#   - datatable = Admin::EffectiveEventNotificationsDatatable.new(event_id: event.id)
+    -#   = render_datatable(datatable, inline: true, simple: true)
 
     = tab 'Access' do
       = render '/admin/events/form_access', event: event

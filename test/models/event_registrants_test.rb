@@ -82,5 +82,4 @@ class EventRegistrantsTest < ActiveSupport::TestCase
     event_registrant.unarchive!
     assert_equal 100_00, event_registrant.price
   end
-
 end

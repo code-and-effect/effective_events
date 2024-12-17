@@ -1,0 +1,45 @@
+%h2 Event Registration Confirmation
+
+%p Event: #{@event.title}
+%p Date: #{effective_events_event_schedule(@event)}
+%p= link_to('View your registration', effective_events.event_event_registration_url(@event, @event_registration))
+
+- if @event.rich_text_confirmation_email.present?
+  %hr
+  = @event.rich_text_confirmation_email.to_s.html_safe
+
+- if @event.delayed_payment?
+  %strong Please note:
+  %ul
+    %li Credit card payment will be processed on #{@event.delayed_payment_date.strftime("%A, %B %d, %Y")} 
+    %li Changes and cancellations must be made before this date.
+    %li A receipt will be sent to you after the transaction is completed.
+
+%hr
+
+- responses = Array(@event_registrants).any? { |er| er.responses.present? }
+
+%table.table
+  %thead
+    %tr
+      %th Qty
+      %th Ticket
+      - if responses
+        %th Details
+      %th Price
+  %tbody
+    - Array(@event_registrants).each do |er|
+      %tr
+        %td 1
+        %td= er.purchasable_name
+        - if responses
+          %td= er.responses
+        %td= price_to_currency(er.price)
+
+    - Array(@event_addons).each do |ea|
+      %tr
+        %td 1
+        %td= ea.purchasable_name
+        - if responses
+          %td= ea.notes
+        %td= price_to_currency(ea.price)

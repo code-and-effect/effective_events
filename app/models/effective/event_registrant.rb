@@ -178,12 +178,31 @@ module Effective
       end
     end
 
+    # Used in email and tickets datatable
+    def full_name
+      if first_name.present?
+        [
+          name,
+          ("<small>#{organization || company}</small>" if organization || company.present?),
+          ("<small>#{email}</small>" if email.present?)
+        ].compact.join('<br>').html_safe
+      elsif owner.present?
+        owner.to_s + ' - GUEST'
+      else
+        'GUEST'
+      end
+    end
+
     def details
       [
         (content_tag(:span, 'Member', class: 'badge badge-warning') if member_ticket?),
         (content_tag(:span, 'Waitlist', class: 'badge badge-warning') if waitlisted_not_promoted?),
         (content_tag(:span, 'Archived', class: 'badge badge-warning') if archived?)
       ].compact.join(' ').html_safe
+    end
+
+    def responses
+      [response1.presence, response2.presence, response3.presence].compact.join('<br>').html_safe
     end
 
     def purchasable_name
@@ -319,6 +338,11 @@ module Effective
 
     def waitlisted_not_promoted?
       (waitlisted? && !promoted?)
+    end
+
+    # Manual admin action only
+    def send_confirmation_email!
+      EffectiveEvents.send_email(:event_registrant_confirmation, self)
     end
 
     private

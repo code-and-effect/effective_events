@@ -49,6 +49,8 @@ EffectiveEvents::Engine.routes.draw do
 
       post :archive, on: :member
       post :unarchive, on: :member
+
+      post :send_confirmation_email, on: :member
     end
 
     resources :event_addons, except: [:show] do
