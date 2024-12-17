@@ -27,7 +27,7 @@ module Effective
       @event_registrants = resource.event_registrants
       @event_addons = resource.event_addons
 
-      subject = subject_for(__method__, "Event Confirmation - #{@event}", resource, opts)
+      subject = subject_for(__method__, "Confirmation - #{@event}", resource, opts)
       headers = headers_for(resource, opts)
 
       mail(to: resource.owner.email, subject: subject, **headers)
@@ -41,7 +41,7 @@ module Effective
       @event = resource.event
       @event_registration = resource.event_registration # Optional
 
-      subject = subject_for(__method__, "Event Registrant Confirmation - #{@event}", resource, opts)
+      subject = subject_for(__method__, "Confirmation - #{@event}", resource, opts)
       headers = headers_for(resource, opts)
 
       mail(to: resource.email, subject: subject, **headers)
