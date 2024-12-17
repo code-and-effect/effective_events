@@ -4,6 +4,9 @@ module Effective
     include EffectiveMailer
     include EffectiveEmailTemplatesMailer
 
+    helper EffectiveEventsHelper
+    helper EffectiveOrdersHelper
+
     # For the notifications. No longer used.
     def event_registrant_purchased(resource, opts = {})
       raise('expected an Effective::EventRegistrant') unless resource.kind_of?(Effective::EventRegistrant)

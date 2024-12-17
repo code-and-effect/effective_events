@@ -4,20 +4,7 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
   datatable do
     order :id
 
-    col :name do |er|
-      if er.first_name.present?
-        [
-          "#{er.first_name} #{er.last_name}",
-          ("<small>#{er.organization || er.company}</small>" if er.organization || er.company.present?),
-          ("<small>#{er.email}</small>" if er.email.present?)
-        ].compact.join('<br>').html_safe
-      elsif er.owner.present?
-        er.owner.to_s + ' - GUEST'
-      else
-        'Unknown'
-      end
-    end
-
+    col :full_name, label: 'Name'
     col :id, visible: false
 
     col :event_ticket, search: :string, label: 'Ticket' do |er|
@@ -36,11 +23,7 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
     col :response2, visible: false
     col :response3, visible: false
 
-    col :responses, label: 'Details' do |registrant|
-      [registrant.response1.presence, registrant.response2.presence, registrant.response3.presence].compact.map do |response|
-        content_tag(:div, response)
-      end.join.html_safe
-    end
+    col :responses, label: 'Details'
 
     col :price, as: :price
     col :archived, visible: false

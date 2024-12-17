@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/code-and-effect/effective_memberships.git
-  revision: 0866f358f0621e86a1618f621e5a3cab03c55859
+  revision: f20009205d36175cd94bac1d0c391ad9259ef835
   specs:
-    effective_memberships (0.32.11)
+    effective_memberships (0.49.4)
       effective_bootstrap
       effective_datatables (>= 4.0.0)
       effective_email_templates
@@ -166,7 +166,7 @@ GEM
       effective_resources
       rails (>= 4.0.0)
       sassc
-    effective_products (0.3.2)
+    effective_products (0.3.9)
       effective_bootstrap
       effective_datatables (>= 4.0.0)
       effective_orders
