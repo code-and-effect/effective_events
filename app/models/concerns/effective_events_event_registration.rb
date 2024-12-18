@@ -229,7 +229,7 @@ module EffectiveEventsEventRegistration
       notifications = event.event_notifications.select(&:registrant_purchased?)
       notifications.each { |notification| notification.notify!(event_registrants: event_registrants) }
 
-      send_event_registration_confirmation! unless submit_order&.delayed?
+      send_event_registration_confirmation! unless submit_order&.delayed? || submit_order&.deferred?
     end
   end
 
