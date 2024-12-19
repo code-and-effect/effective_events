@@ -31,7 +31,7 @@ module Effective
       subject = subject_for(__method__, "Confirmation - #{@event}", resource, opts)
       headers = headers_for(resource, opts)
 
-      mail(to: resource.owner.email, subject: subject, **headers)
+      mail(to: resource.owner.email, cc: mailer_admin, subject: subject, **headers)
     end
 
     # Sent manually by an admin to one registrant
@@ -45,7 +45,7 @@ module Effective
       subject = subject_for(__method__, "Confirmation - #{@event}", resource, opts)
       headers = headers_for(resource, opts)
 
-      mail(to: resource.email, subject: subject, **headers)
+      mail(to: resource.email, cc: mailer_admin, subject: subject, **headers)
     end
 
     protected
