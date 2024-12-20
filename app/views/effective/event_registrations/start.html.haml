@@ -1,5 +1,5 @@
 = render 'layout' do
-  = render 'effective/event_registrations/content', resource: resource
+  = render('effective/event_registrations/content', resource: resource)
 
   - # Signed out
   - if resource.owner.blank?

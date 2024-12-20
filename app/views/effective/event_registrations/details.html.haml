@@ -1,4 +1,5 @@
 = render 'layout' do
+  = render('effective/event_registrations/changing', resource: resource)
   = render('effective/event_registrations/content', resource: resource)
 
   = effective_form_with(model: resource, url: wizard_path(step), method: :put) do |f|

@@ -1,5 +1,6 @@
 = render 'layout' do
-  = render 'effective/event_registrations/content', resource: resource
+  = render('effective/event_registrations/changing', resource: resource)
+  = render('effective/event_registrations/content', resource: resource)
 
   - raise('expected owner to respond to billing_address') unless resource.owner.respond_to?(:billing_address)
 
