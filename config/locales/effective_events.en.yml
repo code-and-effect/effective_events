@@ -6,7 +6,8 @@ en:
   activerecord:
     models:
       effective/event: 'Event'
-      effective/event_registrant: 'Event registrant'
+      effective/event_registrant: 'Event Registrant'
+      effective/event_addon: 'Event Addon'
 
     attributes:
       effective/event_registrant:
