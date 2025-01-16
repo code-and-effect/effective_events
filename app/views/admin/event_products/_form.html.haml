@@ -3,12 +3,7 @@
 
   = f.text_field :title
   = f.number_field :capacity, hint: 'The number of addons will be limited to this capacity. Leave blank for unlimited capacity.'
-
-  = f.price_field :price, hint: 'A price of $0 will allow a checkout for free.'
-  = f.check_box :tax_exempt
-
-  - if defined?(EffectiveQbSync)
-    = f.text_field :qb_item_name, label: 'QuickBooks item name'
+  = acts_as_purchasable_fields(f)
 
   = f.check_box :archived, label: 'Archive this product. It will be unavailable for purchase.'
 
