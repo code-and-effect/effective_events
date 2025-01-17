@@ -22,7 +22,7 @@ module Effective
       return if resource.submit_order&.deferred?
       return if resource.event.registerable? && !resource.event.sold_out?(except: resource)
 
-      flash[:danger] = "Your selected event is no longer available for registration. This event registration is no longer available."
+      flash[:danger] = "Your selected event is not available for registration. This event registration not available."
       return redirect_to(view_context.return_to_dashboard_path)
     end
 
