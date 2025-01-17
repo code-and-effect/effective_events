@@ -44,7 +44,7 @@ module Effective
 
     scope :sorted, -> { order(:id) }
     scope :deep, -> { includes(:event, :event_product) }
-    scope :registered, -> { purchased_or_deferred.or(where(created_by_admin: true)) }
+    scope :registered, -> { unarchived.purchased_or_deferred.or(where(created_by_admin: true)) }
     scope :purchased_or_created_by_admin, -> { purchased.or(unarchived.where(created_by_admin: true)) }
     scope :not_purchased_not_created_by_admin, -> { not_purchased.where(created_by_admin: false) }
 

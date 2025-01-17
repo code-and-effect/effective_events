@@ -1,7 +1,8 @@
 module Admin
   class EffectiveEventRegistrantsDatatable < Effective::Datatable
     filters do
-      scope :registered
+      scope :registered, default: true
+      scope :not_registered
       scope :purchased_or_created_by_admin, label: 'Purchased'
       scope :deferred
       scope :not_purchased_not_created_by_admin, label: 'Not Purchased'
@@ -21,8 +22,14 @@ module Admin
 
       col :event
 
-      col :owner
+      col :owner, visible: false
       col :event_registration, visible: false
+
+      if defined?(EffectiveMemberships) && EffectiveMemberships.Organization.respond_to?(:sponsors)
+        col :sponsorship, search: EffectiveMemberships.Organization::SPONSORSHIPS do |er|
+          (er.owner || er.user).try(:sponsorship)
+        end
+      end
 
       if attributes[:event_id]
         col :event_ticket, search: Effective::EventTicket.where(event: event).all

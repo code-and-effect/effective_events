@@ -1,7 +1,7 @@
 module Admin
   class EffectiveEventAddonsDatatable < Effective::Datatable
     filters do
-      scope :registered
+      scope :registered, default: true
       scope :purchased_or_created_by_admin, label: 'Purchased'
       scope :deferred
       scope :not_purchased_not_created_by_admin, label: 'Not Purchased'
