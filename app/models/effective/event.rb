@@ -194,8 +194,13 @@ module Effective
     # No longer includes sold_out? we check that separately
     def registerable?
       return false unless published?
-      return false if closed?
+      return false unless registration_available?
       (external_registration? && external_registration_url.present?) || event_tickets.present?
+    end
+
+    def registration_available?
+      return false if registration_start_at.blank? || registration_end_at.blank?
+      (registration_start_at..registration_end_at).cover?(Time.zone.now)
     end
 
     def closed?
