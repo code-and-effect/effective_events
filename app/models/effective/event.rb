@@ -139,9 +139,6 @@ module Effective
     validates :end_at, presence: true
     validates :external_registration_url, url: true
 
-    validates :registration_start_at, presence: true, unless: -> { external_registration? }
-    validates :registration_end_at, presence: true, unless: -> { external_registration? }
-
     validates :delayed_payment, inclusion: { in: [false], message: "cannot be used for external registration events" }, if: -> { external_registration? }
     validates :delayed_payment_date, presence: true, if: -> { delayed_payment? }
     validates :delayed_payment_date, absence: true, unless: -> { delayed_payment? }
