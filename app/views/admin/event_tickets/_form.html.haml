@@ -50,8 +50,10 @@
         = f.show_if_any(:category, ['Member Only', 'Member or Non-Member']) do
           = f.price_field :member_price, hint: 'A price of $0 will allow a checkout for free when selecting a member.'
 
-    .row
-      .col-md-6= qb_item_name_field(f)
+    - if EffectiveOrders.use_item_names?
+      .row
+        .col-md-6= qb_item_name_field(f)
+
     = f.check_box :tax_exempt, label: "Yes, this #{etd(f.object)} is tax exempt"
     = f.check_box :archived, label: 'Archive this ticket. While archived, it cannot be purchased by users but registrants can only be added by an admin.'
 
