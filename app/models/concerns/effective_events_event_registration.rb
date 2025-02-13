@@ -167,6 +167,14 @@ module EffectiveEventsEventRegistration
       return false if step == :complete && !completed?
       return true if step == :complete && completed?
 
+      if draft? && orders.any? { |order| order.declined? && order.delayed? }
+        return [:billing, :checkout].include?(step)
+      end
+
+      if submitted? && submit_order&.declined?
+        return [:billing, :checkout, :submitted].include?(step)
+      end
+
       # If submitted with a cheque/phone deferred (but not delayed) processor then lock down the steps.
       if submitted? && !delayed_payment_date_upcoming?
         return (step == :submitted) 
@@ -218,6 +226,24 @@ module EffectiveEventsEventRegistration
       true
     end
 
+    # Ready to check out
+    # This is called by the "ready_checkout" before_action in wizard_controller/before_actions.rb
+    # We have to handle the edge case where a delayed payment was declined
+    # Because we use submitted & completed here instead of submitted as our exit state, it's a bit weird
+    def ready!
+      without_current_step do
+        if submitted? && submit_order&.declined?
+          build_submit_fees_and_order(force: true)
+          wizard_steps.delete(:checkout)
+          wizard_steps.delete(:submitted)
+          unsubmitted!
+        else
+          build_submit_fees_and_order
+          save!
+        end
+      end
+    end
+
     def after_submit_deferred!
       update_deferred_event_registration!
       send_event_registration_confirmation!
@@ -230,6 +256,8 @@ module EffectiveEventsEventRegistration
       notifications.each { |notification| notification.notify!(event_registrants: event_registrants) }
 
       send_event_registration_confirmation! unless submit_order&.delayed? || submit_order&.deferred?
+
+      true
     end
   end
 
@@ -250,6 +278,7 @@ module EffectiveEventsEventRegistration
     return false if done?
     return false unless selected_at.present?
     return false unless current_step.present?
+    return false if draft? && orders.any? { |order| order.declined? && order.delayed? }
 
     [:start, :tickets, :submitted, :complete].exclude?(current_step)
   end
