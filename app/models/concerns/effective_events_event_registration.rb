@@ -230,6 +230,8 @@ module EffectiveEventsEventRegistration
       notifications.each { |notification| notification.notify!(event_registrants: event_registrants) }
 
       send_event_registration_confirmation! unless submit_order&.delayed? || submit_order&.deferred?
+
+      true
     end
   end
 
@@ -388,6 +390,13 @@ module EffectiveEventsEventRegistration
 
     completed!
     true
+  end
+
+  def unsubmit!
+    raise('cannot unsubmit with a purchased order') if submit_order&.purchased?
+
+    assign_attributes(submitted_at: nil, completed_at: nil, wizard_steps: {})
+    draft!
   end
 
   def build_event_registrant(event_ticket:)
