@@ -31,6 +31,7 @@ module Effective
       return if resource.was_submitted?
       return if resource.event.blank?
       return if resource.selection_not_expired?
+      return if resource.orders.any? { |order| order.declined? && order.delayed? }
 
       resource.ticket_selection_expired!
 

@@ -12,6 +12,14 @@
 
   = render 'effective/event_registrations/summary', event_registration: resource
 
+  - # This should only happen with a delayed order that was then declined
+  - if resource.submit_order&.declined?
+    = card do
+      %h3 Declined
+      %p Your card was declined by the payment processor: #{resource.submit_order.declined_reason}
+      %p Please try again.
+      %p= link_to('Click here to checkout again', wizard_path(:checkout))
+
   - if resource.event.allow_blank_registrants? && EffectiveResources.authorized?(self, :update_blank_registrants, resource)
     = card do
       %h3 Incomplete Ticket Information
