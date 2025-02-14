@@ -21,6 +21,7 @@ module Effective
       return if resource.event.blank?
       return if resource.submit_order&.deferred?
       return if resource.event.registerable? && !resource.event.sold_out?(except: resource)
+      return if resource.just_let_them_edit_tickets_and_register_anyway?
 
       flash[:danger] = "Your selected event is not available for registration. This event registration not available."
       return redirect_to(view_context.return_to_dashboard_path)
@@ -32,6 +33,7 @@ module Effective
       return if resource.event.blank?
       return if resource.selection_not_expired?
       return if resource.orders.any? { |order| order.declined? && order.delayed? }
+      return if resource.just_let_them_edit_tickets_and_register_anyway?
 
       resource.ticket_selection_expired!
 
