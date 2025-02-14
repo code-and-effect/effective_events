@@ -522,6 +522,10 @@ module EffectiveEventsEventRegistration
     EffectiveEvents.send_email(:event_registration_confirmation, self)
   end
 
+  def just_let_them_edit_tickets_and_register_anyway?
+    false
+  end
+
   private
 
   def update_deferred_event_registration!
