@@ -15,39 +15,6 @@ module Effective
       mail(to: resource.email, **headers_for(resource, opts))
     end
 
-    # Sent on registration purchase
-    # Sent on delayed payment date registration submitted
-    # Sent on delayed payment date registration update 
-    # Sent on update blank registrants
-    def event_registration_confirmation(resource, opts = {})
-      raise('expected an event registration') unless resource.class.try(:effective_events_event_registration?)
-
-      @event_registration = resource
-      @event = resource.event
-
-      @order = @event_registration.submit_order
-      raise('expected an event registration submit_order') unless @order.present?
-
-      subject = subject_for(__method__, "Confirmation - #{@event}", resource, opts)
-      headers = headers_for(resource, opts)
-
-      mail(to: resource.owner.email, cc: mailer_admin, subject: subject, **headers)
-    end
-
-    # Sent manually by an admin to one registrant
-    def event_registrant_confirmation(resource, opts = {})
-      raise('expected an event registrant') unless resource.kind_of?(Effective::EventRegistrant)
-
-      @event_registrant = resource
-      @event = resource.event
-      @event_registration = resource.event_registration # Optional
-
-      subject = subject_for(__method__, "Confirmation - #{@event}", resource, opts)
-      headers = headers_for(resource, opts)
-
-      mail(to: resource.email, cc: mailer_admin, subject: subject, **headers)
-    end
-
     protected
 
     def assigns_for(resource)

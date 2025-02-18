@@ -19,9 +19,6 @@ EffectiveEvents.setup do |config|
   # Events can be restricted by role
   config.use_effective_roles = true
 
-  # Send confirmation emails
-  config.send_confirmation_email = true
-
   # Mailer Settings
   # Please see config/initializers/effective_resources.rb for default effective_* gem mailer settings
   #
