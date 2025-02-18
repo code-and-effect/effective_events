@@ -343,7 +343,8 @@ module Effective
 
     # Manual admin action only
     def send_confirmation_email!
-      EffectiveEvents.send_email(:event_registrant_confirmation, self)
+      order = event_registration&.submit_order
+      order.send_order_emails!
     end
 
     private

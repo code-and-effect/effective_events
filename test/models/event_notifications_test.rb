@@ -64,8 +64,8 @@ class EventNotificationsTest < ActiveSupport::TestCase
     event_registration.ready!
     order = event_registration.submit_order
 
-    # 1 order email to user, 1 order email to admin, 1 confirmation email
-    assert_email(count: 3) { order.purchase! }
+    # 1 order email to user, 1 order email to admin
+    assert_email(count: 2) { order.purchase! }
   end
 
   test 'notify! with html content' do

@@ -246,7 +246,6 @@ module EffectiveEventsEventRegistration
 
     def after_submit_deferred!
       update_deferred_event_registration!
-      send_event_registration_confirmation!
     end
 
     def after_submit_purchased!
@@ -254,8 +253,6 @@ module EffectiveEventsEventRegistration
 
       notifications = event.event_notifications.select(&:registrant_purchased?)
       notifications.each { |notification| notification.notify!(event_registrants: event_registrants) }
-
-      send_event_registration_confirmation! unless submit_order&.delayed? || submit_order&.deferred?
 
       true
     end
@@ -390,16 +387,6 @@ module EffectiveEventsEventRegistration
     save!
   end
 
-  # Not involved in money processing
-  # This will only be called when the order is previously delayed and deferred
-  # And we're going through the registration again with a saved card
-  def checkout!
-    if submit_order.present? && submit_order.delayed? && submit_order.deferred?
-      send_event_registration_confirmation!
-    end
-
-    save!
-  end
 
   def try_completed!
     return false unless submitted?
@@ -506,20 +493,14 @@ module EffectiveEventsEventRegistration
     update_submit_fees_and_order! if submit_order.present? && !submit_order.purchased?
 
     after_commit do
-      send_event_registration_confirmation!
+      send_order_emails!
     end
 
     true
   end
 
-  # Sent on registration purchase
-  # Sent on delayed payment date registration submitted
-  # Sent on delayed payment date registration update 
-  # Sent on update blank registrants
-  def send_event_registration_confirmation!
-    return false unless EffectiveEvents.send_confirmation_email?
-
-    EffectiveEvents.send_email(:event_registration_confirmation, self)
+  def send_order_emails!
+    submit_order.send_order_emails!
   end
 
   def just_let_them_edit_tickets_and_register_anyway?
