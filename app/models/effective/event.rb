@@ -48,6 +48,8 @@ module Effective
     acts_as_tagged if respond_to?(:acts_as_tagged)
     log_changes if respond_to?(:log_changes)
 
+    attr_accessor :mailer_preview # Set by the mailer preview. Disabled delayed payment validations
+
     effective_resource do
       title                  :string
 
@@ -161,7 +163,7 @@ module Effective
     end
 
     validate(if: -> { delayed_payment? }) do
-      errors.add(:delayed_payment, 'no delayed payment processor available') unless EffectiveOrders.try(:delayed?)
+      errors.add(:delayed_payment, 'no delayed payment processor available') unless EffectiveOrders.try(:delayed?) || mailer_preview
     end
 
     validate(if: -> { file.attached? }) do

@@ -75,8 +75,8 @@ class EventRegistrationsTest < ActiveSupport::TestCase
     event_registration.ready!
     order = event_registration.submit_order
 
-    # 1 order email to user, 1 order email to admin, 1 confirmation email
-    assert_email(count: 3) { order.purchase! }
+    # 1 order email to user, 1 order email to admin
+    assert_email(count: 2) { order.purchase! }
   end
 
   test 'sends order receipt emails AND event notifications on event registration purchase' do
@@ -97,9 +97,9 @@ class EventRegistrationsTest < ActiveSupport::TestCase
     event_registration.ready!
     order = event_registration.submit_order
 
-    # 1 order email to user, 1 order email to admin, 1 event confirmation
+    # 1 order email to user, 1 order email to admin
     # Plus 3 registrant purchased emails
-    assert_email(count: 6) { order.purchase! }
+    assert_email(count: 5) { order.purchase! }
   end
 
   test 'purchasing order marks registrants registered' do
