@@ -27,7 +27,7 @@ module Admin
 
       if defined?(EffectiveMemberships) && EffectiveMemberships.Organization.respond_to?(:sponsors)
         col :sponsorship, search: EffectiveMemberships.Organization::SPONSORSHIPS do |er|
-          (er.owner || er.user).try(:sponsorship)
+          er.user.try(:sponsorship)
         end
       end
 
