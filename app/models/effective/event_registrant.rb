@@ -161,6 +161,21 @@ module Effective
       registered! if event_registration.blank? && !registered?
     end
 
+    # Build an event registration for this registrant with a $0 purchased order
+    after_commit(if: -> { event_registration.blank? && created_by_admin? }) do
+      event_registration = EffectiveEvents.EventRegistration.new(event: event, owner: owner)
+      event_registration.event_registrants << self
+      event_registration.build_submit_fees_and_order()
+      event_registration.save!
+
+      order = event_registration.submit_order
+      order.order_items.each { |oi| oi.assign_attributes(price: 0) }
+      order.order_items.each { |oi| oi.purchasable.assign_attributes(price: 0) }
+      order.mark_as_purchased!
+
+      order.update_columns(subtotal: 0, total: 0, tax: 0, amount_owing: 0)
+    end
+
     def to_s
       persisted? ? title : 'registrant'
     end
@@ -345,6 +360,10 @@ module Effective
     def send_confirmation_email!
       order = event_registration&.submit_order
       order.send_order_emails!
+    end
+
+    def event_registration_submit_order
+      event_registration&.submit_order
     end
 
     private

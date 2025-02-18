@@ -25,6 +25,10 @@
           - if f.object.purchased?
             = f.static_field :event_ticket, label: 'Purchased ticket'
 
+          - if (order = f.object.event_registration_submit_order).present?
+            = f.static_field :event_registration_submit_order, label: 'Order' do
+              = link_to(order, effective_orders.admin_order_path(order), target: '_blank')
+
           = f.select :event_ticket_id, effective_events_event_tickets_collection(f.object.event, namespace), required: true
 
           - if f.object.event.allow_blank_registrants? && (f.object.new_record? || f.object.blank_registrant?)
@@ -34,6 +38,10 @@
 
           = f.show_if(:blank_registrant, false) do
             = render('effective/event_registrants/fields', f: f)
+
+          - if f.object.new_record?
+            %p.text-muted
+              %small A $0 purchased event registration and order will be created. No emails will be sent.
 
   = f.check_box :archived, label: "Archive this registrant. It will be displayed as archived on the owner's event registration"
 

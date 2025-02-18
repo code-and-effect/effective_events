@@ -387,7 +387,6 @@ module EffectiveEventsEventRegistration
     save!
   end
 
-
   def try_completed!
     return false unless submitted?
     return false unless submit_order&.purchased?
