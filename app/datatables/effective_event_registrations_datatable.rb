@@ -32,7 +32,7 @@ class EffectiveEventRegistrationsDatatable < Effective::Datatable
         end
 
         # Register Again
-        if er.event.registerable? && !er.event.sold_out?
+        if (er.event.registerable? && !er.event.sold_out?) || (er.event.registerable_when_impersonating? && impersonating?)
           url = er.event.external_registration_url.presence || effective_events.new_event_event_registration_path(er.event)
           dropdown_link_to('Register Again', url)
         end

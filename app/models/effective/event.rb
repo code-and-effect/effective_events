@@ -197,6 +197,10 @@ module Effective
       (external_registration? && external_registration_url.present?) || event_tickets.present?
     end
 
+    def registerable_when_impersonating?
+      (external_registration? && external_registration_url.present?) || event_tickets.present?
+    end
+
     def registration_available?
       return false if registration_start_at.blank? || registration_end_at.blank?
       (registration_start_at..registration_end_at).cover?(Time.zone.now)
