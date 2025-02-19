@@ -14,7 +14,7 @@
         - if @event.closed?
           .alert.alert-warning.mb-3 This event is no longer available.
 
-        - if @event.registerable?
+        - if @event.registerable? || (impersonating? && @event.registerable_when_impersonating?)
           .register.mb-4
             - url = @event.external_registration_url.presence || effective_events.new_event_event_registration_path(@event)
             = link_to 'Register', url, class: 'btn btn-lg btn-primary'

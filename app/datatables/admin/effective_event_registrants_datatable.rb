@@ -86,7 +86,11 @@ module Admin
       col :response2
       col :response3
 
-      actions_col
+      actions_col do |registrant|
+        if EffectiveResources.authorized?(self, :impersonate, registrant.owner)
+          dropdown_link_to("Impersonate", "/admin/users/#{registrant.owner_id}/impersonate", data: { confirm: "Really impersonate #{registrant.owner}?", method: :post, remote: true })
+        end
+      end
     end
 
     collection do
