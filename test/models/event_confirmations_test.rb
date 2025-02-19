@@ -5,6 +5,7 @@ class EventConfirmationsTest < ActiveSupport::TestCase
     event_registration = build_event_registration()
     event_registration.event.update!(rich_text_confirmation_email: "<p>Test Content</p>")
     event_registration.ready!
+    event_registration.submit_order.mark_as_purchased!
 
     assert_email(count: 2) do
       event_registration.send_order_emails!
@@ -18,6 +19,8 @@ class EventConfirmationsTest < ActiveSupport::TestCase
     event = build_event()
     event_registration = build_event_registration(event: event)
     event_registration.event.update!(rich_text_confirmation_email: "<p>Test Content</p>")
+    event_registration.ready!
+    event_registration.submit_order.mark_as_purchased!
 
     event_registrant = event_registration.event_registrants.last
 

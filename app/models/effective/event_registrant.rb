@@ -358,8 +358,11 @@ module Effective
 
     # Manual admin action only
     def send_confirmation_email!
-      order = event_registration&.submit_order
-      order.send_order_emails!
+      send_order_emails!
+    end
+
+    def send_order_emails!
+      event_registration&.submit_order&.send_order_emails!
     end
 
     def event_registration_submit_order
