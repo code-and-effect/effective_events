@@ -48,7 +48,7 @@ module Effective
       timestamps
     end
 
-    scope :sorted, -> { order(:position) }
+    scope :sorted, -> { order(:title) }
     scope :deep, -> { with_rich_text_body.includes(:event, :purchased_event_registrants) }
 
     before_validation(if: -> { event.present? }) do
@@ -75,6 +75,7 @@ module Effective
       title.presence || 'New Event Ticket'
     end
 
+    # These capacity methods are used by the front end EventRegistrations screens
     def capacity_selectable(except: nil)
       return nil if capacity.blank?
       return nil if waitlist?
@@ -88,7 +89,7 @@ module Effective
     end
 
     def capacity_taken(except: nil)
-      registered_or_selected_event_registrants(except: except).reject(&:waitlisted?).length
+      registered_or_selected_event_registrants(except: except).reject { |er| er.waitlisted? && !er.promoted? }.length
     end
 
     def registered_or_selected_event_registrants(except: nil)
@@ -99,24 +100,31 @@ module Effective
       end
     end
 
-    def registered_or_selected_event_registrants_count
-      registered_or_selected_event_registrants.count
+    # These registered methods are for the admin registrations screens
+
+    # Total registered count, including waitlisted and non waitlisted
+    def registered_count
+      registered_event_registrants.length
     end
 
-    def registered_event_registrants_count
-      registered_event_registrants.length
+    # Registered and not waitlisted count
+    def registered_non_waitlisted_count
+      registered_event_registrants.non_waitlisted.length
+    end
+
+    # Registered and waitlisted count
+    def registered_waitlisted_count
+      registered_event_registrants.waitlisted.length
+    end
+
+    # Registered and available count
+    def registered_available_count
+      return nil if capacity.blank?
+      [capacity - registered_non_waitlisted_count, 0].max
     end
 
     def purchased_event_registrants_count
       purchased_event_registrants.length
-    end
-
-    def non_waitlisted_event_registrants_count
-      registered_event_registrants.where(waitlisted: false).or(registered_event_registrants.where(waitlisted: true, promoted: true))
-    end
-
-    def waitlisted_event_registrants_count
-      registered_event_registrants.where(waitlisted: true, promoted: false).length
     end
 
     def questions
@@ -134,6 +142,5 @@ module Effective
     def member_or_non_member?
       category == 'Member or Non-Member'
     end
-
   end
 end

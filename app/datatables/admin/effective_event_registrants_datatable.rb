@@ -16,7 +16,6 @@ module Admin
       col :updated_at, visible: false
       col :created_at, visible: false
       col :id, visible: false
-      col :archived, visible: false
 
       col :registered_at
 
@@ -45,9 +44,12 @@ module Admin
         else
           '-'
         end
+      end.search do |collection, term|
+        EffectiveResources.truthy?(term) ? collection.waitlisted : collection.non_waitlisted
       end
 
       col :promoted, visible: false
+      col :archived, visible: false
 
       col :name do |er|
         if er.user.present?
