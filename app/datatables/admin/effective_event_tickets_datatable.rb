@@ -1,13 +1,12 @@
 module Admin
   class EffectiveEventTicketsDatatable < Effective::Datatable
     datatable do
-      reorder :position
+      order :title
 
       col :updated_at, visible: false
       col :created_at, visible: false
       col :id, visible: false
       col :archived
-
 
       col :event
       col :title
@@ -49,12 +48,12 @@ module Admin
         if ticket.capacity.present?
           "
             #{ticket.capacity} capacity<br />
-            #{ticket.non_waitlisted_event_registrants_count.count} registered<br />
-            #{ticket.capacity_available} available<br />
-            #{ticket.waitlisted_event_registrants_count} waitlisted
+            #{ticket.registered_non_waitlisted_count} registered<br />
+            #{ticket.registered_available_count} available<br />
+            #{ticket.registered_waitlisted_count} waitlisted
           "
         else
-          "#{ticket.non_waitlisted_event_registrants_count.count} registered"
+          "#{ticket.registered_count} registered"
         end
       end
 
@@ -64,7 +63,7 @@ module Admin
         event.event_registrants.registered.count
       end
 
-      col :purchased_event_registrants_count, label: 'Deferred', visible: false, as: :integer do |event|
+      col :deferred_event_registrants_count, label: 'Deferred', visible: false, as: :integer do |event|
         event.event_registrants.deferred.count
       end
 

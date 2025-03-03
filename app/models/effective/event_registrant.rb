@@ -76,6 +76,9 @@ module Effective
     scope :purchased_or_created_by_admin, -> { purchased.or(unarchived.where(created_by_admin: true)) }
     scope :not_purchased_not_created_by_admin, -> { not_purchased.where(created_by_admin: false) }
 
+    scope :waitlisted, -> { where(waitlisted: true, promoted: false) }
+    scope :non_waitlisted, -> { where(waitlisted: false).or(where(waitlisted: true, promoted: true)) }
+
     before_validation(if: -> { event_registration.present? }) do
       self.event ||= event_registration.event
       self.owner ||= event_registration.owner
