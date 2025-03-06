@@ -36,8 +36,8 @@ module Effective
 
       # Acts as Purchasable
       price             :integer
-      qb_item_name      :string
       tax_exempt        :boolean
+      # The qb_item_name is deferred to event_product
 
       timestamps
     end
@@ -85,7 +85,7 @@ module Effective
     end
 
     def qb_item_name
-      event_product.qb_item_name
+      event_product&.qb_item_name
     end
 
     def registered?

@@ -71,6 +71,8 @@ module Effective
     validates :capacity, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
     validates :capacity, presence: { message: 'must be present when using the waitlist'}, if: -> { waitlist? }
 
+    validates :qb_item_name, presence: true, if: -> { EffectiveOrders.require_item_names? }
+
     def to_s
       title.presence || 'New Event Ticket'
     end

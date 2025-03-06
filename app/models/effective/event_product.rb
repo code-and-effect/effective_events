@@ -41,6 +41,7 @@ module Effective
 
     validates :title, presence: true, uniqueness: { scope: [:event_id] }
     validates :price, presence: true
+    validates :qb_item_name, presence: true, if: -> { EffectiveOrders.require_item_names? }
 
     def to_s
       title.presence || 'New Event Product'
