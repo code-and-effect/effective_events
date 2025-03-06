@@ -59,8 +59,8 @@ module Effective
 
       # Acts as Purchasable
       price                 :integer
-      qb_item_name          :string
       tax_exempt            :boolean
+      # The qb_item_name is deferred to ticket
 
       # Historical. Not used anymore. TO BE DELETED.
       number                :string

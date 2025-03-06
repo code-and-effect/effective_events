@@ -326,5 +326,8 @@ module Effective
       delayed_payment_date > Time.zone.now.to_date
     end
 
+    def qb_item_names
+      (event_tickets + event_products).map(&:qb_item_name).uniq - ['', nil]
+    end
   end
 end

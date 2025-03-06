@@ -54,6 +54,13 @@ module Admin
       col :roles, visible: false
       col :authenticate_user, visible: false
 
+      col :qb_item_names, 
+        search: { fuzzy: true, collection:Effective::ItemName.sorted.map(&:to_s) },
+        label: qb_item_names_label,
+        visible: EffectiveOrders.use_item_names? do |event|
+          event.qb_item_names.map { |qb_item_name| content_tag(:div, qb_item_name) } .join.html_safe
+      end
+
       actions_col do |event|
         dropdown_link_to('View Event', effective_events.event_path(event), target: '_blank')
       end
