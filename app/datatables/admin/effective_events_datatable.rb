@@ -60,7 +60,7 @@ module Admin
       col :qb_item_names, 
         search: { fuzzy: true, collection:Effective::ItemName.sorted.map(&:to_s) },
         label: qb_item_names_label,
-        visible: EffectiveOrders.use_item_names? do |event|
+        visible: false do |event|
           event.qb_item_names.map { |qb_item_name| content_tag(:div, qb_item_name) } .join.html_safe
       end
 

@@ -42,7 +42,7 @@ module Admin
       #   end.join.html_safe
       # end
 
-      col :qb_item_name, label: qb_item_name_label, search: Effective::ItemName.sorted.map(&:to_s), visible: EffectiveOrders.use_item_names?
+      col :qb_item_name, label: qb_item_name_label, search: Effective::ItemName.sorted.map(&:to_s), visible: false
 
       actions_col
     end

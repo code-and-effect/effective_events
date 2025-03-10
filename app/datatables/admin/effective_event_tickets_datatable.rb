@@ -71,7 +71,7 @@ module Admin
         event.event_registrants.purchased.count
       end
 
-      col :qb_item_name, label: qb_item_name_label, search: Effective::ItemName.sorted.map(&:to_s), visible: EffectiveOrders.use_item_names?
+      col :qb_item_name, label: qb_item_name_label, search: Effective::ItemName.sorted.map(&:to_s), visible: false
 
       col :question1, visible: false
       col :question2, visible: false
