@@ -66,7 +66,8 @@ module Admin
       end
       
       col :user, visible: false
-      col :organization, visible: false
+      col :organization, visible: EffectiveEvents.organization_enabled?
+      col :company, visible: !EffectiveEvents.organization_enabled?
 
       col :orders, visible: false
 
@@ -82,7 +83,6 @@ module Admin
       col :first_name, visible: false
       col :last_name, visible: false
       col :email, visible: false
-      col :company, visible: false
 
       col :response1
       col :response2
