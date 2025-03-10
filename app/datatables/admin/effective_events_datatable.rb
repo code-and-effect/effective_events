@@ -10,9 +10,14 @@ module Admin
     end
 
     datatable do
+      order :start_at
+
       col :updated_at, visible: false
       col :created_at, visible: false
       col :id, visible: false
+
+      col :start_at, label: 'Date'
+      col :end_at, label: 'End Date', visible: false
 
       col :title do |event|
         link_to event.title, effective_events.edit_admin_event_path(event)
@@ -25,8 +30,6 @@ module Admin
       col :published_start_at, label: "Published start", as: :datetime
       col :published_end_at, label: "Published end", as: :datetime
 
-      col :start_at, label: 'Start', visible: false
-      col :end_at, label: 'End', visible: false
       col :excerpt, visible: false
 
       col :registration_start_at, label: 'Registration opens', visible: false

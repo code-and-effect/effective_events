@@ -70,7 +70,7 @@ module Effective
     end
 
     scope :sorted, -> { order(:event_ticket_id, :id) }
-    scope :deep, -> { includes(:event, :event_ticket, :owner) }
+    scope :deep, -> { includes(:event, :event_ticket, :owner, event_registration: :orders) }
     scope :registered, -> { unarchived.where.not(registered_at: nil) }
     scope :not_registered, -> { archived.or(where(registered_at: nil)) }
     scope :purchased_or_created_by_admin, -> { purchased.or(unarchived.where(created_by_admin: true)) }
