@@ -290,6 +290,15 @@ module Effective
       registered!
     end
 
+    # Admin update event registrant action
+    def save_and_update_orders!
+      save!
+
+      orders.reject(&:purchased?).each { |order| order.update_purchasable_attributes! }
+
+      true
+    end
+
     def waitlist!
       raise('expected a waitlist? event_ticket') unless event_ticket.waitlist?
 
