@@ -49,7 +49,7 @@ module Effective
     end
 
     scope :sorted, -> { order(:title) }
-    scope :deep, -> { with_rich_text_body.includes(:event, :purchased_event_registrants) }
+    scope :deep, -> { with_rich_text_body.includes(:event, :purchased_event_registrants, :event_registrants) }
 
     before_validation(if: -> { event.present? }) do
       self.category ||= CATEGORIES.first

@@ -92,8 +92,9 @@ module EffectiveEventsEventRegistration
       includes(:owner)
       .includes(event: [:rich_texts, event_products: :purchased_event_addons, event_tickets: :purchased_event_registrants])
       .includes(event_ticket_selections: [:event_ticket])
-      .includes(event_registrants: [event_ticket: :purchased_event_registrants])
+      .includes(event_registrants: [:owner, event_ticket: :purchased_event_registrants])
       .includes(event_addons: [event_product: :purchased_event_addons])
+      .includes(:orders)
     }
 
     scope :sorted, -> { order(:id) }
