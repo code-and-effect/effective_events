@@ -48,17 +48,17 @@ module Admin
       col :delayed_payment_date, visible: false
 
       # These show too much information to be useful to admins, rely on the edit screen
-      # col :event_tickets, search: :string
-      # col :event_products, search: :string
-      # col :event_registrants, search: :string
-      # col :event_addons, search: :string
+      # col :event_tickets
+      # col :event_products
+      # col :event_registrants
+      # col :event_addons
 
       col :allow_blank_registrants, visible: false
       col :roles, visible: false
       col :authenticate_user, visible: false
 
       col :qb_item_names, 
-        search: { fuzzy: true, collection:Effective::ItemName.sorted.map(&:to_s) },
+        search: { fuzzy: true, collection: Effective::ItemName.sorted.map(&:to_s) },
         label: qb_item_names_label,
         visible: false do |event|
           event.qb_item_names.map { |qb_item_name| content_tag(:div, qb_item_name) } .join.html_safe

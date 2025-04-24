@@ -7,7 +7,7 @@ class EffectiveEventRegistrantsDatatable < Effective::Datatable
     col :full_name, label: 'Name'
     col :id, visible: false
 
-    col :event_ticket, search: :string, label: 'Ticket' do |er|
+    col :event_ticket, label: 'Ticket' do |er|
       [er.event_ticket.to_s, er.details.presence].compact.join('<br>').html_safe
     end
 

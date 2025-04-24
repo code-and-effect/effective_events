@@ -7,7 +7,7 @@ class EffectiveEventAddonsDatatable < Effective::Datatable
       "#{er.first_name} #{er.last_name}<br><small>#{mail_to(er.email)}</small>"
     end
 
-    col :event_product, search: :string, label: 'Add-on' do |er|
+    col :event_product, label: 'Add-on' do |er|
       [
         er.event_product.to_s,
         (content_tag(:span, 'Archived', class: 'badge badge-warning') if er.event_product&.archived?)

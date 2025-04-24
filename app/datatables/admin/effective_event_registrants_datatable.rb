@@ -33,7 +33,7 @@ module Admin
       if attributes[:event_id]
         col :event_ticket, search: Effective::EventTicket.where(event: event).all
       else
-        col :event_ticket, search: :string
+        col :event_ticket
       end
 
       col :waitlisted do |registrant|

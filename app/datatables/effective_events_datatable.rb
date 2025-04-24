@@ -30,7 +30,7 @@ class EffectiveEventsDatatable < Effective::Datatable
       end
     end
 
-    col :event_tickets, visible: false, search: :string
+    col :event_tickets, visible: false
     col :early_bird_end_at, label: 'Early bird ends', visible: false
 
     actions_col show: false do |event|

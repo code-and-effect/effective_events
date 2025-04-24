@@ -10,16 +10,16 @@ class EffectiveEventRegistrationsDatatable < Effective::Datatable
       er.submitted_at&.strftime('%F') || 'Incomplete'
     end
 
-    col :event, search: :string do |er|
+    col :event do |er|
       link_to(er.event.to_s, effective_events.event_path(er.event))
     end
 
-    col :owner, visible: false, search: :string
+    col :owner, visible: false
     col :status, visible: false
-    col :event_registrants, label: 'Registrants', search: :string
+    col :event_registrants, label: 'Registrants'
 
-    col :event_addons, label: 'Add-ons', search: :string
-    col :orders, action: :show, visible: false, search: :string
+    col :event_addons, label: 'Add-ons'
+    col :orders, action: :show, visible: false
 
     actions_col(actions: []) do |er|
       if er.draft? || er.submitted?

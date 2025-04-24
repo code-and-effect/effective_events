@@ -22,7 +22,7 @@ module Admin
       if attributes[:event_id]
         col :event_product, search: Effective::EventProduct.where(event: event).all
       else
-        col :event_product, search: :string
+        col :event_product
       end
 
       col :purchased_order, visible: false
