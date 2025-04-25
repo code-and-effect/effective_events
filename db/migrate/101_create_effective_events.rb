@@ -64,6 +64,9 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.timestamps
     end
 
+    add_index :event_tickets, :event_id, if_not_exists: true
+    add_index :event_tickets, :title, if_not_exists: true
+
     create_table :event_registrants do |t|
       t.integer :event_id
       t.integer :event_ticket_id
@@ -110,6 +113,12 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.timestamps
     end
 
+    add_index :event_registrants, [:user_type, :user_id, :owner_type, :owner_id], if_not_exists: true
+    add_index :event_registrants, :event_registration_id, if_not_exists: true
+    add_index :event_registrants, :event_ticket_id, if_not_exists: true
+    add_index :event_registrants, :archived, if_not_exists: true
+    add_index :event_registrants, :registered_at, if_not_exists: true
+
     create_table :event_products do |t|
       t.integer :event_id
 
@@ -126,6 +135,9 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
 
       t.timestamps
     end
+
+    add_index :event_products, :event_id, if_not_exists: true
+    add_index :event_products, :position, if_not_exists: true
 
     create_table :event_addons do |t|
       t.integer :event_id
@@ -151,6 +163,9 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
 
       t.timestamps
     end
+
+    add_index :event_addons, :event_registration_id, if_not_exists: true
+    add_index :event_addons, :event_product_id, if_not_exists: true
 
     create_table :event_registrations do |t|
       t.string :token
@@ -178,6 +193,10 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.datetime :created_at
     end
 
+    add_index :event_registrations, [:owner_id, :owner_type]
+    add_index :event_registrations, :status
+    add_index :event_registrations, :token
+
     create_table :event_ticket_selections do |t|
       t.integer :event_registration_id
       t.string :event_registration_type
@@ -189,9 +208,7 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.datetime :created_at
     end
 
-    add_index :event_registrations, [:owner_id, :owner_type]
-    add_index :event_registrations, :status
-    add_index :event_registrations, :token
+    add_index :event_ticket_selections, :event_registration_id, if_not_exists: true
 
     create_table :event_notifications do |t|
       t.references :event
