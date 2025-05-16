@@ -49,9 +49,9 @@ module Effective
       registered_at         :datetime     # When the order is deferred or purchased
 
       # Question Responses
-      question1             :text
-      question2             :text
-      question3             :text
+      response1             :text
+      response2             :text
+      response3             :text
 
       archived              :boolean
 
@@ -292,6 +292,10 @@ module Effective
 
     # Admin update event registrant action
     def save_and_update_orders!
+      if event_ticket_id_changed?
+        assign_attributes(response1: nil, response2: nil, response3: nil)
+      end
+
       save!
 
       orders.reject(&:purchased?).each { |order| order.update_purchasable_attributes! }
