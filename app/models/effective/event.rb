@@ -349,7 +349,7 @@ module Effective
         Effective::OrderItem.where(purchasable_id: event_addons, purchasable_type: 'Effective::EventAddon').pluck(:order_id)
       ).uniq
 
-      Effective::Order.where.not(status: [:purchased, :declined]).delayed.where(id: order_ids) # deferred delayed orders
+      Effective::Order.where.not(status: [:purchased, :declined, :voided]).delayed.where(id: order_ids) # deferred delayed orders
     end
 
     def qb_item_names
