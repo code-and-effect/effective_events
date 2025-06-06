@@ -25,6 +25,66 @@ class EventRegistrationsTest < ActiveSupport::TestCase
     assert_equal delayed_payment_date, event_registration.submit_order.delayed_payment_date
   end
 
+  test 'update delayed payment date updates orders' do
+    event_registration = build_event_registration()
+    event = event_registration.event
+    delayed_payment_date = (event.registration_end_at + 1.day).to_date
+
+    delayed_payment_attributes = { delayed_payment: true, delayed_payment_date: delayed_payment_date }
+
+    event.update!(delayed_payment_attributes)
+    assert event_registration.delayed_payment_date_upcoming?
+
+    event_registration.ready!
+    
+    assert event_registration.submit_order.delayed?
+    assert_equal delayed_payment_date, event_registration.submit_order.delayed_payment_date
+
+    event.update!(delayed_payment_date: delayed_payment_date + 3.day)
+    event_registration.reload
+    assert_equal delayed_payment_date + 3.day, event_registration.submit_order.delayed_payment_date
+  end
+
+  test 'update delayed payment date does not update purchased orders' do
+    event_registration = build_event_registration()
+    event = event_registration.event
+    delayed_payment_date = (event.registration_end_at + 1.day).to_date
+
+    delayed_payment_attributes = { delayed_payment: true, delayed_payment_date: delayed_payment_date }
+
+    event.update!(delayed_payment_attributes)
+    assert event_registration.delayed_payment_date_upcoming?
+
+    event_registration.ready!
+    assert event_registration.submit_order.delayed?
+    assert_equal delayed_payment_date, event_registration.submit_order.delayed_payment_date
+    event_registration.submit_order.purchase!
+
+    event.update!(delayed_payment_date: delayed_payment_date + 3.day)
+    event_registration.reload
+    assert_equal delayed_payment_date, event_registration.submit_order.delayed_payment_date
+  end
+
+  test 'update delayed payment date does not update declined orders' do
+    event_registration = build_event_registration()
+    event = event_registration.event
+    delayed_payment_date = (event.registration_end_at + 1.day).to_date
+
+    delayed_payment_attributes = { delayed_payment: true, delayed_payment_date: delayed_payment_date }
+
+    event.update!(delayed_payment_attributes)
+    assert event_registration.delayed_payment_date_upcoming?
+
+    event_registration.ready!
+    assert event_registration.submit_order.delayed?
+    assert_equal delayed_payment_date, event_registration.submit_order.delayed_payment_date
+    event_registration.submit_order.decline!
+
+    event.update!(delayed_payment_date: delayed_payment_date + 3.day)
+    event_registration.reload
+    assert_equal delayed_payment_date, event_registration.submit_order.delayed_payment_date
+  end
+
   test 'event with external registration is invalid for registration' do
     event_registration = build_event_registration()
     event_registration.event.update_column(:external_registration, true)
