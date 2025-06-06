@@ -174,6 +174,14 @@ module Effective
       errors.add(:category, 'is not included in the list') unless EffectiveEvents.categories.include?(category)
     end
 
+    validate(if: -> { persisted? && delayed_payment_changed? && delayed_payment_was && !delayed_payment? }) do
+      errors.add(:delayed_payment, "cannot be disabled because there are existing delayed orders") if delayed_orders.present?
+    end
+
+    after_commit(if: -> { persisted? && delayed? && delayed_payment_date_previously_changed? }) do
+      update_delayed_orders_delayed_payment_date!
+    end
+
     def to_s
       title.presence || model_name.human
     end
@@ -324,6 +332,24 @@ module Effective
     def delayed_payment_date_upcoming?
       return false unless delayed?
       delayed_payment_date > Time.zone.now.to_date
+    end
+
+    def update_delayed_orders_delayed_payment_date!
+      raise('expected delayed payment date to be present') unless delayed_payment_date.present?
+
+      transaction do
+        delayed_orders.find_each { |order| order.update!(delayed_payment_date: delayed_payment_date) }
+      end
+    end
+
+    # When an event payment date is changed, all pending orders should also be updated
+    def delayed_orders
+      order_ids = (
+        Effective::OrderItem.where(purchasable_id: event_registrants, purchasable_type: 'Effective::EventRegistrant').pluck(:order_id) +
+        Effective::OrderItem.where(purchasable_id: event_addons, purchasable_type: 'Effective::EventAddon').pluck(:order_id)
+      ).uniq
+
+      Effective::Order.was_not_purchased.delayed.where(id: order_ids) # deferred delayed orders
     end
 
     def qb_item_names

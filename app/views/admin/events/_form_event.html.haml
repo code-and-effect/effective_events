@@ -46,7 +46,7 @@
           = f.hidden_field :delayed_payment_date, value: ''
 
         = f.show_if(:delayed_payment, true) do
-          = f.date_field :delayed_payment_date, label: "Delayed Payment Charge Date", hint: "The date that the credit card will be charged. Expects a date in the future, after the registration end date. Changing this date will not affect previously generated event registration delayed payment orders."
+          = f.date_field :delayed_payment_date, label: "Delayed Payment Charge Date", hint: "The date that the credit card will be charged. Expects a date in the future, after the registration end date.<br>Changing this will update the charge date for all existing delayed payment orders."
 
   = f.submit do
     = f.save 'Save'
