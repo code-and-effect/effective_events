@@ -35,12 +35,12 @@
             - # Early Bird
             - if event.early_bird? && ticket.early_bird_price.to_i > 0 && [ticket.member_price, ticket.regular_price].exclude?(ticket.early_bird_price)
               %li
-                - if ticket.regular_price.to_i > 0
+                - if ticket.regular_price.to_i > 0 && (ticket.member_or_non_member? || ticket.regular?)
                   %div
                     %s.text-muted
                       = price_to_currency(ticket.regular_price)
 
-                - if ticket.member_price.to_i > 0
+                - if ticket.member_price.to_i > 0 && (ticket.member_or_non_member? || ticket.member_only?)
                   %div
                     %s.text-muted
                       = price_to_currency(ticket.member_price)
@@ -50,11 +50,11 @@
                   = price_to_currency(ticket.early_bird_price)
                   .badge.badge-warning Early Bird
             - else
-              - if ticket.regular_price.present?
+              - if ticket.regular_price.to_i > 0 && (ticket.member_or_non_member? || ticket.regular?)
                 %li
                   = price_to_currency(ticket.regular_price)
 
-              - if ticket.member_price.present?
+              - if ticket.member_price.to_i > 0 && (ticket.member_or_non_member? || ticket.member_only?)
                 %li
                   = price_to_currency(ticket.member_price)
                   .badge.badge-secondary Members
