@@ -324,10 +324,34 @@ module Effective
     def promote!
       raise('expected a waitlist? event_ticket') unless event_ticket.waitlist?
 
+      if purchased? && purchased_order.delayed?
+        return promote_after_delayed_payment_date!
+      end
+
       update!(promoted: true)
       orders.reject(&:purchased?).each { |order| order.update_purchasable_attributes! }
 
       true
+    end
+
+    def promote_after_delayed_payment_date!
+      # Remove myself from any existing orders. 
+      # I must be $0 so we don't need to update any prices.
+      purchased_order.order_items.find { |oi| oi.purchasable == self }.destroy!
+      update!(promoted: true, purchased_order: nil)
+
+      # Check if the ticket owner has an unpurchased order for the event
+      order = owner.orders.reject { |order| order.purchased? }.find do |order| 
+        order.purchasables.any? { |purchasable| purchasable.class.name == "Effective::EventRegistrant" && purchasable.try(:event) == event }
+      end
+
+      # If they do have one, move the ticket to that unpurchased order
+      # If they don't, create a new order and move the ticket to it
+      order ||= Effective::Order.new(user: owner, parent: event_registration)
+
+      order.add(self)
+
+      order.save!
     end
 
     def unpromote!
