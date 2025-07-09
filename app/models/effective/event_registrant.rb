@@ -324,31 +324,67 @@ module Effective
     def promote!
       raise('expected a waitlist? event_ticket') unless event_ticket.waitlist?
 
-      if purchased? && purchased_order.delayed?
-        return promote_after_delayed_payment_date!
+      if purchased? && purchased_order.delayed? && event_registration.present?
+        promote_after_delayed_payment_date_with_event_registration!
+      elsif purchased? && purchased_order.delayed? && event_registration.blank?
+        promote_after_delayed_payment_date_without_event_registration!
+      else
+        update!(promoted: true)
+        orders.reject(&:purchased?).each { |order| order.update_purchasable_attributes! }
       end
-
-      update!(promoted: true)
-      orders.reject(&:purchased?).each { |order| order.update_purchasable_attributes! }
 
       true
     end
 
-    def promote_after_delayed_payment_date!
+    def promote_after_delayed_payment_date_with_event_registration!
       # Remove myself from any existing orders. 
       # I must be $0 so we don't need to update any prices.
-      purchased_order.order_items.find { |oi| oi.purchasable == self }.destroy!
+      orders.each do |order|
+        order.order_items.find { |oi| oi.purchasable == self }.destroy!
+      end
+
+      # I'm now promoted and unpurchased
       update!(promoted: true, purchased_order: nil)
 
-      # Check if the ticket owner has an unpurchased order for the event
+      # Check if the ticket owner has an unpurchased event registration for the event or create a new one
+      event_registration = EffectiveEvents.EventRegistration.draft.where(event: event, owner: owner).where.not(id: event_registration_id).first
+      event_registration ||= EffectiveEvents.EventRegistration.new(event: event, owner: owner)
+
+      # Put the event registration on the checkout step
+      event_registration.all_steps_before(:checkout).each do |step|
+        event_registration.wizard_steps[step] ||= Time.zone.now
+      end
+
+      event_registration.save!
+
+      # Move this registrant into the new event registration
+      update!(event_registration: event_registration)
+
+      # Build the order for the event registration
+      # It can be checked out by admin immediately, or the user can go through it themselves
+      event_registration.reload
+      event_registration.find_or_build_submit_order
+
+      event_registration.save!
+    end
+
+    def promote_after_delayed_payment_date_without_event_registration!
+      # Remove myself from any existing orders. 
+      # I must be $0 so we don't need to update any prices.
+      orders.each do |order|
+        order.order_items.find { |oi| oi.purchasable == self }.destroy!
+      end
+
+      # I'm now promoted and unpurchased
+      update!(promoted: true, purchased_order: nil)
+
+      # Check if the ticket owner has an unpurchased order for the event or create a new one
       order = owner.orders.reject { |order| order.purchased? }.find do |order| 
         order.purchasables.any? { |purchasable| purchasable.class.name == "Effective::EventRegistrant" && purchasable.try(:event) == event }
       end
-
-      # If they do have one, move the ticket to that unpurchased order
-      # If they don't, create a new order and move the ticket to it
       order ||= Effective::Order.new(user: owner, parent: event_registration)
 
+      # Move this registrant into the new order
       order.add(self)
 
       order.save!
