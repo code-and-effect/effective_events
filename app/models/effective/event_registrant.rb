@@ -324,19 +324,16 @@ module Effective
     def promote!
       raise('expected a waitlist? event_ticket') unless event_ticket.waitlist?
 
-      if purchased? && purchased_order.delayed? && event_registration.present?
-        promote_after_delayed_payment_date_with_event_registration!
-      elsif purchased? && purchased_order.delayed? && event_registration.blank?
-        promote_after_delayed_payment_date_without_event_registration!
+      if purchased? && event_registration.present?
+        promote_purchased_event_registration!
+      elsif purchased? && event_registration.blank?
+        promote_purchased_order!
       else
-        update!(promoted: true)
-        orders.reject(&:purchased?).each { |order| order.update_purchasable_attributes! }
+        promote_not_purchased!
       end
-
-      true
     end
 
-    def promote_after_delayed_payment_date_with_event_registration!
+    def promote_purchased_event_registration!
       # Remove myself from any existing orders. 
       # I must be $0 so we don't need to update any prices.
       orders.each do |order|
@@ -368,7 +365,7 @@ module Effective
       event_registration.save!
     end
 
-    def promote_after_delayed_payment_date_without_event_registration!
+    def promote_purchased_order!
       # Remove myself from any existing orders. 
       # I must be $0 so we don't need to update any prices.
       orders.each do |order|
@@ -390,12 +387,17 @@ module Effective
       order.save!
     end
 
+    def promote_not_purchased!
+      update!(promoted: true)
+      orders.reject(&:purchased?).each { |order| order.update_purchasable_attributes! }
+      true
+    end
+
     def unpromote!
       raise('expected a waitlist? event_ticket') unless event_ticket.waitlist?
 
       update!(promoted: false)
       orders.reject(&:purchased?).each { |order| order.update_purchasable_attributes! }
-
       true
     end
 
