@@ -379,7 +379,7 @@ module Effective
       order = owner.orders.reject { |order| order.purchased? }.find do |order| 
         order.purchasables.any? { |purchasable| purchasable.class.name == "Effective::EventRegistrant" && purchasable.try(:event) == event }
       end
-      order ||= Effective::Order.new(user: owner, parent: event_registration)
+      order ||= Effective::Order.new(user: owner)
 
       # Move this registrant into the new order
       order.add(self)
