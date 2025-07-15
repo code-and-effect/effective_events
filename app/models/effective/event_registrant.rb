@@ -439,6 +439,16 @@ module Effective
       send_order_emails!
     end
 
+    # Manual admin action only. From datatable.
+    def send_payment_request!
+      raise('already purchased or deferred') if purchased_or_deferred?
+
+      order = (Array(event_registration_submit_order) + Array(orders)).find { |order| order.in_progress? && !order.purchased_or_deferred? && !order.refund? }
+      return false if order.blank?
+
+      order.send_payment_request_to_buyer!
+    end
+
     def send_order_emails!
       event_registration&.submit_order&.send_order_emails!
     end
