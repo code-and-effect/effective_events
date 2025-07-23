@@ -49,11 +49,6 @@ module Effective
       @page_title ||= @event.to_s
     end
 
-    def code_of_conduct
-      EffectiveResources.authorize!(self, :code_of_conduct, Effective::Event)
-      @page_title ||= EffectiveEvents.code_of_conduct_page_title
-    end
-
     def build_event_search
       search = EventSearch.new(search_params)
       search.current_user = current_user
