@@ -36,6 +36,7 @@ module EffectiveEventsEventRegistration
       tickets: 'Tickets',
       details: 'Ticket Details',
       addons: 'Add-ons',
+      code_of_conduct: 'Code of Conduct',
       summary: 'Review',
       billing: 'Billing Address',
       checkout: 'Checkout',
@@ -61,7 +62,7 @@ module EffectiveEventsEventRegistration
     accepts_nested_attributes_for :event_registrants, reject_if: :all_blank, allow_destroy: true
 
     has_many :event_addons, -> { order(:event_product_id, :id) }, class_name: 'Effective::EventAddon', inverse_of: :event_registration, dependent: :destroy
-    accepts_nested_attributes_for :event_addons, reject_if: :all_blank, allow_destroy: true
+    accepts_nested_attributes_for :event_addons, reject_if: -> (atts) { atts[:event_product_id].blank? }, allow_destroy: true
 
     has_many :orders, -> { order(:id) }, as: :parent, class_name: 'Effective::Order', dependent: :nullify
     accepts_nested_attributes_for :orders
@@ -72,6 +73,9 @@ module EffectiveEventsEventRegistration
       has_many :fees, -> { order(:id) }, as: :parent, class_name: 'Effective::Fee', dependent: :nullify
       accepts_nested_attributes_for :fees, reject_if: :all_blank, allow_destroy: true
     end
+
+    # Code of Conduct Step
+    attr_accessor :declare_code_of_conduct
 
     effective_resource do
       # Acts as Statused
@@ -161,6 +165,11 @@ module EffectiveEventsEventRegistration
       end
     end
 
+    # Code of Conduct Step
+    with_options(if: -> { current_step == :code_of_conduct }) do
+      validates :declare_code_of_conduct, acceptance: true
+    end
+
     # If we're submitted. Try to move to completed.
     before_save(if: -> { submitted? }) { try_completed! }
 
@@ -193,9 +202,18 @@ module EffectiveEventsEventRegistration
     def required_steps
       return self.class.test_required_steps if Rails.env.test? && self.class.test_required_steps.present?
 
-      with_addons = event.event_products.any? { |event_product| event_product.archived? == false }
-
-      with_addons ? wizard_step_keys : (wizard_step_keys - [:addons])
+      [
+        :start,
+        :tickets,
+        :details,
+        (:addons if event.event_products.any? { |event_product| !event_product.archived? }),
+        (:code_of_conduct if EffectiveEvents.code_of_conduct_enabled?),
+        :summary,
+        :billing,
+        :checkout,
+        :submitted,
+        :complete
+      ].compact
     end
 
     def delayed_payment_attributes
@@ -505,6 +523,11 @@ module EffectiveEventsEventRegistration
 
   def just_let_them_edit_tickets_and_register_anyway?
     false
+  end
+
+  def wizard_step_title(step)
+    return EffectiveEvents.code_of_conduct_page_title if step == :code_of_conduct
+    default_wizard_step_title(step)
   end
 
   private

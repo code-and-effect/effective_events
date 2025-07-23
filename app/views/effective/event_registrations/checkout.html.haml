@@ -20,5 +20,5 @@
   - if resource.submit_order.delayed? && resource.submit_order.deferred?
     = effective_form_with(model: resource, url: wizard_path(step), method: :put) do |f|
       = f.hidden_field :id
-      = f.save 'Save and Continue'
+      = f.submit 'Save and Continue', left: true
 

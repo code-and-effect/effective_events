@@ -17,6 +17,8 @@ EffectiveEvents::Engine.routes.draw do
       EffectiveEvents.categories.map(&:parameterize).include?(req.params['category'])
     }
 
+    match "events/code-of-conduct", to: 'events#code_of_conduct', via: :get, constraints: lambda { EffectiveEvents.code_of_conduct_enabled? }
+
     resources :events, only: [:index, :show] do
       resources :event_registrations, only: [:new, :show, :destroy] do
         resources :build, controller: :event_registrations, only: [:show, :update]

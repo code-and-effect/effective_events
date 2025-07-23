@@ -29,6 +29,11 @@ EffectiveEvents.setup do |config|
   # Hint text for event images attachments
   config.events_hint_text = 'Optional. Shown on the events index and event pages. Dimensions are 220px tall and 350px wide.'
 
+  # Code of Conduct
+  # When true, will display the effective/events/code_of_conduct.html.haml on events/code-of-conduct
+  config.code_of_conduct_enabled = true
+  config.code_of_conduct_page_title = 'Event Code of Conduct'
+
   # Mailer Settings
   # Please see config/initializers/effective_resources.rb for default effective_* gem mailer settings
   #

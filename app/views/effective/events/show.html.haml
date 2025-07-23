@@ -58,6 +58,10 @@
           .effective-event-body.mb-5
             = @event.body.to_s
 
+        - if EffectiveEvents.code_of_conduct_enabled?
+          .effective-event-code-of-conduct.mb-5
+            = link_to EffectiveEvents.code_of_conduct_page_title, effective_events.events_code_of_conduct_path
+
         - if @event.registerable?
           .register.mb-4
             - url = @event.external_registration_url.presence || effective_events.new_event_event_registration_path(@event)
