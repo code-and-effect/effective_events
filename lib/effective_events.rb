@@ -11,7 +11,7 @@ module EffectiveEvents
       :mailer, :parent_mailer, :deliver_method, :mailer_layout, :mailer_sender, :mailer_admin, :mailer_subject,
       :layout, :per_page, :use_effective_roles, :categories, :events_hint_text,
       :organization_enabled, :create_users, :company_or_organization_required,
-      :code_of_conduct_enabled, :code_of_conduct_page_title,
+      :code_of_conduct_enabled, :code_of_conduct_slug,
       :event_registration_class_name
     ]
   end
@@ -39,8 +39,11 @@ module EffectiveEvents
     code_of_conduct_enabled == true
   end
 
-  def self.code_of_conduct_page_title
-    config[:code_of_conduct_page_title].presence || 'Event Code of Conduct'
+  def self.code_of_conduct_effective_page!
+    page = Effective::Page.where(slug: code_of_conduct_slug).first
+    raise("The Effective::Page for slug \"#{code_of_conduct_slug}\" does not exist. Please create it.") if page.blank?
+
+    page
   end
 
   # If we can create delayed payment events at all

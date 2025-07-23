@@ -59,8 +59,11 @@
             = @event.body.to_s
 
         - if EffectiveEvents.code_of_conduct_enabled?
-          .effective-event-code-of-conduct.mb-5
-            = link_to EffectiveEvents.code_of_conduct_page_title, effective_events.events_code_of_conduct_path
+          - page = EffectiveEvents.code_of_conduct_effective_page!
+
+          .effective-event-code-of-conduct.mb-4
+            View the
+            = link_to(page.title, effective_pages.page_path(page), target: '_blank')
 
         - if @event.registerable?
           .register.mb-4

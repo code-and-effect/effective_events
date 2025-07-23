@@ -1,4 +1,6 @@
 - f.object.declare_code_of_conduct = f.object.has_completed_step?(:code_of_conduct)
 
+- page = EffectiveEvents.code_of_conduct_effective_page!
+
 = f.check_box :declare_code_of_conduct, required: true,
-  label: "I agree to abide by the #{link_to(EffectiveEvents.code_of_conduct_page_title, effective_events.events_code_of_conduct_path, target: '_blank')}."
+  label: "I agree to abide by the #{link_to(page.title, effective_pages.page_path(page), target: '_blank')}."
