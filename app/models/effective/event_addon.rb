@@ -81,7 +81,7 @@ module Effective
     end
 
     def tax_exempt
-      event_product.tax_exempt
+      event_product&.tax_exempt
     end
 
     def qb_item_name

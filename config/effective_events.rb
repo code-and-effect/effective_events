@@ -29,6 +29,12 @@ EffectiveEvents.setup do |config|
   # Hint text for event images attachments
   config.events_hint_text = 'Optional. Shown on the events index and event pages. Dimensions are 220px tall and 350px wide.'
 
+  # Code of Conduct
+  # Enable the code of conduct checkbox on the event registration wizard
+  # Create an Effective::Page for the code of conduct with this slug.
+  config.code_of_conduct_enabled = false
+  config.code_of_conduct_slug = 'event-code-of-conduct' 
+
   # Mailer Settings
   # Please see config/initializers/effective_resources.rb for default effective_* gem mailer settings
   #

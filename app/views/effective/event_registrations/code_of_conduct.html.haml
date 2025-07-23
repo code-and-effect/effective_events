@@ -6,6 +6,6 @@
     = effective_form_with(model: resource, url: wizard_path(step), method: :put) do |f|
       = f.hidden_field :id
 
-      = render('effective/event_registrations/tickets_fields', form: f)
+      = render('effective/event_registrations/code_of_conduct_fields', f: f)
 
       = f.submit 'Save and Continue', left: true
