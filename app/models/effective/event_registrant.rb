@@ -446,7 +446,7 @@ module Effective
       order = (Array(event_registration_submit_order) + Array(orders)).find { |order| order.in_progress? && !order.purchased_or_deferred? && !order.refund? }
       return false if order.blank?
 
-      order.send_payment_request_to_buyer!
+      order.send_payment_request!
     end
 
     def send_order_emails!
