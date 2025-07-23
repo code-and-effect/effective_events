@@ -39,8 +39,13 @@ module EffectiveEvents
     code_of_conduct_enabled == true
   end
 
+  def self.code_of_conduct_effective_page
+    return unless defined?(Effective::Page)
+    Effective::Page.where(slug: code_of_conduct_slug).first
+  end
+
   def self.code_of_conduct_effective_page!
-    page = Effective::Page.where(slug: code_of_conduct_slug).first
+    page = code_of_conduct_effective_page()
     raise("The Effective::Page for slug \"#{code_of_conduct_slug}\" does not exist. Please create it.") if page.blank?
 
     page
