@@ -1,3 +1,3 @@
 module EffectiveEvents
-  VERSION = '2.33.3'.freeze
+  VERSION = '2.34.0'.freeze
 end
