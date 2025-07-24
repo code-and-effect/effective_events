@@ -35,8 +35,9 @@ class EffectiveEventsDatatable < Effective::Datatable
 
     actions_col show: false do |event|
       if event.registerable?
+        label = (event.waitlist_only? ? 'Join Waitlist' : 'Register')
         url = event.external_registration_url.presence || effective_events.new_event_event_registration_path(event)
-        dropdown_link_to('Register', url)
+        dropdown_link_to(label, url)
       end
     end
   end
