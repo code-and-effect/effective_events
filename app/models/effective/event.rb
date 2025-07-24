@@ -210,8 +210,10 @@ module Effective
     end
 
     def registration_available?
-      return false if registration_start_at.blank? || registration_end_at.blank?
-      (registration_start_at..registration_end_at).cover?(Time.zone.now)
+      return false if closed?
+
+      return false if registration_start_at.blank?
+      registration_start_at <= Time.zone.now
     end
 
     def closed?
@@ -226,6 +228,10 @@ module Effective
       return false if any_waitlist?
 
       event_tickets.none? { |event_ticket| event_ticket_available?(event_ticket, except: except, quantity: 1) }
+    end
+
+    def waitlist_only?
+      any_waitlist? && event_tickets.none? { |et| et.capacity_available > 0 }
     end
 
     def upcoming?
@@ -297,7 +303,7 @@ module Effective
     end
 
     # Can I register/purchase this many new event tickets?
-    def event_ticket_available?(event_ticket, except: nil, quantity: 0)
+    def event_ticket_available?(event_ticket, except: nil, quantity: 1)
       raise('expected an EventTicket') unless event_ticket.kind_of?(Effective::EventTicket)
       raise('expected except to be an EventRegistration') if except && !except.class.try(:effective_events_event_registration?)
       raise('expected quantity to be greater than 0') unless quantity.to_i > 0
@@ -311,7 +317,7 @@ module Effective
     end
 
     # Can I register/purchase this many new event products?
-    def event_product_available?(event_product, quantity:)
+    def event_product_available?(event_product, quantity: 1)
       raise('expected an EventProduct') unless event_product.kind_of?(Effective::EventProduct)
       raise('expected quantity to be greater than 0') unless quantity.to_i > 0
 

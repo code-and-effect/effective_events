@@ -16,8 +16,9 @@
 
         - if @event.registerable? || (impersonating? && @event.registerable_when_impersonating?)
           .register.mb-4
+            - label = (@event.waitlist_only? ? 'Join Waitlist' : 'Register')
             - url = @event.external_registration_url.presence || effective_events.new_event_event_registration_path(@event)
-            = link_to 'Register', url, class: 'btn btn-lg btn-primary'
+            = link_to label, url, class: 'btn btn-lg btn-primary'
 
         - if @event.file.attached?
           = image_tag url_for(@event.file), class: "effective-events-image d-none d-lg-block float-right", alt: @event.title, width: "350", height: "220"
@@ -67,7 +68,8 @@
 
         - if @event.registerable?
           .register.mb-4
+            - label = (@event.waitlist_only? ? 'Join Waitlist' : 'Register')
             - url = @event.external_registration_url.presence || effective_events.new_event_event_registration_path(@event)
-            = link_to 'Register', url, class: 'btn btn-lg btn-primary'
+            = link_to label, url, class: 'btn btn-lg btn-primary'
 
         = link_to("&larr; #{events_name_label}".html_safe, effective_events.events_path, class: "btn btn-secondary my-4")
