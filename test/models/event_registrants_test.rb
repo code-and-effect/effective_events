@@ -32,7 +32,7 @@ class EventRegistrantsTest < ActiveSupport::TestCase
     user = build_user()
     user.add_role!(:member)
 
-    event_registrant.event_ticket.update!(category: 'Member or Non-Member', member_price: 50_00)
+    event_registrant.event_ticket.update!(category: 'Anyone', member_price: 50_00)
     event_registrant.update!(user: user)
 
     assert_equal 50_00, event_registrant.price
@@ -46,7 +46,7 @@ class EventRegistrantsTest < ActiveSupport::TestCase
     event_registrant = event_registration.event_registrants.last
     assert_equal 200_00, event_registrant.price
 
-    event_registrant.event_ticket.update!(category: 'Member or Non-Member', member_price: 50_00)
+    event_registrant.event_ticket.update!(category: 'Anyone', member_price: 50_00)
     event_registrant.update!(blank_registrant: true)
 
     assert_equal 200_00, event_registrant.price

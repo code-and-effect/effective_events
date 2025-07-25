@@ -60,7 +60,7 @@ module Effective
     end
 
     validates :title, presence: true, uniqueness: { scope: [:event_id] }
-    validates :category, presence: true
+    validates :category, presence: true, inclusion: { in: CATEGORIES }
 
     # Price validations
     validates :early_bird_price, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
