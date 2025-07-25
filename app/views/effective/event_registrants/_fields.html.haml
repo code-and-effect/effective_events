@@ -27,7 +27,7 @@
 
         - organizations = EffectiveMemberships.Organization.sorted.all
 
-        - if event_ticket&.member_only?
+        - if event_ticket&.members?
           - organization_id = (f.object.event_registration&.owner || current_user).try(:organizations).try(:first).try(:id)
 
           = f.select :organization_id, organizations, label: organization_label, placeholder: 'Search by name', input_html: { disabled: disabled },

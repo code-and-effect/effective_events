@@ -133,12 +133,12 @@ module Effective
     validates :organization, presence: true, if: -> { registrant_validations_enabled? && EffectiveEvents.company_or_organization_required && EffectiveEvents.organization_enabled? }
 
     # Member ticket: company name is locked in. you can only add to your own company
-    validate(if: -> { registrant_validations_enabled? && event_ticket&.member_only? }) do
+    validate(if: -> { registrant_validations_enabled? && event_ticket&.members? }) do
       if building_user_and_organization && owner.present? && Array(owner.try(:organizations)).exclude?(organization)
         errors.add(:organization_id, "must be your own for member-only tickets") 
       end
 
-      errors.add(:user_id, 'must be a member to register for member-only tickets') unless member_present?
+      errors.add(:user_id, 'must be a member to register for member-only tickets') unless owner.try(:membership_present?)
     end
 
     # Copy any user errors from build_user_and_organization() into the registrant
@@ -233,6 +233,7 @@ module Effective
       (first_name.present? && last_name.present?) ? "#{last_name}, #{first_name}" : "GUEST"
     end
 
+    # Anyone or Members tickets
     def early_bird?
       return false if event.blank?
       return false if event_ticket.blank?
@@ -241,6 +242,7 @@ module Effective
       event.early_bird?
     end
 
+    # Anyone or Members tickets
     def member?
       return false if event.blank?
       return false if event_ticket.blank?
@@ -248,6 +250,7 @@ module Effective
       user.try(:membership_present?) || organization.try(:membership_present?)
     end
 
+    # Anyone or Members tickets
     def guest_of_member?
       return false if event.blank?
       return false if event_ticket.blank?
@@ -256,9 +259,11 @@ module Effective
       !member? && owner.try(:membership_present?)
     end
 
+    # Anyone tickets only
     def non_member?
       return false if event.blank?
       return false if event_ticket.blank?
+      return false unless event_ticket.anyone?
 
       !member? && !guest_of_member?
     end
