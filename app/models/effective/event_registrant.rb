@@ -119,7 +119,15 @@ module Effective
       errors.add(:waitlisted, 'is not permitted for a non-waitlist event ticket') if waitlisted? && !event_ticket.waitlist?
     end
 
-    validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
+    validate(if: -> { event_ticket&.members? }, unless: -> { purchased? }) do
+      errors.add(:base, "must be a member") unless owner.try(:membership_present?)
+    end
+
+    validate(if: -> { event_ticket&.members? && registrant_validations_enabled? }, unless: -> { purchased? }) do
+      errors.add(:user_id, "registrant must be a member") unless event_ticket.guest_of_member? || member?
+    end
+
+    validates :price, numericality: { greater_than_or_equal_to: 0 }
     validates :email, email: true
 
     # First name, last name and email are always required fields on details
@@ -134,10 +142,6 @@ module Effective
 
     # Member ticket: company name is locked in. you can only add to your own company
     validate(if: -> { registrant_validations_enabled? && event_ticket&.members? }) do
-      if building_user_and_organization && owner.present? && Array(owner.try(:organizations)).exclude?(organization)
-        errors.add(:organization_id, "must be your own for member-only tickets") 
-      end
-
       errors.add(:user_id, 'must be a member to register for member-only tickets') unless owner.try(:membership_present?)
     end
 
@@ -443,6 +447,8 @@ module Effective
 
       if early_bird?
         event_ticket.early_bird_price
+      elsif blank_registrant?
+        event_ticket.member_price
       elsif member?
         event_ticket.member_price
       elsif guest_of_member?
@@ -450,7 +456,7 @@ module Effective
       elsif non_member?
         event_ticket.non_member_price
       else
-        raise("Unexpected event ticket price calculation")
+        event_ticket.member_price
       end
     end
 

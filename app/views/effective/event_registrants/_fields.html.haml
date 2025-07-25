@@ -27,18 +27,17 @@
 
         - organizations = EffectiveMemberships.Organization.sorted.all
 
-        - if event_ticket&.members?
+        - if event_ticket && event_ticket.members? && !event_ticket.guest_of_member?
           - organization_id = (f.object.event_registration&.owner || current_user).try(:organizations).try(:first).try(:id)
 
-          = f.select :organization_id, organizations, label: organization_label, placeholder: 'Search by name', input_html: { disabled: disabled },
-            input_js: { minimumInputLength: 1 },
-            hint: "You can only add new members to your own #{organization_label.downcase}",
+          - # Must select any existing member organization
+          = f.select :organization_id, organizations.members, label: organization_label, placeholder: 'Search by name', input_html: { disabled: disabled },
             value: (organization_id if organization_id && f.object.organization_id.blank?)
         - else
           - # This creates a select field organization_id and a text field company
           = f.select_or_text :organization_id, :company, organizations, name: organization_label.downcase, input_html: { disabled: disabled },
             text: { label: "#{organization_label} name", placeholder: "New #{organization_label.downcase} name" },
-            select: { label: organization_label, placeholder: 'Search by name', input_js: { minimumInputLength: 1 } }
+            select: { label: organization_label, placeholder: 'Search by name' }
 
   - if event_ticket.present?
     - if event_ticket.question1.present?
