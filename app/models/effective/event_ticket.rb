@@ -142,6 +142,10 @@ module Effective
       event&.early_bird_end_at.present?
     end
 
+    def blank_registrant_price
+      [non_member_price, member_price, (guest_of_member_price if guest_of_member?)].compact.max
+    end
+
     # “Anyone” can buy tickets have: Member, Non-member, and Guest of Member pricing. Member and Non-member are always required.
     def anyone?
       category == 'Anyone'
@@ -151,5 +155,6 @@ module Effective
     def members?
       category == 'Members'
     end
+
   end
 end

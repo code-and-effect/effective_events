@@ -448,7 +448,7 @@ module Effective
       if early_bird?
         event_ticket.early_bird_price
       elsif blank_registrant?
-        event_ticket.member_price
+        event_ticket.blank_registrant_price
       elsif member?
         event_ticket.member_price
       elsif guest_of_member?

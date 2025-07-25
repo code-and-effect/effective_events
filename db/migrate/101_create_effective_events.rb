@@ -116,7 +116,6 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.timestamps
     end
 
-    add_index :event_registrants, [:user_type, :user_id, :owner_type, :owner_id], if_not_exists: true
     add_index :event_registrants, :event_registration_id, if_not_exists: true
     add_index :event_registrants, :event_ticket_id, if_not_exists: true
     add_index :event_registrants, :archived, if_not_exists: true
