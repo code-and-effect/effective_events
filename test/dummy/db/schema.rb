@@ -384,6 +384,8 @@ ActiveRecord::Schema.define(version: 101) do
     t.boolean "created_by_admin", default: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["event_product_id"], name: "index_event_addons_on_event_product_id"
+    t.index ["event_registration_id"], name: "index_event_addons_on_event_registration_id"
   end
 
   create_table "event_notifications", force: :cascade do |t|
@@ -414,6 +416,8 @@ ActiveRecord::Schema.define(version: 101) do
     t.boolean "archived", default: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["event_id"], name: "index_event_products_on_event_id"
+    t.index ["position"], name: "index_event_products_on_position"
   end
 
   create_table "event_registrants", force: :cascade do |t|
@@ -448,6 +452,10 @@ ActiveRecord::Schema.define(version: 101) do
     t.boolean "created_by_admin", default: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["archived"], name: "index_event_registrants_on_archived"
+    t.index ["event_registration_id"], name: "index_event_registrants_on_event_registration_id"
+    t.index ["event_ticket_id"], name: "index_event_registrants_on_event_ticket_id"
+    t.index ["registered_at"], name: "index_event_registrants_on_registered_at"
   end
 
   create_table "event_registrations", force: :cascade do |t|
@@ -476,6 +484,7 @@ ActiveRecord::Schema.define(version: 101) do
     t.integer "quantity"
     t.datetime "updated_at"
     t.datetime "created_at"
+    t.index ["event_registration_id"], name: "index_event_ticket_selections_on_event_registration_id"
   end
 
   create_table "event_tickets", force: :cascade do |t|
@@ -485,8 +494,10 @@ ActiveRecord::Schema.define(version: 101) do
     t.boolean "display_capacity", default: false
     t.boolean "waitlist", default: false
     t.string "category"
-    t.integer "regular_price"
+    t.boolean "guest_of_member", default: false
+    t.integer "non_member_price"
     t.integer "member_price"
+    t.integer "guest_of_member_price"
     t.integer "early_bird_price"
     t.text "question1"
     t.text "question2"
@@ -497,6 +508,8 @@ ActiveRecord::Schema.define(version: 101) do
     t.boolean "archived", default: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["event_id"], name: "index_event_tickets_on_event_id"
+    t.index ["title"], name: "index_event_tickets_on_title"
   end
 
   create_table "events", force: :cascade do |t|

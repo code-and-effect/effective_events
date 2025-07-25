@@ -3,7 +3,7 @@ require 'test_helper'
 class CouponFeesTest < ActiveSupport::TestCase
   test 'build_event_registration purchase' do
     event = build_event()
-    event.event_tickets.each { |ticket| ticket.update!(regular_price: 10_00, early_bird_price: 10_00) }
+    event.event_tickets.each { |ticket| ticket.update!(non_member_price: 10_00, early_bird_price: 10_00) }
     event.event_products.each { |product| product.update!(price: 10_00) }
 
     owner = build_user_with_address()
@@ -19,7 +19,7 @@ class CouponFeesTest < ActiveSupport::TestCase
 
   test 'coupon fees for regular order' do
     event = build_event()
-    event.event_tickets.each { |ticket| ticket.update!(regular_price: 10_00, early_bird_price: 10_00) }
+    event.event_tickets.each { |ticket| ticket.update!(non_member_price: 10_00, early_bird_price: 10_00) }
     event.event_products.each { |product| product.update!(price: 10_00) }
 
     owner = build_user_with_address()
@@ -49,7 +49,7 @@ class CouponFeesTest < ActiveSupport::TestCase
 
   test 'coupon fees for zero dollar order' do
     event = build_event()
-    event.event_tickets.each { |ticket| ticket.update!(regular_price: 0, early_bird_price: 0) }
+    event.event_tickets.each { |ticket| ticket.update!(non_member_price: 0, early_bird_price: 0) }
     event.event_products.each { |product| product.update!(price: 0) }
 
     owner = build_user_with_address()

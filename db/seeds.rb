@@ -25,7 +25,7 @@ event = Effective::Event.create!(
 event.event_tickets.create!(
   title: 'Ticket A 10 Seats',
   capacity: 10,
-  regular_price: 100_00,
+  non_member_price: 100_00,
   early_bird_price: 50_00,
   member_price: 75_00,
   qb_item_name: 'Tickets'
@@ -34,7 +34,7 @@ event.event_tickets.create!(
 event.event_tickets.create!(
   title: 'Ticket B 20 Seats',
   capacity: 20,
-  regular_price: 200_00,
+  non_member_price: 200_00,
   early_bird_price: 150_00,
   member_price: 75_00,
   qb_item_name: 'Tickets'
@@ -43,7 +43,7 @@ event.event_tickets.create!(
 event.event_tickets.create!(
   title: 'Ticket C Unlimited Seats',
   capacity: nil,
-  regular_price: 200_00,
+  non_member_price: 200_00,
   early_bird_price: 150_00,
   member_price: 75_00,
   qb_item_name: 'Tickets'

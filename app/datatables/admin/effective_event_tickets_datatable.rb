@@ -10,35 +10,40 @@ module Admin
 
       col :event
       col :title
-      col :category, visible: false
+      col :category, label: 'Purchasable by', visible: false
       col :waitlist, visible: false
+      col :guest_of_member, visible: false
 
       col :early_bird_price, as: :price, visible: false
-      col :regular_price, as: :price, visible: false
+      col :non_member_price, as: :price, visible: false
       col :member_price, as: :price, visible: false
+      col :guest_of_member_price, as: :price, visible: false
 
-      col :prices do |ticket|
-        prices = ""
+      col :prices, label: 'Price' do |ticket|
+        prices = []
 
         if event&.early_bird_end_at.present?
-          prices += "#{price_to_currency(ticket.early_bird_price || 0)} early<br />"
+          prices << "#{price_to_currency(ticket.early_bird_price || 0)} early"
         end
 
-        if ticket.category == "Member Only"
-          prices += "#{price_to_currency(ticket.member_price)} member"
-        elsif ticket.category == "Regular"
-          prices += "#{price_to_currency(ticket.regular_price)} regular"
-        elsif ticket.category == ("Member or Non-Member" || "Regular")
-          prices +=
-          "
-            #{price_to_currency(ticket.regular_price)} regular<br />
-            #{price_to_currency(ticket.member_price)} member
-          "
+        if [ticket.member_price, ticket.non_member_price, ticket.guest_of_member_price].compact.uniq.length == 1
+          prices << "#{price_to_currency(ticket.member_price)}"
         else
-          "Invalid ticket category"
+          if ticket.anyone?
+            prices << "#{price_to_currency(ticket.non_member_price)} non-member"
+            prices << "#{price_to_currency(ticket.member_price)} member"
+          elsif ticket.members?
+            prices << "#{price_to_currency(ticket.member_price)} member"
+          else
+            raise("Invalid ticket category #{ticket.category}")
+          end
+
+          if ticket.guest_of_member?
+            prices << "#{price_to_currency(ticket.guest_of_member_price)} guest"
+          end
         end
 
-        prices
+        prices.join('<br />')
       end
 
       col :capacity_available, visible: false
@@ -56,8 +61,6 @@ module Admin
           "#{ticket.registered_count} registered"
         end
       end
-
-      col :category, visible: false
 
       col :registered_event_registrants_count, label: 'Registered', visible: false, as: :integer do |event|
         event.event_registrants.registered.count

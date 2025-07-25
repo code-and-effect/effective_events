@@ -41,21 +41,21 @@ module EffectiveEventsHelper
     end
   end
 
-  def effective_events_ticket_price(event, ticket)
+  def effective_events_ticket_prices(event, ticket)
     raise('expected an Effective::Event') unless event.kind_of?(Effective::Event)
     raise('expected an Effective::EventTicket') unless ticket.kind_of?(Effective::EventTicket)
 
-    prices = [
-      (ticket.early_bird_price if event.early_bird?), 
-      (ticket.regular_price if ticket.regular? || ticket.member_or_non_member?),
-      (ticket.member_price if ticket.member_only? || ticket.member_or_non_member?)
-    ].compact.sort.uniq
+    guest_of_member = (ticket.guest_of_member? && (current_user.try(:membership_present?) || current_user.is_any?(:member)))
 
-    if prices.length > 1
-      "#{(prices.first == 0 ? '$0' : price_to_currency(prices.first))} or #{(prices.last == 0 ? '$0' : price_to_currency(prices.last))}"
-    else
-      (prices.first == 0 ? '$0' : price_to_currency(prices.first))
-    end
+    prices = if event.early_bird? && ticket.early_bird_price.present?
+      [ticket.early_bird_price]
+    elsif ticket.members?
+      [ticket.member_price, (ticket.guest_of_member_price if guest_of_member)].compact
+    elsif ticket.anyone?
+      [ticket.member_price, (ticket.guest_of_member_price if guest_of_member), ticket.non_member_price].compact
+    end.uniq.sort
+
+    prices.map { |price| price == 0 ? '$0' : price_to_currency(price) }.to_sentence(last_word_connector: ' or ', two_words_connector: ' or ')
   end
 
   def effective_events_event_tickets_collection(event, namespace = nil)

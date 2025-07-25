@@ -119,7 +119,15 @@ module Effective
       errors.add(:waitlisted, 'is not permitted for a non-waitlist event ticket') if waitlisted? && !event_ticket.waitlist?
     end
 
-    validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
+    validate(if: -> { event_ticket&.members? }, unless: -> { purchased? }) do
+      errors.add(:base, "must be a member") unless owner.try(:membership_present?)
+    end
+
+    validate(if: -> { event_ticket&.members? && registrant_validations_enabled? }, unless: -> { purchased? }) do
+      errors.add(:user_id, "registrant must be a member") unless event_ticket.guest_of_member? || member?
+    end
+
+    validates :price, numericality: { greater_than_or_equal_to: 0 }
     validates :email, email: true
 
     # First name, last name and email are always required fields on details
@@ -131,15 +139,6 @@ module Effective
     validates :user, presence: true, if: -> { registrant_validations_enabled? && EffectiveEvents.create_users }
     validates :company, presence: true, if: -> { registrant_validations_enabled? && EffectiveEvents.company_or_organization_required }
     validates :organization, presence: true, if: -> { registrant_validations_enabled? && EffectiveEvents.company_or_organization_required && EffectiveEvents.organization_enabled? }
-
-    # Member ticket: company name is locked in. you can only add to your own company
-    validate(if: -> { registrant_validations_enabled? && event_ticket&.member_only? }) do
-      if building_user_and_organization && owner.present? && Array(owner.try(:organizations)).exclude?(organization)
-        errors.add(:organization_id, "must be your own for member-only tickets") 
-      end
-
-      errors.add(:user_id, 'must be a member to register for member-only tickets') unless member_present?
-    end
 
     # Copy any user errors from build_user_and_organization() into the registrant
     after_validation(if: -> { user && user.new_record? && user.errors.present? }) do
@@ -214,7 +213,8 @@ module Effective
 
     def details
       [
-        (content_tag(:span, 'Member', class: 'badge badge-warning') if member_ticket?),
+        (content_tag(:span, 'Member', class: 'badge badge-warning') if member?),
+        (content_tag(:span, 'Guest of Member', class: 'badge badge-warning') if guest_of_member?),
         (content_tag(:span, 'Waitlist', class: 'badge badge-warning') if waitlisted_not_promoted?),
         (content_tag(:span, 'Archived', class: 'badge badge-warning') if archived?)
       ].compact.join(' ').html_safe
@@ -232,6 +232,41 @@ module Effective
       (first_name.present? && last_name.present?) ? "#{last_name}, #{first_name}" : "GUEST"
     end
 
+    # Anyone or Members tickets
+    def early_bird?
+      return false if event.blank?
+      return false if event_ticket.blank?
+      return false if event_ticket.early_bird_price.blank?
+
+      event.early_bird?
+    end
+
+    # Anyone or Members tickets
+    def member?
+      return false if event.blank?
+      return false if event_ticket.blank?
+
+      user.try(:membership_present?) || organization.try(:membership_present?)
+    end
+
+    # Anyone or Members tickets
+    def guest_of_member?
+      return false if event.blank?
+      return false if event_ticket.blank?
+      return false unless event_ticket.guest_of_member?
+
+      !member? && owner.try(:membership_present?)
+    end
+
+    # Anyone tickets only
+    def non_member?
+      return false if event.blank?
+      return false if event_ticket.blank?
+      return false unless event_ticket.anyone?
+
+      !member? && !guest_of_member?
+    end
+
     # We create registrants on the tickets step. But don't enforce validations until the details step.
     def registrant_validations_enabled?
       return false if blank_registrant? # They want to come back later
@@ -240,18 +275,6 @@ module Effective
       return false if event_ticket.blank? # Invalid anyway
 
       event_registration.current_step == :details
-    end
-
-    def member_present?
-      user.try(:membership_present?) || organization.try(:membership_present?)
-    end
-
-    def member_ticket?
-      return false if event_ticket.blank?
-      return true if event_ticket.member_only?
-      return true if event_ticket.member_or_non_member? && member_present?
-
-      false
     end
 
     def present_registrant?
@@ -417,16 +440,18 @@ module Effective
       raise('expected an event') if event.blank?
       raise('expected an event ticket') if event_ticket.blank?
 
-      if event.early_bird?
-        event_ticket.early_bird_price # Early Bird Pricing
-      elsif event_ticket.regular?
-        event_ticket.regular_price
-      elsif event_ticket.member_only?
+      if early_bird?
+        event_ticket.early_bird_price
+      elsif blank_registrant?
+        event_ticket.maximum_price
+      elsif member?
         event_ticket.member_price
-      elsif event_ticket.member_or_non_member?
-        (member_present? ? event_ticket.member_price : event_ticket.regular_price)
+      elsif guest_of_member?
+        event_ticket.guest_of_member_price
+      elsif non_member?
+        event_ticket.non_member_price
       else
-        raise("Unexpected event ticket price calculation")
+        event_ticket.maximum_price
       end
     end
 

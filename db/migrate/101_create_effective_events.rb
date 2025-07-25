@@ -45,10 +45,13 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.boolean :display_capacity, default: false
 
       t.boolean :waitlist, default: false
-      t.string :category
 
-      t.integer :regular_price
+      t.string :category
+      t.boolean :guest_of_member, default: false
+
+      t.integer :non_member_price
       t.integer :member_price
+      t.integer :guest_of_member_price
       t.integer :early_bird_price
 
       t.text :question1
@@ -113,7 +116,6 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.timestamps
     end
 
-    add_index :event_registrants, [:user_type, :user_id, :owner_type, :owner_id], if_not_exists: true
     add_index :event_registrants, :event_registration_id, if_not_exists: true
     add_index :event_registrants, :event_ticket_id, if_not_exists: true
     add_index :event_registrants, :archived, if_not_exists: true

@@ -28,9 +28,9 @@
       = f.datetime_field :early_bird_end_at, label: "Early bird end",
         hint: 'Event tickets are purchased at early bird pricing before this date. After this date, regular pricing applies.'
 
-      = f.check_box :allow_blank_registrants, label: "Yes, allow blank ticket registrations", hint: "Allow event tickets to be purchased without adding a name. The purchaser may return to add names later."
+      = f.check_box :allow_blank_registrants, label: "Allow blank ticket registrations", hint: "Allow event tickets to be purchased without adding a name. The purchaser may return to add names later."
 
-      = f.check_box :external_registration, label: "Yes, the registration for this event is handled by another website"
+      = f.check_box :external_registration, label: "The registration for this event is handled by another website"
 
       = f.show_if(:external_registration, true) do
         = f.url_field :external_registration_url, hint: "The url for external event registration. Must start with http(s)://"
@@ -40,13 +40,13 @@
         %h2 Delayed Payments
         %p The online payment for this event will be charged as follows:
 
-        = f.check_box :delayed_payment, label: "Yes, this is a delayed payment event", hint: "Allow registrations for this event without paying immediately.<br>A secure token representing their credit card will be saved and charged automatically on the following payment date."
+        = f.check_box :delayed_payment, label: "This is a delayed payment event", hint: "Allow registrations for this event without paying immediately.<br>A secure token representing their credit card will be saved and charged automatically on the following payment date."
 
         = f.hide_if(:delayed_payment, true) do
           = f.hidden_field :delayed_payment_date, value: ''
 
         = f.show_if(:delayed_payment, true) do
-          = f.date_field :delayed_payment_date, label: "Delayed Payment Charge Date", hint: "The date that the credit card will be charged. Expects a date in the future, after the registration end date.<br>Changing this will update the charge date for all existing delayed payment orders."
+          = f.date_field :delayed_payment_date, label: "Delayed payment charge date", hint: "The date that the credit card will be charged. Expects a date in the future, after the registration end date.<br>Changing this will update the charge date for all existing delayed payment orders."
 
   = f.submit do
     = f.save 'Save'
