@@ -142,7 +142,7 @@ module Effective
       event&.early_bird_end_at.present?
     end
 
-    def blank_registrant_price
+    def maximum_price
       [non_member_price, member_price, (guest_of_member_price if guest_of_member?)].compact.max
     end
 

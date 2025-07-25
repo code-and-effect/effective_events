@@ -140,11 +140,6 @@ module Effective
     validates :company, presence: true, if: -> { registrant_validations_enabled? && EffectiveEvents.company_or_organization_required }
     validates :organization, presence: true, if: -> { registrant_validations_enabled? && EffectiveEvents.company_or_organization_required && EffectiveEvents.organization_enabled? }
 
-    # Member ticket: company name is locked in. you can only add to your own company
-    validate(if: -> { registrant_validations_enabled? && event_ticket&.members? }) do
-      errors.add(:user_id, 'must be a member to register for member-only tickets') unless owner.try(:membership_present?)
-    end
-
     # Copy any user errors from build_user_and_organization() into the registrant
     after_validation(if: -> { user && user.new_record? && user.errors.present? }) do
       errors.add(:first_name, user.errors[:first_name].join(', ')) if user.errors[:first_name].present?
@@ -448,7 +443,7 @@ module Effective
       if early_bird?
         event_ticket.early_bird_price
       elsif blank_registrant?
-        event_ticket.blank_registrant_price
+        event_ticket.maximum_price
       elsif member?
         event_ticket.member_price
       elsif guest_of_member?
@@ -456,7 +451,7 @@ module Effective
       elsif non_member?
         event_ticket.non_member_price
       else
-        event_ticket.member_price
+        event_ticket.maximum_price
       end
     end
 
