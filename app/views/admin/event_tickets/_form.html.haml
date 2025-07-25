@@ -6,56 +6,43 @@
 
     .row
       .col
-        = f.select :category, Effective::EventTicket::CATEGORIES, hint: "Determines who can purchase this ticket at which price. Also determines if the dropdown of related members is displayed to the purchaser."
+        = f.select :category, Effective::EventTicket::CATEGORIES, label: 'Purchasable by', hint: "Determines who can purchase this ticket."
 
-        = f.show_if(:category, 'Regular') do
-          .alert.alert-info.mb-4
-            %strong Regular Ticket:
-            Anyone will be able to purchase this ticket. Only the regular price applies.
+        = f.price_field :early_bird_price, 
+          hint: 'The price charged when registering before the early bird date. This price will be charged instead of any of the prices below. Leave blank for no early bird price.',
+          disabled: !f.object.event&.early_bird_end_at.present?
 
-        = f.show_if(:category, 'Member Only') do
-          .alert.alert-info.mb-4
-            %strong Member Only Ticket:
-            Only members will be able to purchase this ticket. They must select a member from the dropdown list of all members. Only the member price applies.
+        = f.show_if(:category, 'Anyone') do
+          = f.price_field :non_member_price, label: 'Non-member price', hint: 'The price charged when registering a non-member.'
+          = f.price_field :member_price, hint: 'The price charged when registering a member.'
 
-        = f.show_if(:category, 'Member or Non-Member') do
-          .alert.alert-info.mb-4
-            %strong Member or Non-Member Ticket:
-            Anyone will be able to purchase this ticket. They can select a member from the dropdown list of all members to receive the member pricing or they can enter a first name and last name to receive the regular pricing.
+        = f.show_if(:category, 'Members') do
+          = f.price_field :member_price, hint: 'The price charged when registering a member.'
+
+        = f.check_box :guest_of_member, label: 'Allow members to purchase a guest ticket'
+
+        = f.show_if(:guest_of_member, true) do
+          = f.price_field :guest_of_member_price, hint: 'The price charged to members when registering a non-member guest.'
+
+        - if EffectiveOrders.use_item_names?
+          = qb_item_name_field(f)
+
+        = f.check_box :tax_exempt, label: "This #{etd(f.object)} is tax exempt"
 
       .col
         = f.number_field :capacity, hint: "The number of registrations will be limited to capacity. Leave blank for unlimited capacity."
-        = f.check_box :display_capacity, label: "Yes, display the remaining ticket capacity to users during registration", hint: "Leave blank to hide the capacity."
+        = f.check_box :display_capacity, label: "Display the remaining ticket capacity to users during registration", hint: "Leave blank to hide the capacity."
 
         - if EffectiveEvents.delayed?
           - event_delayed = f.object.event&.delayed?
           - f.object.waitlist = false if !event_delayed
 
           = f.check_box :waitlist, 
-            label: "Yes, add to waitlist once capacity is reached",
-            hint: "requires a event with delayed payment. Once capacity is reached, new registrations will be added to the waitlist. Payment information is collected but not charged for waitlisted registrants. To waitlist everyone and promote later, set the capacity to zero.",
+            label: "Add to waitlist once capacity is reached",
+            hint: "Once capacity is reached, new registrations will be added to the waitlist. Payment information is collected but not charged for waitlisted registrants. To waitlist everyone and promote later, set the capacity to zero. Requires an event with delayed payment.",
             disabled: !event_delayed
-    .row
-      .col-md-6
-        = f.price_field :early_bird_price, 
-          hint: 'requires an event with early bird date. A price of $0 will allow a checkout for free. Leave blank for no early bird price.',
-          disabled: !f.object.event&.early_bird_end_at.present?
 
-        = f.show_if_any(:category, ['Regular', 'Member or Non-Member']) do
-          = f.price_field :regular_price, hint: 'A price of $0 will allow a checkout for free.'
-
-        = f.show_if_any(:category, ['Member Only']) do
-          = f.static_field :regular_price, value: 'None'
-
-        = f.show_if_any(:category, ['Member Only', 'Member or Non-Member']) do
-          = f.price_field :member_price, hint: 'A price of $0 will allow a checkout for free when selecting a member.'
-
-    - if EffectiveOrders.use_item_names?
-      .row
-        .col-md-6= qb_item_name_field(f)
-
-    = f.check_box :tax_exempt, label: "Yes, this #{etd(f.object)} is tax exempt"
-    = f.check_box :archived, label: 'Archive this ticket. While archived, it cannot be purchased by users but registrants can only be added by an admin.'
+        = f.check_box :archived, label: 'Archive this ticket', hint: "While archived, it cannot be purchased by users but registrants can still be added by an admin."
 
   = card('Questions') do
     %p

@@ -214,7 +214,8 @@ module Effective
 
     def details
       [
-        (content_tag(:span, 'Member', class: 'badge badge-warning') if member_ticket?),
+        (content_tag(:span, 'Member', class: 'badge badge-warning') if member?),
+        (content_tag(:span, 'Guest of Member', class: 'badge badge-warning') if guest_of_member?),
         (content_tag(:span, 'Waitlist', class: 'badge badge-warning') if waitlisted_not_promoted?),
         (content_tag(:span, 'Archived', class: 'badge badge-warning') if archived?)
       ].compact.join(' ').html_safe
@@ -232,6 +233,36 @@ module Effective
       (first_name.present? && last_name.present?) ? "#{last_name}, #{first_name}" : "GUEST"
     end
 
+    def early_bird?
+      return false if event.blank?
+      return false if event_ticket.blank?
+      return false if event_ticket.early_bird_price.blank?
+
+      event.early_bird?
+    end
+
+    def member?
+      return false if event.blank?
+      return false if event_ticket.blank?
+
+      user.try(:membership_present?) || organization.try(:membership_present?)
+    end
+
+    def guest_of_member?
+      return false if event.blank?
+      return false if event_ticket.blank?
+      return false unless event_ticket.guest_of_member?
+
+      !member? && owner.try(:membership_present?)
+    end
+
+    def non_member?
+      return false if event.blank?
+      return false if event_ticket.blank?
+
+      !member? && !guest_of_member?
+    end
+
     # We create registrants on the tickets step. But don't enforce validations until the details step.
     def registrant_validations_enabled?
       return false if blank_registrant? # They want to come back later
@@ -240,18 +271,6 @@ module Effective
       return false if event_ticket.blank? # Invalid anyway
 
       event_registration.current_step == :details
-    end
-
-    def member_present?
-      user.try(:membership_present?) || organization.try(:membership_present?)
-    end
-
-    def member_ticket?
-      return false if event_ticket.blank?
-      return true if event_ticket.member_only?
-      return true if event_ticket.member_or_non_member? && member_present?
-
-      false
     end
 
     def present_registrant?
@@ -417,14 +436,14 @@ module Effective
       raise('expected an event') if event.blank?
       raise('expected an event ticket') if event_ticket.blank?
 
-      if event.early_bird?
-        event_ticket.early_bird_price # Early Bird Pricing
-      elsif event_ticket.regular?
-        event_ticket.regular_price
-      elsif event_ticket.member_only?
+      if early_bird?
+        event_ticket.early_bird_price
+      elsif member?
         event_ticket.member_price
-      elsif event_ticket.member_or_non_member?
-        (member_present? ? event_ticket.member_price : event_ticket.regular_price)
+      elsif guest_of_member?
+        event_ticket.guest_of_member_price
+      elsif non_member?
+        event_ticket.non_member_price
       else
         raise("Unexpected event ticket price calculation")
       end

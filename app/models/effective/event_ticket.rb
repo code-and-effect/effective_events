@@ -18,7 +18,9 @@ module Effective
 
     has_rich_text :body
 
-    CATEGORIES = ['Regular', 'Member Only', 'Member or Non-Member']
+    #CATEGORIES = ['Regular', 'Member Only', 'Member or Non-Member']
+
+    CATEGORIES = ['Anyone', 'Members'] # Purchasable by
 
     effective_resource do
       title                       :string
@@ -27,7 +29,8 @@ module Effective
       display_capacity            :boolean
       waitlist                    :boolean 
 
-      category                    :string
+      category                    :string  # Purchasable by
+      guest_of_member             :boolean # Allow members to purchase a guest ticket
 
       # Questions
       question1                   :text
@@ -36,8 +39,10 @@ module Effective
 
       # Pricing
       early_bird_price            :integer
+
+      non_member_price            :integer      # Used to be regular_price
       member_price                :integer
-      regular_price               :integer
+      guest_of_member_price       :integer
 
       qb_item_name                :string
       tax_exempt                  :boolean
@@ -59,14 +64,16 @@ module Effective
     validates :title, presence: true, uniqueness: { scope: [:event_id] }
     validates :category, presence: true
 
-    validates :regular_price, presence: true, if: -> { member_or_non_member? || regular? }
-    validates :regular_price, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
-
-    validates :member_price, presence: true, if: -> { member_or_non_member? || member_only? }
-    validates :member_price, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
-
-    validates :early_bird_price, presence: true, if: -> { event&.early_bird_end_at.present? }
+    # Price validations
     validates :early_bird_price, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
+    validates :non_member_price, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
+    validates :member_price, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
+    validates :guest_of_member_price, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
+
+    validates :early_bird_price, presence: true, if: -> { early_bird? }
+    validates :non_member_price, presence: true, if: -> { anyone? }
+    validates :member_price, presence: true, if: -> { anyone? || members? }
+    validates :guest_of_member_price, presence: true, if: -> { guest_of_member? }
 
     validates :capacity, numericality: { greater_than_or_equal_to: 0, allow_blank: true }
     validates :capacity, presence: { message: 'must be present when using the waitlist'}, if: -> { waitlist? }
@@ -133,16 +140,18 @@ module Effective
       [question1.presence, question2.presence, question3.presence].compact
     end
 
-    def regular?
-      category == 'Regular'
+    def early_bird?
+      event&.early_bird_end_at.present?
     end
 
-    def member_only?
-      category == 'Member Only'
+    # “Anyone” can buy tickets have: Member, Non-member, and Guest of Member pricing. Member and Non-member are always required.
+    def anyone?
+      category == 'Anyone'
     end
 
-    def member_or_non_member?
-      category == 'Member or Non-Member'
+    # “Members” can buy tickets have: Member and Guest of Member pricing. Member pricing is always required.
+    def members?
+      category == 'Members'
     end
   end
 end

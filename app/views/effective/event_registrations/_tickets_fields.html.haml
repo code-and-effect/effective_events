@@ -3,8 +3,8 @@
 - tickets = event.event_tickets.reject(&:archived?)
 - waitlist = tickets.any? { |ticket| ticket.waitlist? }
 
-- all_member_only_tickets = tickets.all? { |ticket| ticket.member_only? }
-- any_member_only_tickets = tickets.any? { |ticket| ticket.member_only? }
+- all_members_tickets = tickets.all? { |ticket| ticket.members? }
+- any_members_tickets = tickets.any? { |ticket| ticket.members? }
 - is_member = current_user.try(:membership_present?)
 
 - if event.early_bird?
@@ -32,13 +32,12 @@
                 before waitlist
         %td
           %ul.list-unstyled.mb-0
-            - # Early Bird
-            - if event.early_bird? && ticket.early_bird_price.to_i > 0 && [ticket.member_price, ticket.regular_price].exclude?(ticket.early_bird_price)
+            - if event.early_bird? && ticket.early_bird_price.to_i > 0 && [ticket.member_price, ticket.non_member_price, ticket.guest_of_member_price].exclude?(ticket.early_bird_price)
               %li
-                - if ticket.regular_price.to_i > 0 && (ticket.member_or_non_member? || ticket.regular?)
+                - if ticket.non_member_price.to_i > 0 && (ticket.member_or_non_member? || ticket.regular?)
                   %div
                     %s.text-muted
-                      = price_to_currency(ticket.regular_price)
+                      = price_to_currency(ticket.non_member_price)
 
                 - if ticket.member_price.to_i > 0 && (ticket.member_or_non_member? || ticket.member_only?)
                   %div
@@ -50,9 +49,9 @@
                   = price_to_currency(ticket.early_bird_price)
                   .badge.badge-warning Early Bird
             - else
-              - if ticket.regular_price.to_i > 0 && (ticket.member_or_non_member? || ticket.regular?)
+              - if ticket.non_member_price.to_i > 0 && (ticket.member_or_non_member? || ticket.regular?)
                 %li
-                  = price_to_currency(ticket.regular_price)
+                  = price_to_currency(ticket.non_member_price)
 
               - if ticket.member_price.to_i > 0 && (ticket.member_or_non_member? || ticket.member_only?)
                 %li
@@ -79,7 +78,7 @@
   %p If the ticket capacity has been reached you will be added to the waitlist.
 
 - unless is_member
-  - if all_member_only_tickets
+  - if all_members_tickets
     .alert.alert-info.mb-4 You must be a member to purchase tickets.
-  - elsif any_member_only_tickets
+  - elsif any_members_tickets
     .alert.alert-info.mb-4 You must be a member to purchase some of these tickets.
