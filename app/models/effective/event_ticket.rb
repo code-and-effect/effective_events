@@ -18,8 +18,6 @@ module Effective
 
     has_rich_text :body
 
-    #CATEGORIES = ['Regular', 'Member Only', 'Member or Non-Member']
-
     CATEGORIES = ['Anyone', 'Members'] # Purchasable by
 
     effective_resource do

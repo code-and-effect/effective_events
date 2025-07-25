@@ -66,34 +66,6 @@
                 %li
                   = price_to_currency(ticket.non_member_price)
                   .badge.badge-secondary Non-Member
-
-            -# OLD
-            -# - if event.early_bird? && ticket.early_bird_price.to_i > 0 && [ticket.member_price, ticket.non_member_price, ticket.guest_of_member_price].exclude?(ticket.early_bird_price)
-            -#   %li
-            -#     - if ticket.non_member_price.to_i > 0 && (ticket.member_or_non_member? || ticket.regular?)
-            -#       %div
-            -#         %s.text-muted
-            -#           = price_to_currency(ticket.non_member_price)
-
-            -#     - if ticket.member_price.to_i > 0 && (ticket.member_or_non_member? || ticket.member_only?)
-            -#       %div
-            -#         %s.text-muted
-            -#           = price_to_currency(ticket.member_price)
-            -#         .badge.badge-secondary.mr-2 Members
-
-            -#     %div
-            -#       = price_to_currency(ticket.early_bird_price)
-            -#       .badge.badge-warning Early Bird
-            -# - else
-            -#   - if ticket.non_member_price.to_i > 0 && (ticket.member_or_non_member? || ticket.regular?)
-            -#     %li
-            -#       = price_to_currency(ticket.non_member_price)
-
-            -#   - if ticket.member_price.to_i > 0 && (ticket.member_or_non_member? || ticket.member_only?)
-            -#     %li
-            -#       = price_to_currency(ticket.member_price)
-            -#       .badge.badge-secondary Members
-
         %td
           - event_ticket_selection = form.object.event_ticket_selection(event_ticket: ticket)
 
