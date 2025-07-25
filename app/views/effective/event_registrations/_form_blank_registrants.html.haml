@@ -16,7 +16,7 @@
         = ' - '
 
         - if event_ticket.member_or_non_member? && event_registrant.first_name.blank? && !event.early_bird?
-          = effective_events_ticket_price(event, event_ticket)
+          = effective_events_ticket_prices(event, event_ticket)
         - else
           = price_to_currency(event_registrant.price)
 
