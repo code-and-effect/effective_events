@@ -231,7 +231,7 @@ module Effective
     end
 
     def waitlist_only?
-      any_waitlist? && event_tickets.none? { |et| et.capacity_available > 0 }
+      any_waitlist? && event_tickets.none? { |et| et.capacity.blank? || et.capacity_available > 0 }
     end
 
     def upcoming?
