@@ -50,10 +50,10 @@ module EffectiveEventsHelper
     prices = if event.early_bird? && ticket.early_bird_price.present?
       [ticket.early_bird_price]
     elsif ticket.members?
-      [ticket.member_price, (ticket.guest_of_member_price if guest_of_member)].compact
+      [ticket.member_price, (ticket.guest_of_member_price if guest_of_member)]
     elsif ticket.anyone?
-      [ticket.member_price, (ticket.guest_of_member_price if guest_of_member), ticket.non_member_price].compact
-    end.uniq.sort
+      [ticket.member_price, (guest_of_member ? ticket.guest_of_member_price : ticket.non_member_price)]
+    end.compact.uniq.sort
 
     prices.map { |price| price == 0 ? '$0' : price_to_currency(price) }.to_sentence(last_word_connector: ' or ', two_words_connector: ' or ')
   end

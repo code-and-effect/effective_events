@@ -442,8 +442,10 @@ module Effective
 
       if early_bird?
         event_ticket.early_bird_price
-      elsif blank_registrant?
-        event_ticket.maximum_price
+      elsif blank_registrant? && owner.try(:membership_present?)
+        event_ticket.blank_registrant_member_price
+      elsif blank_registrant? && !owner.try(:membership_present?)
+        event_ticket.blank_registrant_non_member_price
       elsif member?
         event_ticket.member_price
       elsif guest_of_member?

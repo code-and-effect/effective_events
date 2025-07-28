@@ -142,8 +142,16 @@ module Effective
       event&.early_bird_end_at.present?
     end
 
+    def blank_registrant_member_price
+      [member_price, (guest_of_member? ? guest_of_member_price : non_member_price)].compact.max
+    end
+
+    def blank_registrant_non_member_price
+      [member_price, non_member_price].compact.max
+    end
+
     def maximum_price
-      [non_member_price, member_price, (guest_of_member_price if guest_of_member?)].compact.max
+      [member_price, (guest_of_member_price if guest_of_member?), non_member_price].compact.max
     end
 
     # “Anyone” can buy tickets have: Member, Non-member, and Guest of Member pricing. Member and Non-member are always required.
