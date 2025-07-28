@@ -15,12 +15,11 @@
         = event_ticket
         = ' - '
 
-        - if event_ticket.member_or_non_member? && event_registrant.first_name.blank? && !event.early_bird?
-          = effective_events_ticket_prices(event, event_ticket)
-        - else
+        - if event_registrant.first_name.present?
           = price_to_currency(event_registrant.price)
-
-        = event_registrant.details
+          = event_registrant.details
+        - else
+          = effective_events_ticket_prices(event, event_ticket)
 
       = fr.check_box :blank_registrant, label: "I will return and add this ticket's information later"
 
