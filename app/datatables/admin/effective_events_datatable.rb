@@ -27,8 +27,8 @@ module Admin
 
       col :draft?, as: :boolean, visible: false
       col :published?, as: :boolean
-      col :published_start_at, label: "Published start", as: :datetime
-      col :published_end_at, label: "Published end", as: :datetime
+      col :published_start_at, label: "Published start", as: :datetime, visible: false
+      col :published_end_at, label: "Published end", as: :datetime, visible: false
 
       col :excerpt, visible: false
 
