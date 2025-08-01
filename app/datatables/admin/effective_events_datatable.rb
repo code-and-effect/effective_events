@@ -30,6 +30,13 @@ module Admin
       col :published_start_at, label: "Published start", as: :datetime, visible: false
       col :published_end_at, label: "Published end", as: :datetime, visible: false
 
+      # TODO
+      # col :total_capacity, label: 'Capacity' do |event|
+      #   if event.event_tickets_with_capacity.present?
+      #     "#{event.total_capacity_taken}/#{event.total_capacity}"
+      #   end
+      # end
+
       col :excerpt, visible: false
 
       col :registration_start_at, label: 'Registration opens', visible: false

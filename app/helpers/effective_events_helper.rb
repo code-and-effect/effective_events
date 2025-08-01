@@ -48,14 +48,26 @@ module EffectiveEventsHelper
     guest_of_member = (ticket.guest_of_member? && (current_user.try(:membership_present?) || current_user.is_any?(:member)))
 
     prices = if event.early_bird? && ticket.early_bird_price.present?
-      [ticket.early_bird_price]
+      { 
+        ticket.early_bird_price => badge('Early Bird', 'badge-warning')
+      }
     elsif ticket.members?
-      [ticket.member_price, (ticket.guest_of_member_price if guest_of_member)]
+      { 
+        ticket.member_price => badge('Member'),
+        (ticket.guest_of_member_price if guest_of_member) => badge('Guest of Member')
+      }
     elsif ticket.anyone?
-      [ticket.member_price, (guest_of_member ? ticket.guest_of_member_price : ticket.non_member_price)]
-    end.compact.uniq.sort
+      { 
+        ticket.member_price => badge('Member'), 
+        (ticket.guest_of_member_price if guest_of_member) => badge('Guest of Member'),
+        (ticket.non_member_price unless guest_of_member) => badge('Non-member'),
+      }
+    end.delete_if { |price| price.blank? }.sort_by { |price| price }
 
-    prices.map { |price| price == 0 ? '$0' : price_to_currency(price) }.to_sentence(last_word_connector: ' or ', two_words_connector: ' or ')
+    prices
+      .map { |price, badge| [(price == 0 ? '$0' : price_to_currency(price)), badge].join(' ') }
+      .to_sentence(last_word_connector: ' or ', two_words_connector: ' or ')
+      .html_safe
   end
 
   def effective_events_event_tickets_collection(event, namespace = nil)
