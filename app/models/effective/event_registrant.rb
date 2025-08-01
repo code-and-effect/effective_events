@@ -190,9 +190,9 @@ module Effective
       if first_name.present?
         "#{first_name} #{last_name}"
       elsif owner.present?
-        owner.to_s + ' - GUEST'
+        'Pending Name'
       else
-        'GUEST'
+        'Pending Name'
       end
     end
 
@@ -205,9 +205,9 @@ module Effective
           ("<small>#{email}</small>" if email.present?)
         ].compact.join('<br>').html_safe
       elsif owner.present?
-        owner.to_s + ' - GUEST'
+        'Pending Name'
       else
-        'GUEST'
+        'Pending Name'
       end
     end
 
@@ -229,7 +229,7 @@ module Effective
     end
 
     def last_first_name
-      (first_name.present? && last_name.present?) ? "#{last_name}, #{first_name}" : "GUEST"
+      (first_name.present? && last_name.present?) ? "#{last_name}, #{first_name}" : "Pending Name"
     end
 
     # Anyone or Members tickets

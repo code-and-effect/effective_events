@@ -21,12 +21,12 @@ module Admin
 
       col :event
 
-      col :owner, visible: false
+      col :owner
       col :event_registration, visible: false
 
       if defined?(EffectiveMemberships) && EffectiveMemberships.Organization.respond_to?(:sponsors)
         col :sponsorship, search: EffectiveMemberships.Organization::SPONSORSHIPS do |er|
-          er.user.try(:sponsorship)
+          er.user.try(:sponsorship), visible: false
         end
       end
 
@@ -59,9 +59,9 @@ module Admin
         elsif er.first_name.present?
           "#{er.first_name} #{er.last_name}"
         elsif er.owner.present?
-          er.owner.to_s + ' - GUEST'
+          'Pending Name'
         else
-          'Unknown'
+          'Pending Name'
         end
       end
       
