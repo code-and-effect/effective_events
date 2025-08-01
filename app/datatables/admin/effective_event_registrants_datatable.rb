@@ -25,8 +25,8 @@ module Admin
       col :event_registration, visible: false
 
       if defined?(EffectiveMemberships) && EffectiveMemberships.Organization.respond_to?(:sponsors)
-        col :sponsorship, search: EffectiveMemberships.Organization::SPONSORSHIPS do |er|
-          er.user.try(:sponsorship), visible: false
+        col :sponsorship, search: EffectiveMemberships.Organization::SPONSORSHIPS, visible: false do |er|
+          er.user.try(:sponsorship)
         end
       end
 

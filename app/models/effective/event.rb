@@ -89,7 +89,7 @@ module Effective
     scope :for_sitemap, -> { published }
 
     scope :deep, -> { 
-      base = includes(:event_registrants, :event_tickets, :rich_texts) 
+      base = includes(:event_registrants, :rich_texts, event_tickets: :event_registrants)
       base = base.includes(:pg_search_document) if defined?(PgSearch)
       base
     }
@@ -281,6 +281,22 @@ module Effective
 
     def start_time
       start_at
+    end
+
+    def event_tickets_with_capacity
+      event_tickets.reject(&:archived?).select { |et| et.capacity.present? }
+    end
+
+    def total_capacity_available
+      event_tickets_with_capacity.sum { |et| et.capacity_available }
+    end
+
+    def total_capacity_taken
+      event_tickets_with_capacity.sum { |et| et.capacity_taken }
+    end
+
+    def total_capacity
+      event_tickets_with_capacity.sum { |et| et.capacity }
     end
 
     # The amount of tickets that can be purchased except ones from an event registration
