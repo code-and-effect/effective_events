@@ -31,7 +31,7 @@ module Effective
       values = {
         name: resource.title,
         date: resource.start_at.strftime('%F %H:%M'),
-        url: effective_events.event_url(resource)
+        url: link_to(effective_events.event_url(resource))
       }
 
       { event: values }

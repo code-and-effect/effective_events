@@ -41,7 +41,7 @@ class EventsTest < ActiveSupport::TestCase
     assert event.published?
     refute event.draft?
 
-    event.update!(published_start_at: nil)
+    event.update!(published_start_at: Time.zone.now + 10.minutes)
     refute event.published?
     assert event.draft?
     refute Effective::Event.published.include?(event)
