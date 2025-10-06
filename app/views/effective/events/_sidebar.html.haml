@@ -3,5 +3,6 @@
     = nav_link_to("Upcoming #{ets(Effective::Event)}", effective_events.events_path, class: "effective-event-all")
     = nav_link_to("Past #{ets(Effective::Event)}", effective_events.events_path + '/past', class: "effective-event-past")
 
-    - EffectiveEvents.categories.sort.each do |category|
-      = nav_link_to(category, effective_events.events_path + '/' + category.parameterize, class: "effective-event-#{category.parameterize}")
+    - if EffectiveEvents.categories.length > 1
+      - EffectiveEvents.categories.sort.each do |category|
+        = nav_link_to(category, effective_events.events_path + '/' + category.parameterize, class: "effective-event-#{category.parameterize}")
