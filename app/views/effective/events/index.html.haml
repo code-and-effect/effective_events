@@ -1,9 +1,8 @@
 = render 'layout' do
   .row
-    - if EffectiveEvents.categories.length > 1
-      .d-lg-block.col-lg-3.order-2.order-lg-1
-        -#= render('effective/events/form', event_search: @event_search)
-        = render('effective/events/sidebar')
+    .d-lg-block.col-lg-3.order-2.order-lg-1
+      -#= render('effective/events/form', event_search: @event_search)
+      = render('effective/events/sidebar')
 
     .col.order-1.order-lg-2
       %h1.effective-title.mb-4= @page_title
