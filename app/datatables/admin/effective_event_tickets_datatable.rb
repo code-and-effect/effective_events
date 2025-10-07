@@ -80,6 +80,10 @@ module Admin
       col :question2, visible: false
       col :question3, visible: false
 
+      col :question1_required, visible: false
+      col :question2_required, visible: false
+      col :question3_required, visible: false
+
       actions_col
     end
 

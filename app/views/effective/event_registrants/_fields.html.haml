@@ -41,11 +41,11 @@
 
   - if event_ticket.present?
     - if event_ticket.question1.present?
-      = f.text_field :response1, label: event_ticket.question1
+      = f.text_field :response1, label: event_ticket.question1, required: event_ticket.question1_required?
 
     - if event_ticket.question2.present?
-      = f.text_field :response2, label: event_ticket.question2
+      = f.text_field :response2, label: event_ticket.question2, required: event_ticket.question2_required?
 
     - if event_ticket.question3.present?
-      = f.text_field :response3, label: event_ticket.question3
+      = f.text_field :response3, label: event_ticket.question3, required: event_ticket.question3_required?
 

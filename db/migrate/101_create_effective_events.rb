@@ -58,6 +58,10 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.text :question2
       t.text :question3
 
+      t.boolean :question1_required, default: false
+      t.boolean :question2_required, default: false
+      t.boolean :question3_required, default: false
+
       t.string :qb_item_name
       t.boolean :tax_exempt, default: false
 

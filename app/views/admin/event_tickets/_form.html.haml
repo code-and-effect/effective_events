@@ -48,8 +48,16 @@
     %p
       %small.text-muted Please add up to 3 questions to ask during registration. Each ticket will have their own unique answers. Leave a question blank to skip.
 
-    = f.text_field :question1, label: 'Question 1'
-    = f.text_field :question2, label: 'Question 2'
-    = f.text_field :question3, label: 'Question 3'
+    .row
+      .col= f.text_field :question1, label: 'Question 1'
+      .col-2{style: 'margin-top: 2rem;'}= f.check_box :question1_required, label: 'Required'
+
+    .row
+      .col= f.text_field :question2, label: 'Question 2'
+      .col-2{style: 'margin-top: 2rem;'}= f.check_box :question2_required, label: 'Required'
+
+    .row
+      .col= f.text_field :question3, label: 'Question 3'
+      .col-2{style: 'margin-top: 2rem;'}= f.check_box :question3_required, label: 'Required'
 
   = effective_submit(f)

@@ -35,6 +35,10 @@ module Effective
       question2                   :text
       question3                   :text
 
+      question1_required          :boolean
+      question2_required          :boolean
+      question3_required          :boolean
+
       # Pricing
       early_bird_price            :integer
 
@@ -162,6 +166,18 @@ module Effective
     # “Members” can buy tickets have: Member and Guest of Member pricing. Member pricing is always required.
     def members?
       category == 'Members'
+    end
+
+    def question1_required?
+      question1.present? && question1_required
+    end
+
+    def question2_required?
+      question2.present? && question2_required
+    end
+
+    def question3_required?
+      question3.present? && question3_required
     end
 
   end
