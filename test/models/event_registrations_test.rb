@@ -230,5 +230,29 @@ class EventRegistrationsTest < ActiveSupport::TestCase
     assert_equal 100_00, order_item.price
     refute order_item.to_s.include?('Archived')
   end
+  
+  test 'validate_one_ticket_per_event?' do
+    user = build_user_with_address()
+
+    # First registration
+    event_registration = build_event_registration()
+    event = event_registration.event
+    event_registration.event_registrants.each { |er| er.assign_attributes(user: user) }
+    event_registration.ready!
+
+    order = event_registration.submit_order
+    order.purchase!
+
+    # Second registration
+    event_registration2 = build_event_registration(event: event, event_registrants: false, event_addons: false)
+    event_registration2.current_step = :details
+    assert event_registration2.validate_one_ticket_per_event?
+
+    registrant = event_registration2.event_registrants.build(user: user, event_ticket: event.event_tickets.last)
+    refute event_registration2.save
+
+    error = "Unable to register #{user} for #{event}. They've already been registered"
+    assert event_registration2.errors.full_messages.include?(error)
+  end
 
 end

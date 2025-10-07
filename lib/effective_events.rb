@@ -10,7 +10,7 @@ module EffectiveEvents
       :event_registrations_table_name, :event_products_table_name, :event_addons_table_name, :event_notifications_table_name,
       :mailer, :parent_mailer, :deliver_method, :mailer_layout, :mailer_sender, :mailer_admin, :mailer_subject,
       :layout, :per_page, :use_effective_roles, :categories, :events_hint_text,
-      :organization_enabled, :create_users, :company_or_organization_required,
+      :organization_enabled, :create_users, :company_or_organization_required, :validate_one_ticket_per_event,
       :code_of_conduct_enabled, :code_of_conduct_slug,
       :event_registration_class_name
     ]
@@ -49,6 +49,10 @@ module EffectiveEvents
     raise("The Effective::Page for slug \"#{code_of_conduct_slug}\" does not exist. Please create it.") if page.blank?
 
     page
+  end
+
+  def self.validate_one_ticket_per_event?
+    validate_one_ticket_per_event == true
   end
 
   # If we can create delayed payment events at all

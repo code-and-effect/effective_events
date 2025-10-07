@@ -23,6 +23,9 @@ EffectiveEvents.setup do |config|
   # Turn on the validation. You must have a company or organization when filling out Ticket Details screen.
   config.company_or_organization_required = false
 
+  # Prevent users from purchasing more than one ticket for themselves to an event
+  config.validate_one_ticket_per_event = false
+
   # Categories
   config.categories = ['Events']
 
