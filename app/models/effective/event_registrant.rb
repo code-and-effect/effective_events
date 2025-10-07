@@ -135,10 +135,15 @@ module Effective
     validates :last_name, presence: true, if: -> { registrant_validations_enabled? }
     validates :email, presence: true, if: -> { registrant_validations_enabled? }
 
-    # User, company and organization conditionall required
+    # User, company and organization conditionally required
     validates :user, presence: true, if: -> { registrant_validations_enabled? && EffectiveEvents.create_users }
     validates :company, presence: true, if: -> { registrant_validations_enabled? && EffectiveEvents.company_or_organization_required }
     validates :organization, presence: true, if: -> { registrant_validations_enabled? && EffectiveEvents.company_or_organization_required && EffectiveEvents.organization_enabled? }
+
+    # Responses may or may not be required depending on the event ticket
+    validates :response1, presence: true, if: -> { registrant_validations_enabled? && event_ticket&.question1_required? }
+    validates :response2, presence: true, if: -> { registrant_validations_enabled? && event_ticket&.question2_required? }
+    validates :response3, presence: true, if: -> { registrant_validations_enabled? && event_ticket&.question3_required? }
 
     # Copy any user errors from build_user_and_organization() into the registrant
     after_validation(if: -> { user && user.new_record? && user.errors.present? }) do
