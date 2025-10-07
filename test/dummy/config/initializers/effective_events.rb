@@ -19,6 +19,9 @@ EffectiveEvents.setup do |config|
   # Events can be restricted by role
   config.use_effective_roles = true
 
+  # Prevent users from being registered for more than one ticket to an event
+  config.validate_one_ticket_per_event = true
+
   # Mailer Settings
   # Please see config/initializers/effective_resources.rb for default effective_* gem mailer settings
   #

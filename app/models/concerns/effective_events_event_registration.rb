@@ -146,7 +146,7 @@ module EffectiveEventsEventRegistration
       end
     end
 
-    # Validate the same registrant user isn't registered on another registration
+    # Validate the same registrant user isn't registered for this ticket on another registration
     validate(if: -> { current_step == :details }) do
       present_event_registrants.select { |er| er.user.present? }.each do |er|
         existing = Effective::EventRegistrant.unarchived.registered.where(event_ticket: er.event_ticket, user: er.user).where.not(id: er)
@@ -154,6 +154,18 @@ module EffectiveEventsEventRegistration
         if existing.present?
           errors.add(:base, "Unable to register #{er.user} for #{er.event_ticket}. They've already been registered")
           er.errors.add(:user_id, "Unable to register #{er.user} for #{er.event_ticket}. They've already been registered")
+        end
+      end
+    end
+
+    # Validate the same registrant user isn't registered for this event (any ticket) on another registration
+    validate(if: -> { current_step == :details && validate_one_ticket_per_event? }) do
+      present_event_registrants.select { |er| er.user.present? }.each do |er|
+        existing = Effective::EventRegistrant.unarchived.registered.where(event: er.event, user: er.user).where.not(id: er)
+
+        if existing.present?
+          errors.add(:base, "Unable to register #{er.user} for #{er.event}. They've already been registered")
+          er.errors.add(:user_id, "Unable to register #{er.user} for #{er.event}. They've already been registered")
         end
       end
     end
@@ -523,6 +535,13 @@ module EffectiveEventsEventRegistration
 
   def just_let_them_edit_tickets_and_register_anyway?
     false
+  end
+
+  # We always validate that the user cannot register for the same event ticket more than once
+  # This is an additional validation where they cannot register for the same event more than once
+  # Can be overridden in the model if you need event specific validation.
+  def validate_one_ticket_per_event?
+    EffectiveEvents.validate_one_ticket_per_event?
   end
 
   def wizard_step_title(step)
