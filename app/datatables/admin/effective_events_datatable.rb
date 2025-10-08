@@ -30,12 +30,19 @@ module Admin
       col :published_start_at, label: "Published start", as: :datetime, visible: false
       col :published_end_at, label: "Published end", as: :datetime, visible: false
 
-      # TODO
-      # col :total_capacity, label: 'Capacity' do |event|
-      #   if event.event_tickets_with_capacity.present?
-      #     "#{event.total_capacity_taken}/#{event.total_capacity}"
-      #   end
-      # end
+      col :total_registered do |event|
+        registered = if event.event_tickets_with_capacity.present?
+          "#{event.total_registered_non_waitlisted_count}/#{event.total_capacity}"
+        elsif event.event_tickets.present?
+          "#{event.total_registered}"
+        end
+
+        waitlisted = if event.event_tickets_with_waitlist.present?
+          "#{event.total_registered_waitlisted_count} waitlisted"
+        end
+
+        [registered, waitlisted].compact.join(" +")
+      end
 
       col :excerpt, visible: false
 
