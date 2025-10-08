@@ -283,20 +283,31 @@ module Effective
       start_at
     end
 
+    # For Events#index column
     def event_tickets_with_capacity
-      event_tickets.reject(&:archived?).select { |et| et.capacity.present? }
+      event_tickets.select { |et| et.capacity.present? }
     end
 
-    def total_capacity_available
-      event_tickets_with_capacity.sum { |et| et.capacity_available }
+    def event_tickets_with_waitlist
+      event_tickets_with_capacity.select { |et| et.waitlist? }
     end
 
-    def total_capacity_taken
-      event_tickets_with_capacity.sum { |et| et.capacity_taken }
+    # Total Registered and not waitlisted count
+    def total_registered_non_waitlisted_count
+      event_tickets_with_capacity.sum { |et| et.registered_non_waitlisted_count }
+    end
+
+    # Total Registered and waitlisted count
+    def total_registered_waitlisted_count
+      event_tickets_with_capacity.sum { |et| et.registered_waitlisted_count }
     end
 
     def total_capacity
       event_tickets_with_capacity.sum { |et| et.capacity }
+    end
+
+    def total_registered
+      event_tickets.sum { |et| et.registered_count }
     end
 
     # The amount of tickets that can be purchased except ones from an event registration
