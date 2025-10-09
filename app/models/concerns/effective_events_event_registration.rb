@@ -296,7 +296,7 @@ module EffectiveEventsEventRegistration
         event_registrant.archive!
       end
 
-      send_event_registrants_cancelled_email!
+      after_commit { send_event_registrants_cancelled_email! }
 
       true
     end
@@ -561,7 +561,7 @@ module EffectiveEventsEventRegistration
   end
 
   def send_event_registrants_cancelled_email!
-    EffectiveEvents.send_email(:event_registrants_cancelled, self)
+    submit_order.send_event_registrants_cancelled_email!
   end
 
   def just_let_them_edit_tickets_and_register_anyway?

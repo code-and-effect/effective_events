@@ -9,8 +9,9 @@ module Effective
 
     # We do not send email from this gem, and instead use the effective_orders gem to send the email.
 
-    # def event_registrants_cancelled(resource, opts = {})
-    #   raise('expected an Effective::EventRegistration') unless resource.class.try(:effective_events_event_registration?)
+    # For the notifications. No longer used.
+    # def event_registrant_purchased(resource, opts = {})
+    #   raise('expected an Effective::EventRegistrant') unless resource.kind_of?(Effective::EventRegistrant)
 
     #   @assigns = assigns_for(resource)
     #   mail(to: resource.email, **headers_for(resource, opts))

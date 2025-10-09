@@ -25,8 +25,8 @@ ActiveRecord::Schema.define(version: 101) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
-    t.integer "record_id", null: false
-    t.integer "blob_id", null: false
+    t.bigint "record_id", null: false
+    t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
@@ -45,7 +45,7 @@ ActiveRecord::Schema.define(version: 101) do
   end
 
   create_table "active_storage_variant_records", force: :cascade do |t|
-    t.integer "blob_id", null: false
+    t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
@@ -443,6 +443,7 @@ ActiveRecord::Schema.define(version: 101) do
     t.boolean "promoted", default: false
     t.datetime "selected_at"
     t.datetime "registered_at"
+    t.datetime "cancelled_at"
     t.text "response1"
     t.text "response2"
     t.text "response3"
@@ -502,6 +503,9 @@ ActiveRecord::Schema.define(version: 101) do
     t.text "question1"
     t.text "question2"
     t.text "question3"
+    t.boolean "question1_required", default: false
+    t.boolean "question2_required", default: false
+    t.boolean "question3_required", default: false
     t.string "qb_item_name"
     t.boolean "tax_exempt", default: false
     t.integer "position"
