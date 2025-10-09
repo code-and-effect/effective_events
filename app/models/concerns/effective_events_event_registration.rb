@@ -291,7 +291,7 @@ module EffectiveEventsEventRegistration
     # Called by the event_registrant.cancel_all!
     # Admin action only. Cancels all event registrants
     def cancel!
-      event_registrants.each do |event_registrant|
+      event_registrants.reject(&:cancelled?).each do |event_registrant|
         event_registrant.assign_attributes(cancelled_at: Time.zone.now)
         event_registrant.archive!
       end
@@ -302,7 +302,7 @@ module EffectiveEventsEventRegistration
     end
 
     def uncancel!
-      event_registrants.each do |event_registrant|
+      event_registrants.select(&:cancelled?).each do |event_registrant|
         event_registrant.assign_attributes(cancelled_at: nil)
         event_registrant.unarchive!
       end
