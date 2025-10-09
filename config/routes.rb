@@ -47,6 +47,11 @@ EffectiveEvents::Engine.routes.draw do
       post :waitlist, on: :member
       post :unwaitlist, on: :member
 
+      post :cancel, on: :member
+      post :uncancel, on: :member
+      post :cancel_all, on: :member
+      post :uncancel_all, on: :member
+
       post :archive, on: :member
       post :unarchive, on: :member
 

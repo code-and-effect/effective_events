@@ -287,11 +287,38 @@ module EffectiveEventsEventRegistration
 
       true
     end
+
+    # Called by the event_registrant.cancel_all!
+    # Admin action only. Cancels all event registrants
+    def cancel!
+      event_registrants.each do |event_registrant|
+        event_registrant.assign_attributes(cancelled_at: Time.zone.now)
+        event_registrant.archive!
+      end
+
+      send_event_registrants_cancelled_email!
+
+      true
+    end
+
+    def uncancel!
+      event_registrants.each do |event_registrant|
+        event_registrant.assign_attributes(cancelled_at: nil)
+        event_registrant.unarchive!
+      end
+
+      true
+    end
+
   end
 
   # Instance Methods
   def to_s
     event.present? ? "Event registration - #{event}" : model_name.human
+  end
+
+  def email
+    owner&.email
   end
 
   def in_progress?
@@ -531,6 +558,10 @@ module EffectiveEventsEventRegistration
 
   def send_order_emails!
     submit_order.send_order_emails!
+  end
+
+  def send_event_registrants_cancelled_email!
+    EffectiveEvents.send_email(:event_registrants_cancelled, self)
   end
 
   def just_let_them_edit_tickets_and_register_anyway?

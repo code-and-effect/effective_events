@@ -18,8 +18,12 @@
 
     = tab 'Registrants & Addons' do
       %h2 Registrants
+      - email_template = Effective::EmailTemplate.where(template_name: :event_registrants_cancelled).first!
+
       .mb-4
-        %small.text-muted Please refresh the page after archiving/unarchiving here to display an accurate Registered count on the Tickets & Products tab
+        %small.text-muted Please refresh the page after archiving/unarchiving/cancelling to display an accurate Registered count on the Tickets & Products tab.
+        %br
+        %small.text-muted Cancelling a registrant will send an email to the event registration owner notifying them that their tickets have been cancelled.
 
       - datatable = EffectiveResources.best('Admin::EffectiveEventRegistrantsDatatable').new(event_id: event.id)
       .mb-4= render_inline_datatable(datatable)

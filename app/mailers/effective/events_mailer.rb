@@ -7,19 +7,24 @@ module Effective
     helper EffectiveEventsHelper
     helper EffectiveOrdersHelper
 
-    # For the notifications. No longer used.
-    def event_registrant_purchased(resource, opts = {})
-      raise('expected an Effective::EventRegistrant') unless resource.kind_of?(Effective::EventRegistrant)
+    # We do not send email from this gem, and instead use the effective_orders gem to send the email.
 
-      @assigns = assigns_for(resource)
-      mail(to: resource.email, **headers_for(resource, opts))
-    end
+    # def event_registrants_cancelled(resource, opts = {})
+    #   raise('expected an Effective::EventRegistration') unless resource.class.try(:effective_events_event_registration?)
+
+    #   @assigns = assigns_for(resource)
+    #   mail(to: resource.email, **headers_for(resource, opts))
+    # end
 
     protected
 
     def assigns_for(resource)
       if resource.kind_of?(EventRegistrant)
         return event_registrant_assigns(resource).merge(event_assigns(resource.event)).merge(event_ticket_assigns(resource.event_ticket))
+      end
+
+      if resource.class.try(:effective_events_event_registration?)
+        return event_registration_assigns(resource).merge(event_assigns(resource.event))
       end
 
       raise('unexpected resource')
@@ -34,7 +39,23 @@ module Effective
         url: link_to(effective_events.event_url(resource))
       }
 
-      { event: values }
+      { 
+        event: values,
+        dashboard_url: link_to(root_url + 'dashboard')
+      }
+    end
+
+    def event_registration_assigns(resource)
+      raise('expected an event registration') unless resource.class.try(:effective_events_event_registration?)
+
+      values = { 
+        owner: resource.owner.to_s, 
+        email: resource.email, 
+        cancelled_registrants: resource.event_registrants.select(&:cancelled?).map(&:to_s).join("<br>"),
+        url: link_to(effective_events.event_event_registration_url(resource.event, resource))
+      }
+
+      { event_registration: values }
     end
 
     def event_ticket_assigns(resource)
