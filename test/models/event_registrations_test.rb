@@ -139,28 +139,30 @@ class EventRegistrationsTest < ActiveSupport::TestCase
     assert_email(count: 2) { order.purchase! }
   end
 
-  test 'sends order receipt emails AND event notifications on event registration purchase' do
-    event_registration = build_event_registration()
+  # No longer used
 
-    event = event_registration.event
-    category = 'Registrant purchased'
+  # test 'sends order receipt emails AND event notifications on event registration purchase' do
+  #   event_registration = build_event_registration()
 
-    Effective::EventNotification.create!(
-      category: category,
-      event: event,
-      from: 'noreply@example.com',
-      subject: "#{category} subject",
-      body: "#{category} body",
-      content_type: "text/plain"
-    )
+  #   event = event_registration.event
+  #   category = 'Registrant purchased'
 
-    event_registration.ready!
-    order = event_registration.submit_order
+  #   Effective::EventNotification.create!(
+  #     category: category,
+  #     event: event,
+  #     from: 'noreply@example.com',
+  #     subject: "#{category} subject",
+  #     body: "#{category} body",
+  #     content_type: "text/plain"
+  #   )
 
-    # 1 order email to user, 1 order email to admin
-    # Plus 3 registrant purchased emails
-    assert_email(count: 5) { order.purchase! }
-  end
+  #   event_registration.ready!
+  #   order = event_registration.submit_order
+
+  #   # 1 order email to user, 1 order email to admin
+  #   # Plus 3 registrant purchased emails
+  #   assert_email(count: 5) { order.purchase! }
+  # end
 
   test 'purchasing order marks registrants registered' do
     event_registration = build_event_registration()
@@ -253,6 +255,22 @@ class EventRegistrationsTest < ActiveSupport::TestCase
 
     error = "Unable to register #{user} for #{event}. They've already been registered"
     assert event_registration2.errors.full_messages.include?(error)
+  end
+
+  test 'cancelling registrants sends order email' do
+    event_registration = build_event_registration()
+    event_registration.ready!
+
+    order = event_registration.submit_order
+    order.purchase!
+
+    event_registrant = event_registration.event_registrants.first
+    assert_email(count: 1) { EffectiveResources.transaction { event_registrant.cancel! } }
+    assert event_registrant.cancelled?
+    assert event_registrant.archived?
+
+    email = ActionMailer::Base.deliveries.last
+    assert email.body.include?("Your tickets have been cancelled")
   end
 
 end

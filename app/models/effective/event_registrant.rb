@@ -47,6 +47,7 @@ module Effective
 
       selected_at           :datetime     # When the event registration was selected by a user on the tickets! step
       registered_at         :datetime     # When the order is deferred or purchased
+      cancelled_at          :datetime     # When the registrant was cancelled by an admin. This also archives it.
 
       # Question Responses
       response1             :text
@@ -221,7 +222,8 @@ module Effective
         (content_tag(:span, 'Member', class: 'badge badge-warning') if member?),
         (content_tag(:span, 'Guest of Member', class: 'badge badge-warning') if guest_of_member?),
         (content_tag(:span, 'Waitlist', class: 'badge badge-warning') if waitlisted_not_promoted?),
-        (content_tag(:span, 'Archived', class: 'badge badge-warning') if archived?)
+        (content_tag(:span, 'Archived', class: 'badge badge-warning') if archived? && !cancelled?),
+        (content_tag(:span, 'Cancelled', class: 'badge badge-warning') if cancelled?),
       ].compact.join(' ').html_safe
     end
 
@@ -304,7 +306,9 @@ module Effective
 
     def selected_not_expired?
       return false unless EffectiveEvents.EventRegistration.selection_window.present?
-      selected_at.present? && (selected_at + EffectiveEvents.EventRegistration.selection_window > Time.zone.now)
+      return false unless selected_at.present?
+
+      (selected_at + EffectiveEvents.EventRegistration.selection_window) > Time.zone.now
     end
 
     # Called by an event_registration after_defer and after_purchase
@@ -436,9 +440,41 @@ module Effective
     end
 
     def unarchive!
+      assign_attributes(cancelled_at: nil)
+
       super()
       orders.reject(&:purchased?).each { |order| order.update_purchasable_attributes! }
       true
+    end
+
+    def cancelled?
+      cancelled_at.present?
+    end
+
+    # If this changes a lot, consider effective_events_event_registration.cancel!
+    def cancel!
+      assign_attributes(cancelled_at: Time.zone.now)
+      archive!
+
+      after_commit { event_registration&.send_event_registrants_cancelled_email! }
+
+      true
+    end
+
+    # If this changes a lot, consider effective_events_event_registration.uncancel!
+    def uncancel!
+      assign_attributes(cancelled_at: nil)
+      unarchive!
+    end
+
+    def cancel_all!
+      raise("expected an event registration") if event_registration.blank?
+      event_registration.cancel!
+    end
+
+    def uncancel_all!
+      raise("expected an event registration") if event_registration.blank?
+      event_registration.uncancel!
     end
 
     def event_ticket_price

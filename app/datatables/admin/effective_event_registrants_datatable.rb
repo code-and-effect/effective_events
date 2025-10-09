@@ -18,6 +18,7 @@ module Admin
       col :id, visible: false
 
       col :registered_at
+      col :cancelled_at
 
       col :event
 

@@ -106,6 +106,7 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
 
       t.datetime :selected_at
       t.datetime :registered_at
+      t.datetime :cancelled_at
 
       t.text :response1
       t.text :response2
