@@ -18,8 +18,6 @@
 
     = tab 'Registrants & Addons' do
       %h2 Registrants
-      - email_template = Effective::EmailTemplate.where(template_name: :event_registrants_cancelled).first!
-
       .mb-4
         %small.text-muted Please refresh the page after archiving/unarchiving/cancelling to display an accurate Registered count on the Tickets & Products tab.
         %br
