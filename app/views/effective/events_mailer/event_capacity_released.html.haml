@@ -1,0 +1,12 @@
+%p Hi Admin,
+
+%p 
+  The 
+  = @event 
+  was at capacity and had its order changed by 
+  = @event_registration.owner
+  which freed up one or more ticket.
+
+%p For more information, please visit: 
+
+%p= link_to 'View the event', effective_events.edit_admin_event_url(@event)

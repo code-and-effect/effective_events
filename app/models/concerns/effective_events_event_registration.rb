@@ -77,6 +77,9 @@ module EffectiveEventsEventRegistration
     # Code of Conduct Step
     attr_accessor :declare_code_of_conduct
 
+    # For email notification to admin
+    attr_accessor :send_event_capacity_released_email
+
     effective_resource do
       # Acts as Statused
       status                 :string, permitted: false
@@ -401,11 +404,14 @@ module EffectiveEventsEventRegistration
   end
 
   # Looks at any unselected event registrants and assigns a waitlist value
+  # If a single non-promoted waitlisted registrant exists, then all tickets purchased must also be waitlisted tickets.
   def waitlist_event_registrants
     present_event_registrants.group_by { |er| er.event_ticket }.each do |event_ticket, event_registrants|
       if event_ticket.waitlist?
+        existing = event_registrants.find { |er| er.persisted? && er.waitlisted_not_promoted? }
         capacity = event.capacity_available(event_ticket: event_ticket, event_registration: self)
-        event_registrants.each_with_index { |er, index| er.assign_attributes(waitlisted: index >= capacity) }
+
+        event_registrants.each_with_index { |er, index| er.assign_attributes(waitlisted: (existing || index >= capacity)) }
       else
         event_registrants.each { |er| er.assign_attributes(waitlisted: false) }
       end
@@ -419,11 +425,17 @@ module EffectiveEventsEventRegistration
 
     update_event_registrants
     select_event_registrants
+
+    if event_registrants.any? { |er| er.marked_for_destruction? && !er.waitlisted_not_promoted? && er.event_ticket.capacity_available == 0 }
+      assign_attributes(send_event_capacity_released_email: true)
+    end
+
     waitlist_event_registrants
 
     after_commit do
       update_submit_fees_and_order! if submit_order.present?
       update_deferred_event_registration! if submit_order&.deferred?
+      send_event_capacity_released_email! if send_event_capacity_released_email
     end
 
     save!
@@ -562,6 +574,10 @@ module EffectiveEventsEventRegistration
 
   def send_event_registrants_cancelled_email!
     submit_order.send_event_registrants_cancelled_email!
+  end
+
+  def send_event_capacity_released_email!
+    EffectiveEvents.send_email(:event_capacity_released, self)
   end
 
   def just_let_them_edit_tickets_and_register_anyway?

@@ -310,6 +310,10 @@ module Effective
       event_tickets.sum { |et| et.registered_count }
     end
 
+    def total_capacity_available
+      total_capacity - total_registered_non_waitlisted_count
+    end
+
     # The amount of tickets that can be purchased except ones from an event registration
     def capacity_selectable(event_ticket:, event_registration: nil)
       return 0 if event_ticket.archived?
