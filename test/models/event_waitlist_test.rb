@@ -118,7 +118,6 @@ class EventWaitlistTest < ActiveSupport::TestCase
     assert_equal 4, event.capacity_taken(event_ticket: ticket, event_registration: reg2)
     assert_equal 0, event.capacity_available(event_ticket: ticket)
 
-    # Send email
     reg2.event_registrants.find { |er| !er.waitlisted? }.mark_for_destruction
     assert_email(:event_capacity_released) { reg2.tickets! }
 

@@ -1,13 +1,11 @@
 %p Hi Admin,
 
 %p 
-  = succeed('.') do
-    The 
-    = @event 
-    was at capacity and had its order changed by 
-    = @event_registration.owner
-    which freed up
-    = pluralize(@event.total_capacity_available, 'ticket')
+  The 
+  = @event 
+  was at capacity and had its order changed by 
+  = @event_registration.owner
+  which freed up one or more ticket.
 
 %p For more information, please visit: 
 

@@ -425,11 +425,12 @@ module EffectiveEventsEventRegistration
 
     update_event_registrants
     select_event_registrants
-    waitlist_event_registrants
 
-    if event_registrants.any? { |er| er.marked_for_destruction? && !er.waitlisted_not_promoted? && er.event_ticket.waitlist? }
+    if event_registrants.any? { |er| er.marked_for_destruction? && !er.waitlisted_not_promoted? && er.event_ticket.capacity_available == 0 }
       assign_attributes(send_event_capacity_released_email: true)
     end
+
+    waitlist_event_registrants
 
     after_commit do
       update_submit_fees_and_order! if submit_order.present?
