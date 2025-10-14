@@ -124,6 +124,9 @@ class EventWaitlistTest < ActiveSupport::TestCase
 
     # Now go 20 minutes in the future
     with_time_travel(Time.zone.now + selection_window) do
+      # This has at least one waitlisted registrant. So the additional tickets will be all waitlisted
+      assert reg2.event_registrants.find { |er| er.waitlisted_not_promoted? }.present?
+
       reg2.event_ticket_selection(event_ticket: ticket, quantity: 4)
       reg2.tickets!
       ticket.reload
