@@ -393,8 +393,15 @@ module Effective
       # It can be checked out by admin immediately, or the user can go through it themselves
       event_registration.reload
       event_registration.find_or_build_submit_order
-
       event_registration.save!
+
+      order = event_registration.submit_order
+
+      if order.pending?
+        order.defer!(provider: (order.payment_provider.presence || 'cheque'), email: false)
+      end
+
+      true
     end
 
     def promote_purchased_order!
@@ -417,11 +424,25 @@ module Effective
       order.add(self)
 
       order.save!
+
+      if order.pending?
+        order.defer!(provider: (order.payment_provider.presence || 'cheque'), email: false)
+      end
+
+      true
     end
 
     def promote_not_purchased!
       update!(promoted: true)
-      orders.reject(&:purchased?).each { |order| order.update_purchasable_attributes! }
+
+      orders.reject(&:purchased?).each do |order| 
+        order.update_purchasable_attributes!
+
+        if order.pending?
+          order.defer!(provider: (order.payment_provider.presence || 'cheque'), email: false)
+        end
+      end
+
       true
     end
 
