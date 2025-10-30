@@ -86,7 +86,7 @@ module EffectiveEventsHelper
 
       price = effective_events_ticket_prices(event, ticket)
 
-      label = [title, price].compact.join(' - ')
+      label = [title, price].compact.join(' - ').html_safe
 
       disabled = { disabled: :disabled } unless (authorized || ticket.waitlist? || event.event_ticket_available?(ticket, quantity: 1))
 
