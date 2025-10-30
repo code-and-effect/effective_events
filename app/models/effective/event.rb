@@ -230,8 +230,14 @@ module Effective
       event_tickets.none? { |event_ticket| event_ticket_available?(event_ticket, except: except, quantity: 1) }
     end
 
+    # it should say join waitlist if: there are no tickets with capacity remaining OR ALL tickets have at least 1 waitlist registration
     def waitlist_only?
-      any_waitlist? && event_tickets.reject(&:archived?).none? { |et| et.capacity.blank? || et.capacity_available > 0 }
+      return false unless any_waitlist?
+
+      return true if event_tickets.reject(&:archived?).none? { |et| et.capacity.blank? || et.capacity_available > 0 }
+      return true if event_tickets.reject(&:archived?).all? { |et| et.registered_waitlisted_count > 0 }
+
+      false
     end
 
     def upcoming?
