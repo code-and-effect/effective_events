@@ -116,6 +116,10 @@ module Effective
       assign_price()
     end
 
+    before_validation(if: -> { event_ticket_id_changed? && event_ticket_id_was.present? && event_ticket_id.present? }) do
+      assign_attributes(waitlisted: false, promoted: false) unless event_ticket.waitlist?
+    end
+
     validate(if: -> { event_ticket.present? }, unless: -> { purchased? }) do
       errors.add(:waitlisted, 'is not permitted for a non-waitlist event ticket') if waitlisted? && !event_ticket.waitlist?
     end
