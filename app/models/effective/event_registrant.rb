@@ -256,6 +256,7 @@ module Effective
     def member?
       return false if event.blank?
       return false if event_ticket.blank?
+      return false if (user.try(:membership_disabled?) || organization.try(:membership_disabled?))
 
       user.try(:membership_present?) || organization.try(:membership_present?)
     end
@@ -265,6 +266,7 @@ module Effective
       return false if event.blank?
       return false if event_ticket.blank?
       return false unless event_ticket.guest_of_member?
+      return false if !member? && owner.try(:membership_disabled?)
 
       !member? && owner.try(:membership_present?)
     end
@@ -508,9 +510,9 @@ module Effective
 
       if early_bird?
         event_ticket.early_bird_price
-      elsif blank_registrant? && owner.try(:membership_present?)
+      elsif blank_registrant? && owner.try(:membership_present?) && !owner.try(:membership_disabled?)
         event_ticket.blank_registrant_member_price
-      elsif blank_registrant? && !owner.try(:membership_present?)
+      elsif blank_registrant?
         event_ticket.blank_registrant_non_member_price
       elsif member?
         event_ticket.member_price
