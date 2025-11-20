@@ -5,7 +5,7 @@
 
 - all_members_tickets = tickets.all? { |ticket| ticket.members? }
 - any_members_tickets = tickets.any? { |ticket| ticket.members? }
-- is_member = current_user.try(:membership_present?)
+- is_member = (current_user.try(:membership_present?) || current_user.is_any?(:member)) && !current_user.try(:membership_disabled?)
 
 - if event.early_bird?
   .alert.alert-warning.mb-3
@@ -42,7 +42,7 @@
                 = price_to_currency(ticket.member_price)
                 .badge.badge-secondary Member
 
-              - if ticket.guest_of_member? && (current_user.try(:membership_present?) || current_user.is_any?(:member))
+              - if ticket.guest_of_member? && is_member
                 %li
                   = price_to_currency(ticket.guest_of_member_price)
                   .badge.badge-secondary Guest of Member
@@ -58,7 +58,7 @@
                   = price_to_currency(ticket.member_price)
                   .badge.badge-secondary Member
 
-                - if ticket.guest_of_member? && (current_user.try(:membership_present?) || current_user.is_any?(:member))
+                - if ticket.guest_of_member? && is_member
                   %li
                     = price_to_currency(ticket.guest_of_member_price)
                     .badge.badge-secondary Guest of Member
