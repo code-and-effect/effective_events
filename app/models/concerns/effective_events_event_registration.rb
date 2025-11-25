@@ -411,7 +411,7 @@ module EffectiveEventsEventRegistration
         existing = event_registrants.find { |er| er.persisted? && er.waitlisted_not_promoted? }
         capacity = event.capacity_available(event_ticket: event_ticket, event_registration: self)
 
-        event_registrants.each_with_index { |er, index| er.assign_attributes(waitlisted: (existing || index >= capacity)) }
+        event_registrants.reject(&:registered?).each_with_index { |er, index| er.assign_attributes(waitlisted: (existing || index >= capacity)) }
       else
         event_registrants.each { |er| er.assign_attributes(waitlisted: false) }
       end

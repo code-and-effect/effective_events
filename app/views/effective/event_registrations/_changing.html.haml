@@ -1,2 +1,7 @@
 - if resource.submitted? && resource.event&.delayed_payment_date_upcoming?
   .alert.alert-warning.mb-4 Please note: you must submit each step and checkout for your ticket changes to be saved. You will receive a new confirmation email.
+
+- if resource.display_countdown?
+  .alert.alert-warning.mb-4
+    Your tickets are reserved until #{resource.selected_expires_at.strftime("%l:%M%P %Z")}.
+    If you have not checked out by this time, your tickets will be released.
