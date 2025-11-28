@@ -382,7 +382,7 @@ module Effective
       update!(promoted: true, purchased_order: nil)
 
       # Check if the ticket owner has an unpurchased event registration for the event or create a new one
-      event_registration = EffectiveEvents.EventRegistration.draft.where(event: event, owner: owner).where.not(id: event_registration_id).first
+      event_registration = EffectiveEvents.EventRegistration.submitted.where(event: event, owner: owner).where.not(id: event_registration_id).first
       event_registration ||= EffectiveEvents.EventRegistration.new(event: event, owner: owner)
 
       # Put the event registration on the checkout step
