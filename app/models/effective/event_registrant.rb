@@ -95,7 +95,7 @@ module Effective
       end
 
       before_validation(if: -> { user.blank? && first_name.present? && last_name.present? && email.present? }) do
-        build_user() if EffectiveEvents.create_users
+        build_user()
         build_organization_and_representative() if EffectiveEvents.organization_enabled?
       end
 
@@ -575,7 +575,7 @@ module Effective
         if EffectiveEvents.organization_enabled? && user_klass.try(:effective_memberships_organization_user?)
           assign_attributes(organization: existing_user.organizations.first) if existing_user.organizations.present?
         end
-      else
+      elsif EffectiveEvents.create_users
         # Otherwise create a new user
         new_user = user_klass.create(
           first_name: first_name.strip, 
@@ -587,7 +587,7 @@ module Effective
         assign_attributes(user: new_user)
       end
 
-      user.valid?
+      user&.valid?
     end
 
     # The organization might already be set here
