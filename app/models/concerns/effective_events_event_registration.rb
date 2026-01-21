@@ -135,7 +135,7 @@ module EffectiveEventsEventRegistration
     validate(if: -> { current_step == :tickets }) do
       unavailable_event_tickets.each do |event_ticket|
         errors.add(:base, "The requested number of #{event_ticket} tickets are not available")
-        event_ticket_selections.find { |ets| ets.event_ticket == event_ticket }.errors.add(:quantity, "not available")
+        event_ticket_selections.find { |ets| ets.event_ticket == event_ticket }&.errors&.add(:quantity, "not available")
       end
     end
 
