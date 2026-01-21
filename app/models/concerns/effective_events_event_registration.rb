@@ -135,7 +135,7 @@ module EffectiveEventsEventRegistration
     validate(if: -> { current_step == :tickets }) do
       unavailable_event_tickets.each do |event_ticket|
         errors.add(:base, "The requested number of #{event_ticket} tickets are not available")
-        event_ticket_selections.find { |ets| ets.event_ticket == event_ticket }.errors.add(:quantity, "not available")
+        event_ticket_selections.find { |ets| ets.event_ticket == event_ticket }&.errors&.add(:quantity, "not available")
       end
     end
 
@@ -408,10 +408,14 @@ module EffectiveEventsEventRegistration
   def waitlist_event_registrants
     present_event_registrants.group_by { |er| er.event_ticket }.each do |event_ticket, event_registrants|
       if event_ticket.waitlist?
-        existing = event_registrants.find { |er| er.persisted? && er.waitlisted_not_promoted? }
+        existing = event_registrants.find { |er| er.persisted? && er.waitlisted_not_promoted? }.present?
         capacity = event.capacity_available(event_ticket: event_ticket, event_registration: self)
 
-        event_registrants.reject(&:registered?).each_with_index { |er, index| er.assign_attributes(waitlisted: (existing || index >= capacity)) }
+        # Count already-registered non-waitlisted registrants in this registration
+        registered = event_registrants.count { |er| er.registered? && !er.waitlisted? }
+        available = [capacity - registered, 0].max
+
+        event_registrants.reject(&:registered?).each_with_index { |er, index| er.assign_attributes(waitlisted: (existing || index >= available)) }
       else
         event_registrants.each { |er| er.assign_attributes(waitlisted: false) }
       end
@@ -493,8 +497,9 @@ module EffectiveEventsEventRegistration
 
   # Find or build
   def event_ticket_selection(event_ticket:, quantity: 0)
-    selection = event_ticket_selections.find { |ets| ets.event_ticket == event_ticket } 
-    selection || event_ticket_selections.build(event_ticket: event_ticket, quantity: quantity)
+    selection = event_ticket_selections.find { |ets| ets.event_ticket == event_ticket } || event_ticket_selections.build(event_ticket: event_ticket)
+    selection.assign_attributes(quantity: quantity)
+    selection
   end
 
   # This builds the default event addons used by the wizard form
