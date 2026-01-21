@@ -21,6 +21,9 @@
         - else
           = effective_events_ticket_prices(event, event_ticket)
 
+        - if event_registrant.waitlisted_not_promoted?
+          %span.badge.badge-warning Waitlist
+
       = fr.check_box :blank_registrant, label: "I will return and add this ticket's information later"
 
       = fr.show_if(:blank_registrant, false) do

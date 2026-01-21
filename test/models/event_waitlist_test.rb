@@ -137,4 +137,41 @@ class EventWaitlistTest < ActiveSupport::TestCase
     end
   end
 
+  test 'assigning waitlist with existing waitlisted registrants again' do
+    selection_window = EffectiveEvents.EventRegistration.selection_window
+
+    event = build_waitlist_event()
+
+    ticket = event.event_tickets.first!
+    assert ticket.waitlist?
+    assert_equal 5, ticket.capacity
+
+    reg1 = build_event_registration(event: event, event_registrants: false)
+
+    assert event.event_ticket_available?(ticket, quantity: 5)
+    assert_equal 5, event.capacity_available(event_ticket: ticket, event_registration: reg1)
+    assert_equal 0, event.capacity_taken(event_ticket: ticket, event_registration: reg1)
+
+    # Select tickets in reg1
+    reg1.event_ticket_selection(event_ticket: ticket, quantity: 5)
+    reg1.tickets!
+    reg1.ready!
+    reg1.submit_order.defer!(provider: 'cheque')
+
+    reg1.reload
+    ticket.reload
+
+    assert_equal 5, reg1.event_registrants.count { |et| et.registered? }
+    assert_equal 5, reg1.event_registrants.count { |et| !et.waitlisted? }
+    assert_equal 0, reg1.event_registrants.count { |et| et.waitlisted? }
+
+    # Now go back for more tickets
+    reg1.event_ticket_selection(event_ticket: ticket, quantity: 7)
+    reg1.tickets!
+
+    assert_equal 7, reg1.event_registrants.count { |et| et.registered? }
+    assert_equal 5, reg1.event_registrants.count { |et| !et.waitlisted? }
+    assert_equal 2, reg1.event_registrants.count { |et| et.waitlisted? }
+  end
+
 end
