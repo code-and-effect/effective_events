@@ -438,7 +438,12 @@ module EffectiveEventsEventRegistration
 
     after_commit do
       update_submit_fees_and_order! if submit_order.present?
-      update_deferred_event_registration! if submit_order&.deferred?
+      
+      if submit_order&.deferred?
+        update_deferred_event_registration! 
+        send_order_emails!
+      end
+
       send_event_capacity_released_email! if send_event_capacity_released_email
     end
 
