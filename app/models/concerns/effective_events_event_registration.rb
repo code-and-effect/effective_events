@@ -22,6 +22,16 @@ module EffectiveEventsEventRegistration
   end
 
   included do
+
+    # This has to go before acts_as_purchasable_parent
+    before_destroy(if: -> { was_submitted? }) do
+      if event_registrants.any? { |er| er.registered? && !er.waitlisted_not_promoted? && er.event_ticket.capacity_available == 0 }
+        send_event_capacity_released_email!
+      end
+
+      true
+    end
+
     acts_as_purchasable_parent
     acts_as_tokened
 
