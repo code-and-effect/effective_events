@@ -302,7 +302,7 @@ module EffectiveEventsEventRegistration
     end
 
     # Called by the event_registrant.cancel_all!
-    # Admin action only. Cancels all event registrants
+    # Called by the Admin or by the registering user
     def cancel!
       event_registrants.reject(&:cancelled?).each do |event_registrant|
         event_registrant.assign_attributes(cancelled_at: Time.zone.now)

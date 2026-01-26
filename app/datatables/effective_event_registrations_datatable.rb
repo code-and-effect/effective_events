@@ -38,10 +38,14 @@ class EffectiveEventRegistrationsDatatable < Effective::Datatable
         end
       end
 
+
+      if EffectiveResources.authorized?(self, :cancel, er)
+        dropdown_link_to('Cancel All', effective_events.cancel_event_event_registration_path(er.event, er), 'data-confirm': "Really cancel #{er}?", 'data-method': :post)
+      end
+
       if EffectiveResources.authorized?(self, :destroy, er)
         dropdown_link_to('Delete', effective_events.event_event_registration_path(er.event, er), 'data-confirm': "Really delete #{er}?", 'data-method': :delete)
       end
-
     end
   end
 
