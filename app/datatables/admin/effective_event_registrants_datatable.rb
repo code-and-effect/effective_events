@@ -89,6 +89,13 @@ module Admin
       col :response2
       col :response3
 
+      col(:billing_address1, visible: false) { |registrant| registrant.user.try(:billing_address).try(:address1) }
+      col(:billing_address2, visible: false) { |registrant| registrant.user.try(:billing_address).try(:address2) }
+      col(:billing_city, visible: false) { |registrant| registrant.user.try(:billing_address).try(:city) }
+      col(:billing_province, visible: false) { |registrant| registrant.user.try(:billing_address).try(:province) }
+      col(:billing_postal_code, visible: false) { |registrant| registrant.user.try(:billing_address).try(:postal_code) }
+      col(:billing_country, visible: false) { |registrant| registrant.user.try(:billing_address).try(:country) }
+
       actions_col do |registrant|
         if EffectiveResources.authorized?(self, :impersonate, registrant.owner)
           dropdown_link_to("Impersonate", "/admin/users/#{registrant.owner_id}/impersonate", data: { confirm: "Really impersonate #{registrant.owner}?", method: :post, remote: true })
@@ -97,7 +104,7 @@ module Admin
     end
 
     collection do
-      scope = Effective::EventRegistrant.deep.all
+      scope = Effective::EventRegistrant.deep.includes(user: :addresses).all
 
       if attributes[:event_id].present?
         scope = scope.where(event: event)
