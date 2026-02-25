@@ -26,7 +26,7 @@ module Admin
       end
 
       col :purchased_order, visible: false
-      col :owner, visible: false
+      col :owner, visible: false, sql_column: :owner
 
       col :first_name
       col :last_name
