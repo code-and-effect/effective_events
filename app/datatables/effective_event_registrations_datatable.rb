@@ -14,7 +14,7 @@ class EffectiveEventRegistrationsDatatable < Effective::Datatable
       link_to(er.event.to_s, effective_events.event_path(er.event))
     end
 
-    col :owner, visible: false
+    col :owner, visible: false, sql_column: :owner
     col :status, visible: false
     col :event_registrants, label: 'Registrants'
 

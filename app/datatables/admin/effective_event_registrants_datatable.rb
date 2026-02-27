@@ -22,7 +22,7 @@ module Admin
 
       col :event
 
-      col :owner
+      col :owner, sql_column: :owner
       col :event_registration, visible: false
 
       if defined?(EffectiveMemberships) && EffectiveMemberships.Organization.respond_to?(:sponsors)

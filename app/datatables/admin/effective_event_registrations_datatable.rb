@@ -11,7 +11,7 @@ class Admin::EffectiveEventRegistrationsDatatable < Effective::Datatable
     col :completed_at, label: 'Completed', as: :date
 
     col :event
-    col :owner
+    col :owner, sql_column: :owner
 
     col :event_registrants, visible: false
     col :event_addons, visible: false
