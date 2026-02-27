@@ -156,7 +156,7 @@ module Effective
           EffectiveEvents.send_email(email_template, event_registrant, email_notification_params)
         rescue => e
           EffectiveLogger.error(e.message, associated: event_registrant) if defined?(EffectiveLogger)
-          ExceptionNotifier.notify_exception(e, data: { event_registrant_id: event_registrant.id, event_notification_id: id }) if defined?(ExceptionNotifier)
+          EffectiveResources.send_error(e, event_registrant_id: event_registrant.id, event_notification_id: id)
           raise(e) if Rails.env.test? || Rails.env.development?
         end
       end
