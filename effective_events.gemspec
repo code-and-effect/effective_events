@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'effective_resources'
   spec.add_dependency 'effective_orders'
   spec.add_dependency 'simple_calendar', '< 3'
+  spec.add_dependency 'wicked'
 
   spec.add_development_dependency 'sqlite3'
   spec.add_development_dependency 'devise'
