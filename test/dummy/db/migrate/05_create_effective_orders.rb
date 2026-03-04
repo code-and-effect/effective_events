@@ -23,6 +23,8 @@ class CreateEffectiveOrders < ActiveRecord::Migration[6.0]
       t.text      :note_internal
 
       t.string    :billing_name
+      t.string    :billing_first_name
+      t.string    :billing_last_name
       t.string    :email
       t.string    :cc
 
@@ -109,6 +111,16 @@ class CreateEffectiveOrders < ActiveRecord::Migration[6.0]
     end
 
     add_index :customers, :user_id
+
+    create_table :item_names do |t|
+      t.string :name
+      t.boolean :archived, default: false
+
+      t.datetime :updated_at
+      t.datetime :created_at
+    end
+
+    add_index :item_names, [:name, :archived]
 
     create_table :subscriptions do |t|
       t.integer   :customer_id
