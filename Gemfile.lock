@@ -16,7 +16,7 @@ GIT
 PATH
   remote: .
   specs:
-    effective_events (3.3.1)
+    effective_events (3.3.2)
       effective_bootstrap
       effective_datatables (>= 4.0.0)
       effective_email_templates
@@ -24,6 +24,7 @@ PATH
       effective_resources
       rails (>= 6.0.0)
       simple_calendar (< 3)
+      wicked
 
 GEM
   remote: https://rubygems.org/
@@ -433,7 +434,6 @@ DEPENDENCIES
   effective_test_bot
   haml-rails
   pry-byebug
-  psych
   sqlite3
 
 RUBY VERSION
