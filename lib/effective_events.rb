@@ -12,6 +12,7 @@ module EffectiveEvents
       :layout, :per_page, :use_effective_roles, :categories, :events_hint_text,
       :organization_enabled, :create_users, :company_or_organization_required, :validate_one_ticket_per_event,
       :code_of_conduct_enabled, :code_of_conduct_slug,
+      :disable_delayed,
       :event_registration_class_name
     ]
   end
@@ -57,6 +58,7 @@ module EffectiveEvents
 
   # If we can create delayed payment events at all
   def self.delayed?
+    return false if disable_delayed
     !!EffectiveOrders.try(:delayed?) 
   end
 

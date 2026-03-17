@@ -20,14 +20,6 @@ module Effective
       mail(to: mailer_admin, **headers_for(resource, opts))
     end
 
-    # For the notifications. No longer used.
-    # def event_registrant_purchased(resource, opts = {})
-    #   raise('expected an Effective::EventRegistrant') unless resource.kind_of?(Effective::EventRegistrant)
-
-    #   @assigns = assigns_for(resource)
-    #   mail(to: resource.email, **headers_for(resource, opts))
-    # end
-
     protected
 
     def assigns_for(resource)

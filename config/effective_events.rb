@@ -38,6 +38,10 @@ EffectiveEvents.setup do |config|
   config.code_of_conduct_enabled = false
   config.code_of_conduct_slug = 'event-code-of-conduct' 
 
+  # Delayed Payments
+  # When true will disable delayed payments. Otherwise considers EffectiveOrders.delayed?
+  config.disable_delayed = false
+
   # Mailer Settings
   # Please see config/initializers/effective_resources.rb for default effective_* gem mailer settings
   #
