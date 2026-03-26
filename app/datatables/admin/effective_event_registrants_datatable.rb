@@ -15,14 +15,16 @@ module Admin
 
       col :updated_at, visible: false
       col :created_at, visible: false
-      col :id, visible: false
+      col :id
 
       col :registered_at
       col :cancelled_at
 
       col :event
 
-      col :owner, sql_column: :owner
+      col :owner, as: :string, sql_column: 'users.last_name' do |er|
+        er.owner.to_s
+      end
       col :event_registration, visible: false
 
       if defined?(EffectiveMemberships) && EffectiveMemberships.Organization.respond_to?(:sponsors)
@@ -52,7 +54,7 @@ module Admin
       col :promoted, visible: false
       col :archived, visible: false
 
-      col :name do |er|
+      col :name, as: :string, sql_column: "NULLIF(event_registrants.last_name, '')" do |er|
         if er.user.present?
           "#{link_to(er.user, "/admin/users/#{er.user.id}/edit", target: '_blank')}<br><small>#{mail_to(er.user.email)}</small>"
         elsif er.first_name.present? && er.email.present?
@@ -67,7 +69,9 @@ module Admin
       end
       
       col :user, visible: false
-      col :organization, visible: EffectiveEvents.organization_enabled?
+      col :organization, as: :string, sql_column: "NULLIF(organizations.title, '')", visible: EffectiveEvents.organization_enabled? do |er|
+        er.organization.to_s
+      end
       col :company, visible: !EffectiveEvents.organization_enabled?
 
       col :orders, visible: false
@@ -105,6 +109,8 @@ module Admin
 
     collection do
       scope = Effective::EventRegistrant.deep.includes(user: :addresses).all
+        .joins("LEFT JOIN users ON users.id = event_registrants.owner_id AND event_registrants.owner_type = 'Boma::User'")
+        .joins("LEFT JOIN organizations ON organizations.id = event_registrants.organization_id AND event_registrants.organization_type = 'Boma::Organization'")
 
       if attributes[:event_id].present?
         scope = scope.where(event: event)
