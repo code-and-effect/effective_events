@@ -377,6 +377,11 @@ module Effective
       delayed_payment_date > Time.zone.now.to_date
     end
 
+    def delayed_payment_date_past?
+      return false unless delayed?
+      delayed_payment_date <= Time.zone.now.to_date
+    end
+
     def update_delayed_orders_delayed_payment_date!
       raise('expected delayed payment date to be present') unless delayed_payment_date.present?
 
