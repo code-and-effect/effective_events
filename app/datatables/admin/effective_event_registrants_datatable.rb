@@ -109,8 +109,8 @@ module Admin
 
     collection do
       scope = Effective::EventRegistrant.deep.includes(user: :addresses).all
-        .joins("LEFT JOIN users ON users.id = event_registrants.owner_id AND event_registrants.owner_type = 'Boma::User'")
-        .joins("LEFT JOIN organizations ON organizations.id = event_registrants.organization_id AND event_registrants.organization_type = 'Boma::Organization'")
+        .joins("LEFT JOIN users ON users.id = event_registrants.owner_id")
+        .joins("LEFT JOIN organizations ON organizations.id = event_registrants.organization_id")
 
       if attributes[:event_id].present?
         scope = scope.where(event: event)
