@@ -249,6 +249,11 @@ module EffectiveEventsEventRegistration
       event&.delayed_payment_date_upcoming?
     end
 
+    def delayed_payment_date_past?
+      return false unless event&.delayed?
+      !event&.delayed_payment_date_upcoming?
+    end
+
     def find_or_build_submit_fees
       with_outstanding_coupon_fees(submit_fees)
     end
