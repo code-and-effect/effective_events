@@ -250,8 +250,7 @@ module EffectiveEventsEventRegistration
     end
 
     def delayed_payment_date_past?
-      return false unless event&.delayed?
-      !event&.delayed_payment_date_upcoming?
+      event&.delayed_payment_date_past?
     end
 
     def find_or_build_submit_fees
