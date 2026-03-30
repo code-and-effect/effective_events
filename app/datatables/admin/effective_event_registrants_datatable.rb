@@ -24,6 +24,8 @@ module Admin
 
       col :owner, as: :string, sql_column: 'users.last_name' do |er|
         er.owner.to_s
+      end.search do |collection, term|
+        collection.where("users.first_name ILIKE :term OR users.last_name ILIKE :term", term: "%#{term}%")
       end
       col :event_registration, visible: false
 
@@ -66,11 +68,15 @@ module Admin
         else
           'Pending Name'
         end
+      end.search do |collection, term|
+        collection.where("event_registrants.first_name ILIKE :term OR event_registrants.last_name ILIKE :term", term: "%#{term}%")
       end
       
       col :user, visible: false
       col :organization, as: :string, sql_column: "NULLIF(organizations.title, '')", visible: EffectiveEvents.organization_enabled? do |er|
         er.organization.to_s
+      end.search do |collection, term|
+        collection.where("organizations.title ILIKE :term", term: "%#{term}%")
       end
       col :company, visible: !EffectiveEvents.organization_enabled?
 
