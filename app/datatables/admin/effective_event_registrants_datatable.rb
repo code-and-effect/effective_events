@@ -23,7 +23,7 @@ module Admin
       col :event
 
       col :owner, as: :string, sql_column: 'owners.last_name' do |er|
-        link_to(er.owner, "/admin/users/#{er.owner_id}/edit")
+        link_to(er.owner, "/admin/users/#{er.owner_id}/edit") if er.owner.present?
       end.search do |collection, term|
         users = Effective::Resource.new(current_user).search_any(term, columns: [:first_name, :last_name, :email])
         collection.where(owner_id: users, owner_type: current_user.class.name)
@@ -79,7 +79,7 @@ module Admin
 
       if defined?(EffectiveMemberships) && EffectiveEvents.organization_enabled?
         col :organization, as: :string, sql_column: 'organizations.title', visible: true do |er|
-          link_to(er.organization, effective_memberships.edit_admin_organization_path(er.organization))
+          link_to(er.organization, effective_memberships.edit_admin_organization_path(er.organization)) if er.organization.present?
         end.search do |collection, term|
           organizations = Effective::Resource.new(EffectiveMemberships.Organization).search_any(term, columns: [:title])
           collection.where(organization_id: organizations, organization_type: EffectiveMemberships.Organization.name)
