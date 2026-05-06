@@ -22,11 +22,13 @@ module Admin
 
       col :event
 
-      col :owner, as: :string, sql_column: 'users.last_name' do |er|
-        er.owner.to_s
+      col :owner, as: :string, sql_column: 'owners.last_name' do |er|
+        link_to(er.owner, "/admin/users/#{er.owner_id}/edit")
       end.search do |collection, term|
-        collection.where("users.first_name ILIKE :term OR users.last_name ILIKE :term", term: "%#{term}%")
+        users = Effective::Resource.new(current_user).search_any(term, columns: [:first_name, :last_name, :email])
+        collection.where(owner_id: users, owner_type: current_user.class.name)
       end
+
       col :event_registration, visible: false
 
       if defined?(EffectiveMemberships) && EffectiveMemberships.Organization.respond_to?(:sponsors)
@@ -69,24 +71,27 @@ module Admin
           'Pending Name'
         end
       end.search do |collection, term|
-        collection.where("event_registrants.first_name ILIKE :term OR event_registrants.last_name ILIKE :term", term: "%#{term}%")
+        event_registrants = Effective::Resource.new(Effective::EventRegistrant).search_any(term, columns: [:first_name, :last_name, :email])
+        collection.where(id: event_registrants)
       end
       
       col :user, visible: false
-      col :organization, as: :string, sql_column: "NULLIF(organizations.title, '')", visible: EffectiveEvents.organization_enabled? do |er|
-        er.organization.to_s
-      end.search do |collection, term|
-        collection.where("organizations.title ILIKE :term", term: "%#{term}%")
+
+      if defined?(EffectiveMemberships) && EffectiveEvents.organization_enabled?
+        col :organization, as: :string, sql_column: 'organizations.title', visible: true do |er|
+          link_to(er.organization, effective_memberships.edit_admin_organization_path(er.organization))
+        end.search do |collection, term|
+          organizations = Effective::Resource.new(EffectiveMemberships.Organization).search_any(term, columns: [:title])
+          collection.where(organization_id: organizations, organization_type: EffectiveMemberships.Organization.name)
+        end
+      else
+        col :company, visible: true
       end
-      col :company, visible: !EffectiveEvents.organization_enabled?
 
       col :orders, visible: false
 
       col(:price, as: :price) do |registrant|
-        [
-          (badge('ADMIN') if registrant.created_by_admin?),
-          price_to_currency(registrant.price)
-        ].compact.join(' ').html_safe
+        [(badge('ADMIN') if registrant.created_by_admin?), price_to_currency(registrant.price)].compact.join(' ').html_safe
       end
 
       col :created_by_admin, visible: false
@@ -114,9 +119,12 @@ module Admin
     end
 
     collection do
-      scope = Effective::EventRegistrant.deep.includes(user: :addresses).all
-        .joins("LEFT JOIN users ON users.id = event_registrants.owner_id")
-        .joins("LEFT JOIN organizations ON organizations.id = event_registrants.organization_id")
+      scope = Effective::EventRegistrant.deep.all
+        .joins("LEFT JOIN users AS owners ON owners.id = event_registrants.owner_id")
+
+      if defined?(EffectiveMemberships) && EffectiveEvents.organization_enabled?
+        scope = scope.joins("LEFT JOIN organizations AS organizations ON organizations.id = event_registrants.organization_id")
+      end
 
       if attributes[:event_id].present?
         scope = scope.where(event: event)

@@ -208,7 +208,7 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.integer :event_registration_id
       t.string :event_registration_type
 
-      t.string :event_ticket_id
+      t.integer :event_ticket_id
       t.integer :quantity
 
       t.datetime :updated_at
