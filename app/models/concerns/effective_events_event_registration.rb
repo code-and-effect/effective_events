@@ -74,9 +74,6 @@ module EffectiveEventsEventRegistration
     has_many :event_addons, -> { order(:event_product_id, :id) }, class_name: 'Effective::EventAddon', inverse_of: :event_registration, dependent: :destroy
     accepts_nested_attributes_for :event_addons, reject_if: -> (atts) { atts[:event_product_id].blank? }, allow_destroy: true
 
-    has_many :orders, -> { order(:id) }, as: :parent, class_name: 'Effective::Order', dependent: :nullify
-    accepts_nested_attributes_for :orders
-
     # Effective Namespace
     # For coupon fees
     if defined?(EffectiveMemberships)
