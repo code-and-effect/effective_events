@@ -115,9 +115,12 @@ module EffectiveEventsEventRegistration
     }
 
     scope :sorted, -> { order(:id) }
-    
+
     scope :in_progress, -> { where(status: [:draft, :submitted]) }
     scope :done, -> { where(status: :completed) }
+
+    # Records safe to purge via the purge_resources task: draft, unpaid, for an event that has already ended.
+    scope :purgable, -> { draft.not_purchased.where(event_id: Effective::Event.past) }
 
     scope :delayed, -> { where(event_id: Effective::Event.delayed) }
     scope :not_delayed, -> { where.not(event_id: Effective::Event.delayed) }
@@ -212,7 +215,7 @@ module EffectiveEventsEventRegistration
 
       # If submitted with a cheque/phone deferred (but not delayed) processor then lock down the steps.
       if submitted? && !delayed_payment_date_upcoming?
-        return (step == :submitted) 
+        return (step == :submitted)
       end
 
       # Add ability to edit registrations up until payment date
@@ -269,7 +272,7 @@ module EffectiveEventsEventRegistration
     # When the submit_order is deferred or purchased, we call submit!
     # When the order is a deferred payment processor, we continue to the :submitted step
     # When the order is a regular processor, the before_save will call complete! and we continue to the :complete step
-    # Purchasing the order later on will automatically call 
+    # Purchasing the order later on will automatically call
     def submit_wizard_on_deferred_order?
       true
     end
