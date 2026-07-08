@@ -15,9 +15,10 @@
     %p
       Please
       = link_to("Continue registration", effective_events.event_event_registration_build_path(registration.event, registration, registration.next_step), 'data-turbolinks' => false, class: 'btn btn-primary')
-      or you can
-      = link_to('Abandon registration', effective_events.event_event_registration_path(registration.event, registration), 'data-confirm': "Really delete registration for #{registration.event}?", 'data-method': :delete, class: 'btn btn-danger')
-      to register for another event.
+      - if EffectiveResources.authorized?(self, :destroy, registration)
+        or you can
+        = link_to('Abandon registration', effective_events.event_event_registration_path(registration.event, registration), 'data-confirm': "Really delete registration for #{registration.event}?", 'data-method': :delete, class: 'btn btn-danger')
+        to register for another event.
 
   - if registration.submitted?
     %p 
@@ -31,9 +32,10 @@
   - if registration.submitted? && registration.event.delayed_payment_date_upcoming? && registration.can_visit_step?(:tickets)
     %p 
       You can #{link_to('change your registration', effective_events.event_event_registration_build_path(registration.event, registration, :tickets))} until the payment date
-      or
-      = link_to('abandon registration', effective_events.event_event_registration_path(registration.event, registration), 'data-confirm': "Really delete registration for #{registration.event}?", 'data-method': :delete)
-      to cancel and register for another event.
+      - if EffectiveResources.authorized?(self, :destroy, registration)
+        or
+        = link_to('abandon registration', effective_events.event_event_registration_path(registration.event, registration), 'data-confirm': "Really delete registration for #{registration.event}?", 'data-method': :delete)
+        to cancel and register for another event.
 
   %hr
 
