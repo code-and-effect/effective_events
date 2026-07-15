@@ -555,7 +555,7 @@ module Effective
     private
 
     def build_user
-      raise('is already purchased') if purchased?
+      raise('is already purchased') if purchased? && !blank_registrant_was
       raise('expected no user') unless user.blank?
       raise('expected a first_name') unless first_name.present?
       raise('expected a last_name') unless last_name.present?
@@ -592,7 +592,7 @@ module Effective
 
     # The organization might already be set here
     def build_organization_and_representative
-      raise('is already purchased') if purchased?
+      raise('is already purchased') if purchased? && !blank_registrant_was
 
       return if organization_type.blank?
 
