@@ -132,6 +132,16 @@ module Effective
       errors.add(:user_id, "registrant must be a member") unless event_ticket.guest_of_member? || member?
     end
 
+    # Validate this user isn't already registered for this event ticket on another registration
+    # Or for this event on any ticket, when one ticket per event is enabled
+    validate(if: -> { user.present? && event_ticket.present? && registrant_validations_enabled? }, unless: -> { purchased? }) do
+      duplicate_of = (validate_one_ticket_per_event? ? { event: event } : { event_ticket: event_ticket })
+
+      if Effective::EventRegistrant.unarchived.registered.where(user: user).where(duplicate_of).where.not(id: id).present?
+        errors.add(:user_id, "Unable to register #{user} for #{duplicate_of.values.first}. They've already been registered")
+      end
+    end
+
     validates :price, numericality: { greater_than_or_equal_to: 0 }
     validates :email, email: true
 
@@ -280,6 +290,12 @@ module Effective
       !member? && !guest_of_member?
     end
 
+    # The event registration can override this to add event specific validation
+    def validate_one_ticket_per_event?
+      return event_registration.validate_one_ticket_per_event? if event_registration.present?
+      EffectiveEvents.validate_one_ticket_per_event?
+    end
+
     # We create registrants on the tickets step. But don't enforce validations until the details step.
     def registrant_validations_enabled?
       return false if blank_registrant? # They want to come back later
@@ -372,7 +388,7 @@ module Effective
     end
 
     def promote_purchased_event_registration!
-      # Remove myself from any existing orders. 
+      # Remove myself from any existing orders.
       # I must be $0 so we don't need to update any prices.
       orders.each do |order|
         order.order_items.find { |oi| oi.purchasable == self }.destroy!
@@ -411,7 +427,7 @@ module Effective
     end
 
     def promote_purchased_order!
-      # Remove myself from any existing orders. 
+      # Remove myself from any existing orders.
       # I must be $0 so we don't need to update any prices.
       orders.each do |order|
         order.order_items.find { |oi| oi.purchasable == self }.destroy!
@@ -421,7 +437,7 @@ module Effective
       update!(promoted: true, purchased_order: nil)
 
       # Check if the ticket owner has an unpurchased order for the event or create a new one
-      order = owner.orders.reject { |order| order.purchased? }.find do |order| 
+      order = owner.orders.reject { |order| order.purchased? }.find do |order|
         order.purchasables.any? { |purchasable| purchasable.class.name == "Effective::EventRegistrant" && purchasable.try(:event) == event }
       end
       order ||= Effective::Order.new(user: owner)
@@ -441,7 +457,7 @@ module Effective
     def promote_not_purchased!
       update!(promoted: true)
 
-      orders.reject(&:purchased?).each do |order| 
+      orders.reject(&:purchased?).each do |order|
         order.update_purchasable_attributes!
 
         if order.pending?
@@ -578,9 +594,9 @@ module Effective
       elsif EffectiveEvents.create_users
         # Otherwise create a new user
         new_user = user_klass.create(
-          first_name: first_name.strip, 
-          last_name: last_name.strip, 
-          email: email.strip.downcase, 
+          first_name: first_name.strip,
+          last_name: last_name.strip,
+          email: email.strip.downcase,
           password: SecureRandom.base64(12) + '!@#123abcABC-'
         )
 
