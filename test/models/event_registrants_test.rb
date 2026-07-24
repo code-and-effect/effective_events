@@ -122,4 +122,30 @@ class EventRegistrantsTest < ActiveSupport::TestCase
     assert_not blank_registrant.blank_registrant?
     assert_equal existing_user, blank_registrant.user
   end
+
+  test 'an admin created registrant validates duplicates' do
+    user = build_user_with_address()
+
+    # The user is registered for every ticket on this event
+    event_registration = build_event_registration()
+    event = event_registration.event
+    event_registration.event_registrants.each { |er| er.assign_attributes(user: user) }
+    event_registration.ready!
+    event_registration.submit_order.purchase!
+
+    # An admin registers them again from the admin new event registrant form
+    event_registrant = Effective::EventRegistrant.new(
+      event: event,
+      owner: user,
+      user: user,
+      event_ticket: event.event_tickets.last,
+      registered_at: Time.zone.now,
+      created_by_admin: true
+    )
+
+    assert event_registrant.validate_one_ticket_per_event?
+    refute event_registrant.valid?
+
+    assert_equal ["Unable to register #{user} for #{event}. They've already been registered"], event_registrant.errors[:user_id]
+  end
 end

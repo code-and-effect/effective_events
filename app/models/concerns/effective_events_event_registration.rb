@@ -160,26 +160,14 @@ module EffectiveEventsEventRegistration
     end
 
     # Validate the same registrant user isn't registered for this ticket on another registration
+    # Or for this event (any ticket) on another registration, when one ticket per event is enabled
+    # The event registrant adds its own error. We add the base error so it's visible at the top of the form.
     validate(if: -> { current_step == :details }) do
       present_event_registrants.select { |er| er.user.present? }.each do |er|
-        existing = Effective::EventRegistrant.unarchived.registered.where(event_ticket: er.event_ticket, user: er.user).where.not(id: er)
+        duplicate_of = (validate_one_ticket_per_event? ? { event: er.event } : { event_ticket: er.event_ticket })
+        existing = Effective::EventRegistrant.unarchived.registered.where(user: er.user).where(duplicate_of).where.not(id: er)
 
-        if existing.present?
-          errors.add(:base, "Unable to register #{er.user} for #{er.event_ticket}. They've already been registered")
-          er.errors.add(:user_id, "Unable to register #{er.user} for #{er.event_ticket}. They've already been registered")
-        end
-      end
-    end
-
-    # Validate the same registrant user isn't registered for this event (any ticket) on another registration
-    validate(if: -> { current_step == :details && validate_one_ticket_per_event? }) do
-      present_event_registrants.select { |er| er.user.present? }.each do |er|
-        existing = Effective::EventRegistrant.unarchived.registered.where(event: er.event, user: er.user).where.not(id: er)
-
-        if existing.present?
-          errors.add(:base, "Unable to register #{er.user} for #{er.event}. They've already been registered")
-          er.errors.add(:user_id, "Unable to register #{er.user} for #{er.event}. They've already been registered")
-        end
+        errors.add(:base, "Unable to register #{er.user} for #{duplicate_of.values.first}. They've already been registered") if existing.present?
       end
     end
 
