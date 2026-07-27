@@ -574,10 +574,13 @@ module EffectiveEventsEventRegistration
     assign_attributes(current_step: :details) if current_step.blank? # Enables validations
     save!
 
-    update_submit_fees_and_order! if submit_order.present? && !submit_order.purchased?
-
-    after_commit do
-      send_order_emails!
+    # Never touch a declined submit order. Rebuilding it would build a brand new pending
+    # order, which hides the declined one and breaks the submitted step. And there's no
+    # order email to send, the buyer was already told their payment was declined.
+    # The fees and order are rebuilt by ready! when they return to the checkout step.
+    unless submit_order&.declined?
+      update_submit_fees_and_order! if submit_order.present? && !submit_order.purchased?
+      after_commit { send_order_emails! }
     end
 
     true
