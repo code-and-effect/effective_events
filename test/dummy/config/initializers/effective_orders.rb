@@ -20,7 +20,6 @@ EffectiveOrders.setup do |config|
   # config.organization_class_name = 'Example::Organization'
 
   # Synchronize with Quickbooks
-  config.use_effective_qb_sync = false
   config.use_effective_qb_online = false
 
   # If set, the orders#new screen will render effective/orders/_order_note_fields to capture any Note info

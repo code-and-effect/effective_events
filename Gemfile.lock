@@ -13,10 +13,23 @@ GIT
       rails (>= 6.0.0)
       wicked
 
+GIT
+  remote: https://github.com/code-and-effect/effective_orders.git
+  revision: 362b36c407b5b9c1d8b8f0b66f41638e76bcd5b7
+  specs:
+    effective_orders (6.34.4)
+      coffee-rails
+      effective_addresses
+      effective_bootstrap
+      effective_datatables
+      effective_resources
+      rails (>= 4.0.0)
+      sassc
+
 PATH
   remote: .
   specs:
-    effective_events (3.3.12)
+    effective_events (3.3.13)
       effective_bootstrap
       effective_datatables (>= 4.0.0)
       effective_email_templates
@@ -179,14 +192,6 @@ GEM
       effective_resources
       liquid
       rails
-    effective_orders (6.32.3)
-      coffee-rails
-      effective_addresses
-      effective_bootstrap
-      effective_datatables
-      effective_resources
-      rails (>= 4.0.0)
-      sassc
     effective_products (0.3.17)
       effective_bootstrap
       effective_datatables (>= 4.0.0)
@@ -430,6 +435,7 @@ DEPENDENCIES
   effective_developer
   effective_events!
   effective_memberships!
+  effective_orders!
   effective_roles
   effective_test_bot
   haml-rails
