@@ -167,6 +167,29 @@ class EventRegistrantsTest < ActiveSupport::TestCase
     assert_equal submit_order, event_registration.submit_order
     assert event_registration.submit_order.declined?
     assert event_registration.submit_order.was_deferred?
+
+    # And the declined order still drives the checkout again flow.
+    # ready! is called by the ready_checkout before_action when they revisit the checkout step
+    assert event_registration.can_visit_step?(:checkout)
+    event_registration.ready!
+
+    # The registration is back to draft with a new order for the same fees
+    event_registration.reload
+    assert event_registration.draft?
+    assert_equal 2, event_registration.orders.length
+
+    order = event_registration.submit_order
+    assert order.pending?
+    assert_not_equal submit_order, order
+    assert_equal submit_order.total, order.total
+
+    # The completed registrant is on the new order
+    assert order.order_items.any? { |order_item| order_item.name.include?('Come Back') }
+
+    # And they can pay it. The registration is submitted again
+    order.defer!(provider: 'cheque', email: false)
+    assert event_registration.reload.submitted?
+    assert event_registration.submit_order.was_deferred?
   end
 
   test 'an admin created registrant validates duplicates' do
