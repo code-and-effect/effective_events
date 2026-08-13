@@ -32,7 +32,7 @@ module EffectiveEvents
   end
 
   def self.organization_enabled?
-    raise('missing the effective_memberships gem') if organization_enabled && !defined?(EffectiveMemberships)
+    raise('missing the effective_memberships gem') if organization_enabled == true && !defined?(EffectiveMemberships)
     organization_enabled == true
   end
 
@@ -58,7 +58,7 @@ module EffectiveEvents
 
   # If we can create delayed payment events at all
   def self.delayed?
-    return false if disable_delayed
+    return false if disable_delayed == true
     !!EffectiveOrders.try(:delayed?) 
   end
 
