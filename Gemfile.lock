@@ -29,7 +29,7 @@ GIT
 PATH
   remote: .
   specs:
-    effective_events (3.3.14)
+    effective_events (3.3.15)
       effective_bootstrap
       effective_datatables (>= 4.0.0)
       effective_email_templates
@@ -200,8 +200,8 @@ GEM
       effective_roles
       rails (>= 6.0.0)
       wicked
-    effective_resources (2.35.1)
-      rails
+    effective_resources (2.40.0)
+      rails (>= 7.0.0)
       sprockets-rails
     effective_roles (2.8.1)
       effective_resources

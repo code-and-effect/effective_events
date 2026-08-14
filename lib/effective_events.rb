@@ -20,7 +20,7 @@ module EffectiveEvents
   include EffectiveGem
 
   def self.EventRegistration
-    event_registration_class_name&.constantize || Effective::EventRegistration
+    klass(:event_registration)
   end
 
   def self.mailer_class
