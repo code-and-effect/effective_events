@@ -85,7 +85,7 @@ module Effective
       self.owner ||= event_registration.owner
     end
 
-    with_options(unless: -> { purchased? && !blank_registrant_was }) do
+    with_options(unless: -> { purchased? && !blank_registrant_was && !user_changed? }) do
       before_validation(if: -> { blank_registrant? }) do
         assign_attributes(user: nil, organization: nil, first_name: nil, last_name: nil, email: nil, company: nil)
       end
@@ -101,6 +101,11 @@ module Effective
 
       before_validation(if: -> { user.present? }) do
         assign_attributes(first_name: user.first_name, last_name: user.last_name, email: (user.try(:public_email).presence || user.email))
+      end
+
+      before_validation(if: -> { user.present? && user_changed? && user.class.try(:effective_memberships_organization_user?) }) do
+        organization = user.organizations.first
+        assign_attributes(organization: organization, company: organization.to_s.presence)
       end
 
       before_validation(if: -> { organization.blank? && user.present? && user.class.try(:effective_memberships_organization_user?) }) do
@@ -134,7 +139,7 @@ module Effective
 
     # Validate this user isn't already registered for this event ticket on another registration
     # Or for this event on any ticket, when one ticket per event is enabled
-    validate(if: -> { user.present? && event_ticket.present? && registrant_validations_enabled? }, unless: -> { purchased? }) do
+    validate(if: -> { user.present? && event_ticket.present? && (registrant_validations_enabled? || (registered? && !archived? && user_changed?)) }) do
       duplicate_of = (validate_one_ticket_per_event? ? { event: event } : { event_ticket: event_ticket })
 
       if Effective::EventRegistrant.unarchived.registered.where(user: user).where(duplicate_of).where.not(id: id).present?
