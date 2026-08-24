@@ -217,4 +217,43 @@ class EventRegistrantsTest < ActiveSupport::TestCase
 
     assert_equal ["Unable to register #{user} for #{event}. They've already been registered"], event_registrant.errors[:user_id]
   end
+
+  test 'changing the user on a purchased registrant updates the attendee details' do
+    event_registration = build_event_registration()
+    event_registration.ready!
+    event_registration.submit_order.purchase!
+
+    organization = Organization.create!(title: 'New Organization', email: 'admin@new-organization.com')
+    user = build_user_with_address()
+    user.update!(first_name: 'New', last_name: 'Attendee')
+    user.build_representative(organization: organization).save!
+
+    event_registrant = event_registration.event_registrants.first
+    event_registrant.update!(user: user)
+
+    assert_equal 'New', event_registrant.first_name
+    assert_equal 'Attendee', event_registrant.last_name
+    assert_equal user.email, event_registrant.email
+    assert_equal organization, event_registrant.organization
+    assert_equal organization.to_s, event_registrant.company
+  end
+
+  test 'changing the user on a purchased registrant validates duplicates' do
+    user = build_user_with_address()
+    event_registration = build_event_registration()
+    event = event_registration.event
+    event_registration.event_registrants.first.update!(user: user)
+    event_registration.ready!
+    event_registration.submit_order.purchase!
+
+    duplicate_registration = build_event_registration(event: event)
+    duplicate_registration.ready!
+    duplicate_registration.submit_order.purchase!
+
+    event_registrant = duplicate_registration.event_registrants.first
+    refute event_registrant.update(user: user)
+
+    assert_equal ["Unable to register #{user} for #{event}. They've already been registered"], event_registrant.errors[:user_id]
+    refute_equal user, event_registrant.reload.user
+  end
 end
