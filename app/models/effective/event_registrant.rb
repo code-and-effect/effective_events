@@ -103,11 +103,6 @@ module Effective
         assign_attributes(first_name: user.first_name, last_name: user.last_name, email: (user.try(:public_email).presence || user.email))
       end
 
-      before_validation(if: -> { user.present? && user_changed? && user.class.try(:effective_memberships_organization_user?) }) do
-        organization = user.organizations.first
-        assign_attributes(organization: organization, company: organization.to_s.presence)
-      end
-
       before_validation(if: -> { organization.blank? && user.present? && user.class.try(:effective_memberships_organization_user?) }) do
         assign_attributes(company: user.organizations.first.to_s.presence) if company.blank?
       end
