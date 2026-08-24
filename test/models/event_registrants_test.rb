@@ -229,7 +229,7 @@ class EventRegistrantsTest < ActiveSupport::TestCase
     user.build_representative(organization: organization).save!
 
     event_registrant = event_registration.event_registrants.first
-    event_registrant.update!(user: user)
+    event_registrant.update!(user: user, organization: organization)
 
     assert_equal 'New', event_registrant.first_name
     assert_equal 'Attendee', event_registrant.last_name
