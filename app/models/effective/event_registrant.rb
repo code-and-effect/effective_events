@@ -85,7 +85,7 @@ module Effective
       self.owner ||= event_registration.owner
     end
 
-    with_options(unless: -> { purchased? && !blank_registrant_was && !user_changed? }) do
+    with_options(unless: -> { purchased? && !blank_registrant_was && !(user_id.present? && user_id_changed?) }) do
       before_validation(if: -> { blank_registrant? }) do
         assign_attributes(user: nil, organization: nil, first_name: nil, last_name: nil, email: nil, company: nil)
       end
