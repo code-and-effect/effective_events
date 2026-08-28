@@ -124,6 +124,24 @@ class EventRegistrantsTest < ActiveSupport::TestCase
     assert_equal existing_user, blank_registrant.user
   end
 
+  test 'updating a purchased registrant without a user does not build one' do
+    event_registration = build_event_registration()
+    event_registration.ready!
+    event_registration.submit_order.purchase!
+
+    event_registrant = event_registration.reload.event_registrants.first
+    assert event_registrant.purchased?
+    assert_nil event_registrant.user
+
+    # The admin form always submits the hidden polymorphic type, which makes
+    # user_changed? true even though no user was selected.
+    event_registrant.assign_attributes(user_type: 'User', response1: 'Updated response')
+
+    assert event_registrant.save_and_update_orders!
+    assert_equal 'Updated response', event_registrant.reload.response1
+    assert_nil event_registrant.user
+  end
+
   test 'completing a blank registrant does not replace a declined submit order' do
     event = build_event()
     event.update!(delayed_payment: true, delayed_payment_date: (event.registration_end_at + 1.day).to_date)
