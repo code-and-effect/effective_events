@@ -29,7 +29,7 @@ GIT
 PATH
   remote: .
   specs:
-    effective_events (3.4.2)
+    effective_events (3.5.1)
       effective_bootstrap
       effective_datatables (>= 4.0.0)
       effective_email_templates

@@ -29,7 +29,15 @@ module Effective
       @event_search = build_event_search
       @event_search.search!
 
-      @events = @event_search.results(page: params[:page])
+      @events_count = @event_search.events.count
+
+      page = EffectiveResources.validate_page!(
+        params[:page],
+        collection_count: @events_count,
+        per_page: @event_search.per_page
+      )
+
+      @events = @event_search.results(page: page)
     end
 
     def show

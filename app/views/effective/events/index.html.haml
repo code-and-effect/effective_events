@@ -7,12 +7,11 @@
     .col.order-1.order-lg-2
       %h1.effective-title.mb-4= @page_title
 
-      - results = @event_search.results(page: params[:page])
-      - if (@event_search.present? && results.length == 0) || @events.blank?
+      - if (@event_search.present? && @events.length == 0) || @events.blank?
         .alert.alert-warning.mb-3
           There are no active #{events_label.downcase} for this category.
       - else
-        = render(results) # This renders effective/events/event
+        = render(@events) # This renders effective/events/event
 
       %nav.d-flex.justify-content-center.mb-4
-        = bootstrap_paginate(results, per_page: @event_search.per_page)
+        = bootstrap_paginate(@events, per_page: @event_search.per_page, collection_count: @events_count)
