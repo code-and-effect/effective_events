@@ -23,7 +23,7 @@ class EffectiveEventRegistrationsDatatable < Effective::Datatable
 
     actions_col(actions: []) do |er|
       if er.draft? || er.submitted?
-        dropdown_link_to('Continue', effective_events.event_event_registration_build_path(er.event, er, er.next_step), 'data-turbolinks' => false)
+        dropdown_link_to('Continue', effective_events.event_event_registration_build_path(er.event, er, er.next_step), 'data-turbolinks' => false, 'data-turbo' => false)
       elsif er.completed?
         if EffectiveResources.authorized?(self, :update_blank_registrants, er)
           dropdown_link_to('Continue', effective_events.event_event_registration_path(er.event, er))
