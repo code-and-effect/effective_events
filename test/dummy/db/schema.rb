@@ -528,6 +528,7 @@ ActiveRecord::Schema[8.1].define(version: 101) do
     t.integer "event_registrants_count", default: 0
     t.boolean "external_registration", default: false
     t.string "external_registration_url"
+    t.boolean "hidden", default: false
     t.boolean "legacy_draft", default: false
     t.datetime "published_end_at", precision: nil
     t.datetime "published_start_at", precision: nil

@@ -59,6 +59,7 @@ module Effective
       published_start_at       :datetime
       published_end_at         :datetime
       legacy_draft             :boolean       # No longer used. To be removed.
+      hidden                   :boolean       # Hidden from Events#index and the sitemap.
 
       start_at               :datetime
       end_at                 :datetime
@@ -86,7 +87,8 @@ module Effective
 
     scope :sorted, -> { order(start_at: :desc) }
 
-    scope :for_sitemap, -> { published }
+    scope :not_hidden, -> { where(hidden: false) }
+    scope :for_sitemap, -> { published.not_hidden }
 
     scope :deep, -> { 
       base = includes(:event_registrants, :rich_texts, event_tickets: :event_registrants)
@@ -126,7 +128,7 @@ module Effective
       end
 
       unless unpublished
-        scope = scope.published
+        scope = scope.published.not_hidden
       end
 
       scope
