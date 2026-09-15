@@ -66,4 +66,21 @@ class EventsTest < ActiveSupport::TestCase
     refute Effective::Event.draft.include?(event)
   end
 
+  test 'hidden events remain published and registerable' do
+    event = create_event
+
+    refute event.hidden?
+    assert_includes Effective::Event.not_hidden, event
+    assert_includes Effective::Event.for_sitemap, event
+
+    event.update!(hidden: true)
+
+    assert event.hidden?
+    assert event.published?
+    assert event.registerable?
+    assert_includes Effective::Event.registerable, event
+    assert_not_includes Effective::Event.not_hidden, event
+    assert_not_includes Effective::Event.for_sitemap, event
+  end
+
 end

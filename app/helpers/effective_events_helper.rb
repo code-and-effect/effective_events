@@ -24,13 +24,17 @@ module EffectiveEventsHelper
   def admin_event_status_badge(event)
     return nil unless EffectiveResources.authorized?(self, :admin, :effective_events)
 
-    if event.try(:archived?)
+    status = if event.try(:archived?)
       content_tag(:span, 'ARCHIVED', class: 'badge badge-secondary')
     elsif event.draft?
       content_tag(:span, 'NOT PUBLISHED', class: 'badge badge-danger')
     elsif event.published? == false
       content_tag(:span, "TO BE PUBLISHED AT #{event.published_start_at&.strftime('%F %H:%M') || 'LATER'}", class: 'badge badge-danger')
     end
+
+    hidden = content_tag(:span, 'HIDDEN', class: 'badge badge-warning') if event.hidden?
+
+    safe_join([status, hidden].compact, ' ')
   end
 
   def effective_events_event_schedule(event)

@@ -9,6 +9,7 @@ class CreateEffectiveEvents < ActiveRecord::Migration[6.0]
       t.datetime :published_start_at
       t.datetime :published_end_at
       t.boolean :legacy_draft, default: false
+      t.boolean :hidden, default: false
 
       t.datetime :start_at
       t.datetime :end_at
