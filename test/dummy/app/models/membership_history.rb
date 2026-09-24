@@ -1,0 +1,3 @@
+class MembershipHistory < ApplicationRecord
+  effective_memberships_membership_history
+end
