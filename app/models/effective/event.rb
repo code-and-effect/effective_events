@@ -88,7 +88,7 @@ module Effective
     scope :sorted, -> { order(start_at: :desc) }
 
     scope :not_hidden, -> { where(hidden: false) }
-    scope :for_sitemap, -> { published.not_hidden }
+    scope :for_sitemap, -> { published.not_hidden.where(roles_mask: [nil, 0], authenticate_user: [false, nil]) }
 
     scope :deep, -> { 
       base = includes(:event_registrants, :rich_texts, event_tickets: :event_registrants)

@@ -83,4 +83,27 @@ class EventsTest < ActiveSupport::TestCase
     assert_not_includes Effective::Event.for_sitemap, event
   end
 
+  test 'sitemap excludes role restricted and sign in only events' do
+    event = create_event()
+
+    [nil, 0].each do |roles_mask|
+      [nil, false].each do |authenticate_user|
+        event.update!(roles_mask: roles_mask, authenticate_user: authenticate_user)
+        assert Effective::Event.for_sitemap.exists?(event.id)
+      end
+    end
+
+    event.update!(roles_mask: 1)
+    refute Effective::Event.for_sitemap.exists?(event.id)
+
+    event.update!(roles_mask: 0, authenticate_user: true)
+    refute Effective::Event.for_sitemap.exists?(event.id)
+
+    event.update!(authenticate_user: false, published_start_at: 1.day.from_now)
+    refute Effective::Event.for_sitemap.exists?(event.id)
+
+    event.update!(published_start_at: 2.days.ago, published_end_at: 1.day.ago)
+    refute Effective::Event.for_sitemap.exists?(event.id)
+  end
+
 end
